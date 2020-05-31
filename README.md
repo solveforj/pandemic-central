@@ -46,3 +46,7 @@ https://www.covidtracking.com/
 https://www.apple.com/covid19/mobility
 
 https://www.nrcs.usda.gov/wps/portal/nrcs/detail/?cid=nrcs143_013696
+
+## Data folder
+
+[Go here] (https://universityofdallas-my.sharepoint.com/:f:/g/personal/jgalasso_universityofdallas_onmicrosoft_com/EjuRZaRDJWxAkSpmBCPnJ88ByQXvr_YX0iQqn0vySH9HzA?e=BBGsbx)
