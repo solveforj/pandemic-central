@@ -22,9 +22,9 @@ In this project, we take advantage of these specific variables.
   - `n_grade_total`, `n_grade_distance`, `n_grade_visitation`, and `n_grade_encounters`
 
 ## Authors
-* **Joseph Galasso** - [solveforj](https://github.com/solveforj/)
-* **Duy Cao** - [caominhduy](https://github.com/caominhduy/)
-* **Kimberly Diwa**
+* [**Joseph Galasso**](https://github.com/solveforj/)
+* [**Duy Cao**](https://github.com/caominhduy/)
+* [**Kimberly Diwa**](https://github.com/kdiwa/)
 
 ## Credits
 *Here is a list of websites with good data*
