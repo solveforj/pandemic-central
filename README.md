@@ -2,15 +2,23 @@
 An AI that predicts the next location to be severely hit by COVID-19.
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/solveforj/pandemic-central/blob/master/LICENSE.txt)
 
 ## Database
 In this project, we take advantage of these specific variables.
 
-* From **Apple Mobility Trends Reports**:
+* From **Apple Maps Mobility Trends Reports**:
   - `geo_type`: country, region, sub-region, city, or county
   - `region` and `country`
   - `transportation`: _driving_ or _walking_
   - Date columns from `1/13/2020`
+
+
+* From **Novel Corona Virus 2019 Dataset** _(Kaggle)_
+  - `date`
+  - `fips`: FIPS codes for county/ state _(see reference in Unacast section)_
+  - `cases`
+  - `deaths`
 
 
 * From **Unacast**:
@@ -27,13 +35,25 @@ In this project, we take advantage of these specific variables.
 * [**Kimberly Diwa**](https://github.com/kdiwa/)
 
 ## Credits
+Here is a list of datasets we have used so far.
+
+* **Apple Maps Mobility Trends Reports**
+
+  [https://www.apple.com/covid19/mobility](https://www.apple.com/covid19/mobility)
+
+* **Unacast**
+
+  [https://www.unacast.com/covid19](https://www.unacast.com/covid19)
+
+* **Novel Corona Virus 2019 Dataset**
+
+  [https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset](https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset)
+
 *Here is a list of websites with good data*
 
 https://dataforgood.fb.com/docs/covid19/
 
 http://ghdx.healthdata.org/
-
-https://unacast.com/
 
 https://www.census.gov/
 
@@ -43,9 +63,8 @@ https://github.com/CSSEGISandData/COVID-19
 
 https://www.covidtracking.com/
 
-https://www.apple.com/covid19/mobility
-
 https://www.nrcs.usda.gov/wps/portal/nrcs/detail/?cid=nrcs143_013696
+
 
 ## Data folder
 
