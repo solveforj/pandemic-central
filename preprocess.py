@@ -20,6 +20,20 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         lastest_file = 'applemobilitytrends-' + max_[:4] + '-' + max_[4:6] + \
             '-' + max_[6:] + '.csv'
         lastest_dir = dir + src + '/' + lastest_file
+
+    if src == 'kaggle':
+        files = os.listdir(dir + src + '/county')
+        new_files = []
+        for file in files:
+            new_file = file.replace('county-', '')
+            new_file = new_file.replace('.csv', '')
+            new_file = new_file.replace('-', '')
+            new_files.append(new_file)
+        max_ = max(new_files)
+        lastest_file = 'county-' + max_[:4] + '-' + max_[4:6] + \
+            '-' + max_[6:] + '.csv'
+        lastest_dir = dir + src + '/county/' + lastest_file
+
     return lastest_dir
 
 def check_lastest_file(dir): # verify the lastest file with system time
@@ -27,6 +41,13 @@ def check_lastest_file(dir): # verify the lastest file with system time
     if src == 'apple':
         t = date.today().isoformat()
         if t == dir.split('applemobilitytrends-')[1].replace('.csv', ''):
+            return True
+        else:
+            return False
+
+    if src == 'kaggle':
+        t = date.today().isoformat()
+        if t == dir.split('county-')[1].replace('.csv', ''):
             return True
         else:
             return False
@@ -40,6 +61,6 @@ def get_file_on_date(src, date, dir='raw_data/'): # get the directory of the fil
     return new_dir
 
 if __name__ == '__main__':
-    test = get_latest_file('apple')
+    test = get_latest_file('kaggle')
     print(test)
     print(check_lastest_file(test))
