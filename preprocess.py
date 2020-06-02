@@ -1,5 +1,6 @@
 """
-This module preprocesses raw datasets into usable Pandas df.
+This module preprocesses raw datasets into usable Pandas df before merging into
+final dataset.
 Notice that at early developing stage, we are only focusing on US counties.
 """
 
@@ -8,6 +9,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, date
 from jhu_rename import rename_em
+import csv
 
 def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest file
     if src == 'apple':
@@ -82,8 +84,27 @@ def get_file_on_date(src, date, dir='raw_data/'): # get the directory of the fil
         path = dir + src + '/county_renamed/' + date + '.csv'
     return path
 
+
+def apple_mobility_to_pd(): # read Apple Mobility Report as Pandas dataframe
+    path = get_latest_file('apple')
+    with open(path) as data:
+        reader = csv.reader(data)
+        cols = next(reader)
+    _ = cols.pop(3) # filter out 'alternative_name'
+    _ = cols.pop(4) # filter out 'country'
+    #cols = cols.pop(5)
+    df_load = pd.read_csv(
+        path,
+        header=0,
+        usecols=cols # final move for filtering
+    )
+    # Keep only rows that belong to some 'county'
+    df_apple = df_load.loc[df_load['geo_type'] == 'county']
+    return df_apple
+
 if __name__ == '__main__':
     rename_em()
-    test = get_latest_file('jhu')
+    test = get_latest_file('apple')
     print(test)
     print(check_lastest_file(test))
+    print(apple_mobility_to_pd())
