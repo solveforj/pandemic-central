@@ -45,9 +45,8 @@ Here is a list of datasets we have used so far.
 
   [https://www.unacast.com/covid19](https://www.unacast.com/covid19)
 
-* **Novel Corona Virus 2019 Dataset**
-
-  [https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset](https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset)
+* **Johns Hopkins CSSEGISandData**
+  [https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports)
 
 *Here is a list of websites with good data*
 
@@ -64,6 +63,8 @@ https://github.com/CSSEGISandData/COVID-19
 https://www.covidtracking.com/
 
 https://www.nrcs.usda.gov/wps/portal/nrcs/detail/?cid=nrcs143_013696
+
+https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset
 
 
 ## Data folder
