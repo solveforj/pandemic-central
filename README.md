@@ -35,7 +35,7 @@ In this project, we take advantage of these specific variables.
 * [**Kimberly Diwa**](https://github.com/kdiwa/)
 
 ## Credits
-Here is a list of datasets we have used so far.
+Here is a list of datasets we have used so far. We thank you for your great efforts and supports.
 
 * **Apple Maps Mobility Trends Reports**
 
@@ -48,7 +48,7 @@ Here is a list of datasets we have used so far.
 * **Johns Hopkins CSSEGISandData**
   [https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports)
 
-*Here is a list of websites with good data*
+Here is a list of websites with good data
 
 https://dataforgood.fb.com/docs/covid19/
 
