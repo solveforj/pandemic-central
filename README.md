@@ -35,7 +35,7 @@ In this project, we take advantage of these specific variables.
 * [**Kimberly Diwa**](https://github.com/kdiwa/)
 
 ## Credits
-Here is a list of datasets we have used so far.
+Here is a list of datasets we have used so far. We thank you for your great efforts and supports.
 
 * **Apple Maps Mobility Trends Reports**
 
@@ -48,8 +48,10 @@ Here is a list of datasets we have used so far.
 * **Novel Corona Virus 2019 Dataset**
 
   [https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset](https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset)
+  
+---
 
-*Here is a list of websites with good data*
+Here is a list of websites with good data
 
 https://dataforgood.fb.com/docs/covid19/
 
