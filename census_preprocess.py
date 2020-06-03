@@ -1,5 +1,6 @@
 """
-Run this module (in Python 2) to keep only the census data of 2018
+Run this module (in Python 2) to filter out the census data for 2010-2017 and
+save as a new dataset.
 """
 
 import pandas as pd
