@@ -65,9 +65,6 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 * **US Census Population Data**
 
   [https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html)
-  * (Bottom-most file)
-
-  * Joseph will publish code for this
 
 
 * **CV 19 Lab Testing Dashboard**
@@ -111,8 +108,3 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 * Kaggle COVID-19 Database
 
   https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset
-
-
-## Data folder
-
-[Click here for U.S. Census Data](https://drive.google.com/uc?export=download&id=15SqpwGut7vmiyViGrglEJE6I4B4kh9M4)
