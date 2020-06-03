@@ -87,4 +87,4 @@ https://rt.live/
 
 ## Data folder
 
-[Click here for Microsoft OneDrive Folder](https://universityofdallas-my.sharepoint.com/:f:/g/personal/jgalasso_universityofdallas_onmicrosoft_com/EjuRZaRDJWxAkSpmBCPnJ88Bu0UhsF-4M7M397EAGRN2hQ?e=awJtRN)
+[Click here for U.S. Census Data](https://drive.google.com/uc?export=download&id=15SqpwGut7vmiyViGrglEJE6I4B4kh9M4)
