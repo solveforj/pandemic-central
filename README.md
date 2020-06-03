@@ -42,6 +42,7 @@ Here is a list of datasets we have used so far. We thank you for your great effo
   [https://www.apple.com/covid19/mobility](https://www.apple.com/covid19/mobility)
 
 * **Google Community Mobility Reports**
+
   [https://www.google.com/covid19/mobility/](https://www.google.com/covid19/mobility/)
 
 * **Unacast**
