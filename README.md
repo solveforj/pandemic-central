@@ -111,8 +111,3 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 * Kaggle COVID-19 Database
 
   https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset
-
-
-## Data folder
-
-[Click here for U.S. Census Data](https://drive.google.com/uc?export=download&id=15SqpwGut7vmiyViGrglEJE6I4B4kh9M4)
