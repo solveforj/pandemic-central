@@ -64,24 +64,29 @@ Here is a list of datasets we have used so far. We thank you for your great effo
   [https://www.aei.org/covid-2019-action-tracker/](https://www.aei.org/covid-2019-action-tracker/)
   * Joseph will work on web scraper for this
 
-
-Here is a list of websites with good data
-
-https://dataforgood.fb.com/docs/covid19/
-
 http://ghdx.healthdata.org/
-
-https://www.census.gov/
 
 https://rt.live/
 
-https://github.com/CSSEGISandData/COVID-19
+**Websites with interesting data:**
 
-https://www.covidtracking.com/
+* Facebook Data for Good
 
-https://www.nrcs.usda.gov/wps/portal/nrcs/detail/?cid=nrcs143_013696
+  https://dataforgood.fb.com/docs/covid19/
 
-https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset
+  https://visualization.covid19mobility.org/
+
+* COVID Tracking Project
+
+  https://www.covidtracking.com/
+
+* US FIPS Codes
+
+  https://www.nrcs.usda.gov/wps/portal/nrcs/detail/?cid=nrcs143_013696
+
+* Kaggle COVID-19 Database
+
+  https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset
 
 
 ## Data folder
