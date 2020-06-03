@@ -63,7 +63,7 @@ Here is a list of datasets we have used so far. We thank you for your great effo
   [https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html)
   * (Bottom-most file)
 
-  * Duy will work on this
+  * Joseph will publish code for this
 
 
 * **CV 19 Lab Testing Dashboard**
