@@ -41,6 +41,9 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 
   [https://www.apple.com/covid19/mobility](https://www.apple.com/covid19/mobility)
 
+* **Google Community Mobility Reports**
+  [https://www.google.com/covid19/mobility/](https://www.google.com/covid19/mobility/)
+
 * **Unacast**
 
   [https://www.unacast.com/covid19](https://www.unacast.com/covid19)
@@ -48,6 +51,17 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 * **Johns Hopkins CSSEGISandData**
 
   [https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports)
+
+* **US Census Population Data**
+
+  [https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html)
+  (Bottom-most file)
+
+* **CV 19 Lab Testing Dashboard**
+
+  [https://www.aei.org/covid-2019-action-tracker/](https://www.aei.org/covid-2019-action-tracker/)
+  * Joseph will work on web scraper for this
+
 
 Here is a list of websites with good data
 
