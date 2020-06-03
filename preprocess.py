@@ -49,6 +49,17 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
             '-' + max_[6:] + '.csv'
         path = dir + src + '/county/' + lastest_file
 
+    if src == 'google':
+        files = os.listdir(dir + src)
+        new_files = []
+        for file in files:
+            new_file = file.replace('-', '')
+            new_file = new_file.replace('.csv', '')
+            new_files.append(new_file)
+        max_ = max(new_files)
+        lastest_file = max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + '.csv'
+        path = dir + src + '/' + lastest_file
+
     return path
 
 def check_lastest_file(dir): # verify the lastest file with system time
@@ -92,7 +103,6 @@ def apple_mobility_to_pd(): # read Apple Mobility Report as Pandas dataframe
         cols = next(reader)
     _ = cols.pop(3) # filter out 'alternative_name'
     _ = cols.pop(4) # filter out 'country'
-    #cols = cols.pop(5)
     df_load = pd.read_csv(
         path,
         header=0,
@@ -102,9 +112,24 @@ def apple_mobility_to_pd(): # read Apple Mobility Report as Pandas dataframe
     df_apple = df_load.loc[df_load['geo_type'] == 'county']
     return df_apple
 
+def google_mobility_to_pd():
+    path = get_latest_file('google')
+    with open(path) as data:
+        reader = csv.reader(data)
+        cols = next(reader)
+    _ = cols.pop(1) # filter out 'country_region'
+    df_load = pd.read_csv(
+        path,
+        header=0,
+        usecols=cols
+    )
+    # Keep only rows that are in the US
+    df_google = df_load.loc[df_load['country_region_code'] == 'US']
+    return df_google
+
 if __name__ == '__main__':
     rename_em()
     test = get_latest_file('apple')
     print(test)
     print(check_lastest_file(test))
-    print(apple_mobility_to_pd())
+    print(google_mobility_to_pd())
