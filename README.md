@@ -55,7 +55,7 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 * **US Census Population Data**
 
   [https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html)
-  (Bottom-most file)
+  * (Bottom-most file)
 
 * **CV 19 Lab Testing Dashboard**
 
