@@ -42,21 +42,25 @@ Here is a list of datasets we have used so far. We thank you for your great effo
   [https://www.apple.com/covid19/mobility](https://www.apple.com/covid19/mobility)
   * Duy will work on this
 
+
 * **Google Community Mobility Reports**
 
   [https://www.google.com/covid19/mobility/](https://www.google.com/covid19/mobility/)
   * Duy will work on this
+
 
 * **Unacast**
 
   [https://www.unacast.com/covid19](https://www.unacast.com/covid19)
   * Joseph will work on this
 
+
 * **Johns Hopkins CSSEGISandData**
 
   [https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports)
 
   * Duy will work on this
+
 
 * **US Census Population Data**
 
@@ -71,16 +75,19 @@ Here is a list of datasets we have used so far. We thank you for your great effo
   [https://www.aei.org/covid-2019-action-tracker/](https://www.aei.org/covid-2019-action-tracker/)
   * Joseph will work on web scraper for this
 
+
 * **IHME Datasets**
 
   http://ghdx.healthdata.org/us-data
   * Joseph will work on this
+
 
 * **Rt.live Reproduction Rate**
 
   https://rt.live/
 
   * Joseph will work on web scraper for this
+
 
 **Websites with interesting data:**
 
@@ -90,13 +97,16 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 
   https://visualization.covid19mobility.org/
 
+
 * COVID Tracking Project
 
   https://www.covidtracking.com/
 
+
 * US FIPS Codes
 
   https://www.nrcs.usda.gov/wps/portal/nrcs/detail/?cid=nrcs143_013696
+
 
 * Kaggle COVID-19 Database
 
