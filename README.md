@@ -71,17 +71,21 @@ https://rt.live/
 **Websites with interesting data:**
 
 * Facebook Data for Good
+
   https://dataforgood.fb.com/docs/covid19/
 
   https://visualization.covid19mobility.org/
 
 * COVID Tracking Project
+
   https://www.covidtracking.com/
 
 * US FIPS Codes
+
   https://www.nrcs.usda.gov/wps/portal/nrcs/detail/?cid=nrcs143_013696
 
 * Kaggle COVID-19 Database
+
   https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset
 
 
