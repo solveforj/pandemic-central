@@ -64,9 +64,13 @@ Here is a list of datasets we have used so far. We thank you for your great effo
   [https://www.aei.org/covid-2019-action-tracker/](https://www.aei.org/covid-2019-action-tracker/)
   * Joseph will work on web scraper for this
 
-http://ghdx.healthdata.org/
+* **IHME Datasets**
 
-https://rt.live/
+  http://ghdx.healthdata.org/us-data
+
+* **Rt.live Reproduction Rate**
+
+  https://rt.live/
 
 **Websites with interesting data:**
 
