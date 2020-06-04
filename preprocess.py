@@ -125,7 +125,9 @@ def google_mobility_to_pd():
     )
     # Keep only rows that are in the US
     df_google = df_load.loc[df_load['country_region_code'] == 'US']
+    df_google.insert(len(df_google.columns), 'fips', allow_duplicates=False)
     return df_google
+
 
 if __name__ == '__main__':
     rename_em()
