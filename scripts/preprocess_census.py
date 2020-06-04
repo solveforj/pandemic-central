@@ -1,7 +1,7 @@
 import pandas as pd
 
 censusData = pd.read_csv("/Users/josephgalasso/Documents/cc-est2018-alldata.csv",  encoding = "ISO-8859-1", dtype={'STATE': str, 'COUNTY': str})
-censusData['FIPS'] = censusData["STATE"] + censusData["COUNTY"]
+censusData.insert(loc = 0, column = "FIPS", value = censusData["STATE"] + censusData["COUNTY"])
 
 year = 2018
 censusData = censusData[(censusData['YEAR'] == year - 2007)]
@@ -30,6 +30,7 @@ for fips in uniqueFIPS:
     print type(newRow)
     print len(newCensusData)
 
+newCensusData = newCensusData.drop(['AGEGRP'], axis=1)
 print newCensusData
 
 newCensusData.to_csv("/Users/josephgalasso/Documents/GitHub/pandemic-central/raw_data/census/census-" + str(year) + ".csv", sep=",", index=False)
