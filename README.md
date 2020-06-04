@@ -108,3 +108,7 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 * Kaggle COVID-19 Database
 
   https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset
+
+**Full Data Google Drive Link**
+
+https://drive.google.com/drive/folders/1gBTJ_Gq7qE0zkzLBxJpxq65ydMfODHBl?usp=sharing
