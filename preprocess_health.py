@@ -59,4 +59,32 @@ def respiratory_disease_mortality():
 
 
 
-# Smoking, Infectious Disease Mortality, Respiratory Disease Mortality,
+def process_fips():
+        fipsData = pd.read_csv("all-geocodes-v2017.csv", dtype={'State Code (FIPS)': str, 'County Code (FIPS)': str})
+
+        # Map 040 level fips code to state name in dictionary
+        stateData = fipsData[fipsData['Summary Level'] == 40]
+        stateMap = pd.Series(stateData['Area Name (including legal/statistical area description)'].values,index=stateData['State Code (FIPS)']).to_dict()
+
+        # Get all county fips codes
+        fipsData = fipsData[fipsData['County Code (FIPS)'] != "000"]
+        fipsData.insert(0, 'FIPS', fipsData['State Code (FIPS)'] + fipsData['County Code (FIPS)'])
+
+        def make_identifier(a, b):
+            state = stateMap[a[:2]]
+            county = b.split(" ")[0:-1]
+            if isinstance(county, list):
+                county = " ".join(county)
+            return state + " " + county
+
+        fipsData['Identifier'] = fipsData.apply(lambda row : make_identifier(row['FIPS'], row['Area Name (including legal/statistical area description)']), axis=1)
+        fipsMap = pd.Series(fipsData['FIPS'].values, index=fipsData['Identifier']).to_dict()
+
+        return fipsMap
+
+def smoking_prevalence():
+    smokingData = pd.read_csv("/Users/josephgalasso/Documents/IHME_US_COUNTY_TOTAL_AND_DAILY_SMOKING_PREVALENCE_1996_2012/IHME_US_COUNTY_TOTAL_AND_DAILY_SMOKING_PREVALENCE_1996_2012.csv")
+    smokingData = smokingData[(smokingData['sex'] == 'Both') & (smokingData['year'] == 2012) & (smokingData['county'].notnull())]
+
+    print smokingData
+process_fips()
