@@ -8,7 +8,7 @@ import os, sys
 import numpy as np
 import pandas as pd
 from datetime import datetime, date
-from jhu_rename import rename_em
+from scripts/jhu_rename import rename_em
 import csv
 
 def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest file
@@ -95,6 +95,8 @@ def get_file_on_date(src, date, dir='raw_data/'): # get the directory of the fil
         path = dir + src + '/county_renamed/' + date + '.csv'
     return path
 
+def create_fips_dict():
+    fips = {}
 
 def apple_mobility_to_pd(): # read Apple Mobility Report as Pandas dataframe
     path = get_latest_file('apple')
@@ -125,7 +127,7 @@ def google_mobility_to_pd():
     )
     # Keep only rows that are in the US
     df_google = df_load.loc[df_load['country_region_code'] == 'US']
-    df_google.insert(len(df_google.columns), 'fips', allow_duplicates=False)
+    #df_google.insert(len(df_google.columns), 'fips', 'NaN', allow_duplicates=False)
     return df_google
 
 
