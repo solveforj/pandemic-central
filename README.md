@@ -23,7 +23,7 @@ pandemic-central/
 ├── preprocess_census.py
 ├── preprocess_health.py
 ├── preprocess.py
-├── README.md
+└── README.md
 ```
 In which:
 - `raw_data/` contains the raw datasets (in csv or txt formats) that we have collected or generated locally.
@@ -42,6 +42,8 @@ In which:
 
 
 - `preprocess.py` preprocesses and merges Apple, Google Mobility Reports and Unacast datasets.
+
+- `README.md` is what you are reading.
 
 
 ## Database
