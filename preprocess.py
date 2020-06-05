@@ -95,6 +95,23 @@ def get_file_on_date(src, date, dir='raw_data/'): # get the directory of the fil
         path = dir + src + '/county_renamed/' + date + '.csv'
     return path
 
+def get_fips_dict():
+    src = get_latest_file('jhu')
+    dataset_path = get_latest_file('jhu')
+    # Read Johns Hopkins lastest dataset
+    df_jhu = pd.read_csv(
+        dataset_path,
+        header=0,
+        low_memory=False,
+        dtype={'FIPS': str}
+    )
+    df_jhu.insert(len(df_jhu.columns), 'id', df_jhu['Province_State'] + ' ' + \
+        df_jhu['Admin2'])
+    # Drop the rows that do not represent county properly
+    df_jhu = df_jhu.dropna(subset=['FIPS', 'id'])
+
+    dict = pd.Series(df_jhu['FIPS'].values, index=df_jhu['id']).to_dict()
+    return dict
 
 def apple_mobility_to_pd(): # read Apple Mobility Report as Pandas dataframe
     path = get_latest_file('apple')
@@ -121,11 +138,28 @@ def google_mobility_to_pd():
     df_load = pd.read_csv(
         path,
         header=0,
-        usecols=cols
+        usecols=cols,
+        low_memory=False
     )
     # Keep only rows that are in the US
     df_google = df_load.loc[df_load['country_region_code'] == 'US']
-    df_google.insert(len(df_google.columns), 'fips', allow_duplicates=False)
+    # Insert a new 'id' column (state name + county name)
+    df_google.insert(len(df_google.columns), 'id', \
+        df_google['sub_region_1'] + ' ' + df_google['sub_region_2'] + '-',\
+        allow_duplicates=False)
+    pd.options.mode.chained_assignment = None
+    df_google['id'] = df_google['id'].str.replace(' County-', '')
+    df_google['id'] = df_google['id'].str.replace(' Borough-', '')
+    df_google['id'] = df_google['id'].str.replace(' Parish-', '')
+    pd.options.mode.chained_assignment = 'warn'
+    
+    # Drop rows that do not represent county properly
+    df_google = df_google.dropna(subset=['sub_region_1', 'sub_region_2'])
+
+    # Get FIPS dictionary from John Hopkins dataset
+    fips_dict = get_fips_dict()
+    df_google['fips'] = df_google['id'].replace(fips_dict)
+
     return df_google
 
 
