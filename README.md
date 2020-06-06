@@ -52,7 +52,7 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 * **Unacast**
 
   [https://www.unacast.com/covid19](https://www.unacast.com/covid19)
-  * Joseph will work on this
+  * Duy will work on this
 
 
 * **Johns Hopkins CSSEGISandData**
@@ -65,25 +65,31 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 * **US Census Population Data**
 
   [https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html)
+  * Joseph - completed
 
 
-* **CV 19 Lab Testing Dashboard**
+* **COVID Tracking Project**
 
-  [https://www.aei.org/covid-2019-action-tracker/](https://www.aei.org/covid-2019-action-tracker/)
-  * Joseph will work on web scraper for this
+  https://www.aei.org/covid-2019-action-tracker/
+  * Joseph - testing density per state, cases (from previous week) density per county
 
 
 * **IHME Datasets**
 
   http://ghdx.healthdata.org/us-data
-  * Joseph will work on this
+  * Joseph - completed
 
 
 * **Rt.live Reproduction Rate**
 
   https://rt.live/
 
-  * Joseph will work on web scraper for this
+  * Joseph - completed
+
+* **CCVI Index**
+
+  https://docs.google.com/spreadsheets/d/1qEPuziEpxj-VG11IAZoa5RWEr4GhNoxMn7aBdU76O5k/edit#gid=549685106
+  * Joseph - get CCVI for each county
 
 
 **Websites with interesting data:**
