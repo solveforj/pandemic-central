@@ -61,6 +61,19 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         lastest_file = max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + '.csv'
         path = dir + src + '/' + lastest_file
 
+    if src == 'unacast':
+        files = os.listdir(dir + src + '/county')
+        new_files = []
+        for file in files:
+            new_file = file.replace('COVID-', '')
+            new_file = new_file.replace('-sds-v3-full-county.csv', '')
+            new_file = new_file.replace('-', '')
+            new_files.append(new_file)
+        max_ = max(new_files)
+        lastest_file = 'COVID-' + max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + \
+            '-sds-v3-full-county.csv'
+        path = dir + src + '/county/' + lastest_file
+
     return path
 
 def check_lastest_file(dir): # verify the lastest file with system time
@@ -120,7 +133,7 @@ def get_fips_dict(): # Read Johns Hopkins dataset and export FIPS dictionary for
     with open('raw_data/dicts/fips_codes.txt', 'w') as f:
         print(dict, file=f)
 
-def apple_mobility_to_pd(): # read Apple Mobility Report as Pandas dataframe
+def apple_mobility_to_pd(): # process Apple Mobility Report as Pandas dataframe
     path = get_latest_file('apple')
     with open(path) as data:
         reader = csv.reader(data)
@@ -149,12 +162,12 @@ def apple_mobility_to_pd(): # read Apple Mobility Report as Pandas dataframe
         fips_dict = ast.literal_eval(contents)
     df_apple['fips'] = df_apple['id'].replace(fips_dict)
     pd.options.mode.chained_assignment = 'warn' # return to default
-    # Drop the 'geo_type' column for no more use
-    df_apple = df_apple.drop(['geo_type'], 1)
+    # Drop the all the unnecessary columns
+    df_apple = df_apple.drop(['geo_type', 'region', 'sub-region', 'id'], 1)
 
     return df_apple
 
-def google_mobility_to_pd():
+def google_mobility_to_pd(): # process Google Mobility Report
     path = get_latest_file('google')
     with open(path) as data:
         reader = csv.reader(data)
@@ -178,15 +191,36 @@ def google_mobility_to_pd():
     df_google['id'] = df_google['id'].str.replace(' Parish-', '')
     # Drop rows that do not represent county properly
     df_google = df_google.dropna(subset=['sub_region_1', 'sub_region_2'])
+    # Remove unnecessary columns
+    df_google = df_google.drop(['sub_region_1', 'sub_region_2', \
+     'country_region_code'], 1)
     # Read FIPS dictionary
     with open('raw_data/dicts/fips_codes.txt', 'r') as f:
         contents = f.read()
         fips_dict = ast.literal_eval(contents)
     df_google['fips'] = df_google['id'].replace(fips_dict)
     pd.options.mode.chained_assignment = 'warn' # return to default
+    df_google = df_google.drop(['id'], 1) # drop ID column
 
     return df_google
 
+def unacast_to_pd(): # process Unacast data as Pandas dataframe
+    path = get_latest_file('unacast')
+    with open(path) as data:
+        reader = csv.reader(data)
+        cols = next(reader)
+    for i in range(3):
+        _ = cols.pop(0) # remove 'state_code', 'state_fips', and 'state_name'
+    _ = cols.pop(1) # remove 'county_name'
+    _ = cols.pop(2) # remove 'last_updated'
+    df_unacast = pd.read_csv(
+        path,
+        header=0,
+        usecols=cols,
+        low_memory=False
+    )
+
+    return df_unacast
 
 if __name__ == '__main__':
     rename_em()
@@ -194,3 +228,5 @@ if __name__ == '__main__':
     print(test)
     print(check_lastest_file(test))
     print(apple_mobility_to_pd())
+    print(google_mobility_to_pd())
+    print(unacast_to_pd())
