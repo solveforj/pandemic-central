@@ -4,6 +4,48 @@ An AI that predicts the next location to be severely hit by COVID-19.
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/solveforj/pandemic-central/blob/master/LICENSE.txt)
 
+## Project Structure
+```
+pandemic-central/
+│
+├── raw_data/
+│    ├── apple
+│    ├── census
+│    ├── dicts
+│    ├── google
+│    ├── health_data
+│    ├── jhu
+│    ├── kaggle
+│    └── unacast
+│
+├── jhu_rename.py
+├── LICENSE.txt
+├── preprocess_census.py
+├── preprocess_health.py
+├── preprocess.py
+└── README.md
+```
+In which:
+- `raw_data/` contains the raw datasets (in csv or txt formats) that we have collected or generated locally.
+
+
+- `jhu_rename.py` automates the process of renaming Johns Hopkins datasets into isoformat date.
+
+
+- `LICENSE.txt` is MIT license.
+
+
+- `preprocess_census.py` preprocesses the 2010-2018 Census data (to shrink the size for our need only)
+
+
+- `preprocess_health.py` preprocesses and merges datasets in `raw_data/health_data/`
+
+
+- `preprocess.py` preprocesses and merges Apple, Google Mobility Reports and Unacast datasets.
+
+- `README.md` is what you are reading.
+
+
 ## Database
 In this project, we take advantage of these specific variables.
 
@@ -40,13 +82,11 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 * **Apple Maps Mobility Trends Reports**
 
   [https://www.apple.com/covid19/mobility](https://www.apple.com/covid19/mobility)
-  * Duy will work on this
 
 
 * **Google Community Mobility Reports**
 
   [https://www.google.com/covid19/mobility/](https://www.google.com/covid19/mobility/)
-  * Duy will work on this
 
 
 * **Unacast**
