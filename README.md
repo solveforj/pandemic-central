@@ -104,7 +104,9 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 
 * **US Census Population Data**
 
-  [https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html)
+  https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html
+
+  https://www.ers.usda.gov/data-products/rural-urban-commuting-area-codes/
   * Joseph - completed
 
 
