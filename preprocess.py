@@ -14,7 +14,6 @@ import ast
 from preprocess_fips_dict import get_fips_dict
 
 
-
 def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest file
     if src == 'apple':
         files = os.listdir(dir + src)
@@ -130,8 +129,8 @@ def apple_mobility_to_pd(): # process Apple Mobility Report as Pandas dataframe
     # Keep only rows that represent 'driving'
     df_apple = df_apple.loc[df_apple['transportation_type'] == 'driving']
 
-    # Filter out 'Virgin Islands' and 'Puerto Rico'
-    # !! READ THE DISCLAIMER FOR REASON WHY
+    # Filter out Virgin Islands, Puerto Rico, and Guam since there is not enough
+    # relavant data for further analysis
     pd.options.mode.chained_assignment = None
     df_apple = df_apple.replace('Virgin Islands', np.NaN)
     df_apple = df_apple.replace('Puerto Rico', np.NaN)
@@ -162,8 +161,8 @@ def apple_mobility_to_pd(): # process Apple Mobility Report as Pandas dataframe
         'transportation_type'], 1)
 
     # Switch the date header columns into row of dates
-    df_apple = df_apple.melt(id_vars=['fips'], var_name = 'date', \
-        value_name = 'driving_change_rate').sort_values(['fips', 'date'])
+    df_apple = df_apple.melt(id_vars=['fips'], var_name='date', \
+        value_name='driving_change_rate').sort_values(['fips', 'date'])
     df_apple = df_apple.dropna(subset=['fips']).sort_values(['fips', 'date'])
     df_apple = df_apple.reset_index(drop=True)
 
@@ -187,7 +186,7 @@ def google_mobility_to_pd(): # process Google Mobility Report
     df_google.insert(len(df_google.columns), 'id', \
         df_google['sub_region_1'] + ' ' + df_google['sub_region_2'] + '-',\
         allow_duplicates=False)
-    pd.options.mode.chained_assignment = None
+    pd.options.mode.chained_assignment=None
     df_google['id'] = df_google['id'].str.replace(' County-', '')
     df_google['id'] = df_google['id'].str.replace(' Borough-', '')
     df_google['id'] = df_google['id'].str.replace(' Parish-', '')
@@ -201,7 +200,7 @@ def google_mobility_to_pd(): # process Google Mobility Report
         contents = f.read()
         fips_dict = ast.literal_eval(contents)
     df_google['fips'] = df_google['id'].replace(fips_dict)
-    pd.options.mode.chained_assignment = 'warn' # return to default
+    pd.options.mode.chained_assignment='warn' # return to default
     df_google = df_google.drop(['id'], 1) # drop ID column
 
     return df_google
@@ -227,9 +226,14 @@ def unacast_to_pd(): # process Unacast data as Pandas dataframe
         'grade_encounters', 'n_grade_encounters'], 1)
     return df_unacast
 
-def merger(): # merge all the mobility reports into one csv file
+def merger(dst='processed_data/mobility'): # merge all the mobility reports into one csv file
+    t = date.today().isoformat()
+    dst = dst + '-' + t + '.csv'
     df_google = google_mobility_to_pd()
     df_apple = apple_mobility_to_pd()
+    df_merged = pd.merge(df_google, df_apple, how='outer', on=['fips', 'date'])
+    df_merged.to_csv(dst, index=False) # export as csv file
+    return df_merged
 
 if __name__ == '__main__':
     rename_em()
@@ -237,6 +241,6 @@ if __name__ == '__main__':
     test = get_latest_file('apple')
     print(test)
     print(check_lastest_file(test))
-    print(apple_mobility_to_pd())
+    #print(apple_mobility_to_pd())
     #print(google_mobility_to_pd())
-#    print(unacast_to_pd())
+    print(merger())
