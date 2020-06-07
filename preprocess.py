@@ -11,6 +11,9 @@ from datetime import datetime, date
 from jhu_rename import rename_em
 import csv
 import ast
+from preprocess_fips_dict import get_fips_dict
+
+
 
 def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest file
     if src == 'apple':
@@ -109,30 +112,6 @@ def get_file_on_date(src, date, dir='raw_data/'): # get the directory of the fil
         path = dir + src + '/county_renamed/' + date + '.csv'
     return path
 
-def get_fips_dict(): # Read Johns Hopkins dataset and export FIPS dictionary for county
-    src = get_latest_file('jhu')
-    dataset_path = get_latest_file('jhu')
-    # Read Johns Hopkins lastest dataset
-    df_jhu = pd.read_csv(
-        dataset_path,
-        header=0,
-        low_memory=False,
-        dtype={'FIPS': str}
-    )
-    df_jhu.insert(len(df_jhu.columns), 'id', df_jhu['Province_State'] + ' ' + \
-        df_jhu['Admin2'])
-    # Drop the rows that do not represent county properly
-    df_jhu = df_jhu.dropna(subset=['FIPS', 'id'])
-
-    dict = pd.Series(df_jhu['FIPS'].values, index=df_jhu['id']).to_dict()
-    # Export dictionary of FIPS codes as text file
-    if not os.path.exists('raw_data/dicts'):
-        os.mkdir('raw_data/dicts')
-    if os.path.exists('raw_data/dicts/fips_codes.txt'):
-        os.remove('raw_data/dicts/fips_codes.txt')
-    with open('raw_data/dicts/fips_codes.txt', 'w') as f:
-        print(dict, file=f)
-
 def apple_mobility_to_pd(): # process Apple Mobility Report as Pandas dataframe
     path = get_latest_file('apple')
     with open(path) as data:
@@ -145,25 +124,48 @@ def apple_mobility_to_pd(): # process Apple Mobility Report as Pandas dataframe
         header=0,
         usecols=cols # final move for filtering
     )
+
     # Keep only rows that belong to some 'county'
     df_apple = df_load.loc[df_load['geo_type'] == 'county']
+    # Keep only rows that represent 'driving'
+    df_apple = df_apple.loc[df_apple['transportation_type'] == 'driving']
+
+    # Filter out 'Virgin Islands' and 'Puerto Rico'
+    # !! READ THE DISCLAIMER FOR REASON WHY
+    pd.options.mode.chained_assignment = None
+    df_apple = df_apple.replace('Virgin Islands', np.NaN)
+    df_apple = df_apple.replace('Puerto Rico', np.NaN)
+    df_apple = df_apple.replace('Guam', np.NaN)
+    df_apple = df_apple.dropna(subset=['region'])
 
     # Insert a new 'id' column (state name + county name)
     df_apple.insert(0, 'id', \
         df_apple['sub-region'] + ' ' + df_apple['region'] + '-',\
         allow_duplicates=False)
-    pd.options.mode.chained_assignment = None
+    df_apple['id'] = df_apple['id'].str.replace(' City and Borough-', '')
     df_apple['id'] = df_apple['id'].str.replace(' County-', '')
     df_apple['id'] = df_apple['id'].str.replace(' Borough-', '')
     df_apple['id'] = df_apple['id'].str.replace(' Parish-', '')
+    df_apple['id'] = df_apple['id'].str.replace(' City-', '')
+    df_apple['id'] = df_apple['id'].str.replace(' Island-', '')
+    df_apple['id'] = df_apple['id'].str.replace(' Municipality-', '')
+
     # Read FIPS dictionary
     with open('raw_data/dicts/fips_codes.txt', 'r') as f:
         contents = f.read()
         fips_dict = ast.literal_eval(contents)
     df_apple['fips'] = df_apple['id'].replace(fips_dict)
     pd.options.mode.chained_assignment = 'warn' # return to default
+
     # Drop the all the unnecessary columns
-    df_apple = df_apple.drop(['geo_type', 'region', 'sub-region', 'id'], 1)
+    df_apple = df_apple.drop(['geo_type', 'region', 'sub-region', 'id',
+        'transportation_type'], 1)
+
+    # Switch the date header columns into row of dates
+    df_apple = df_apple.melt(id_vars=['fips'], var_name = 'date', \
+        value_name = 'driving_change_rate').sort_values(['fips', 'date'])
+    df_apple = df_apple.dropna(subset=['fips']).sort_values(['fips', 'date'])
+    df_apple = df_apple.reset_index(drop=True)
 
     return df_apple
 
@@ -219,14 +221,22 @@ def unacast_to_pd(): # process Unacast data as Pandas dataframe
         usecols=cols,
         low_memory=False
     )
-
+    # drop unnecessary columns
+    df_unacast = df_unacast.drop(['covid', 'grade_total', 'n_grade_total', \
+        'grade_distance', 'n_grade_distance', 'grade_visitation', 'n_grade_visitation',
+        'grade_encounters', 'n_grade_encounters'], 1)
     return df_unacast
+
+def merger(): # merge all the mobility reports into one csv file
+    df_google = google_mobility_to_pd()
+    df_apple = apple_mobility_to_pd()
 
 if __name__ == '__main__':
     rename_em()
+    get_fips_dict()
     test = get_latest_file('apple')
     print(test)
     print(check_lastest_file(test))
     print(apple_mobility_to_pd())
-    print(google_mobility_to_pd())
-    print(unacast_to_pd())
+    #print(google_mobility_to_pd())
+#    print(unacast_to_pd())
