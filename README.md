@@ -99,26 +99,27 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 
   [https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports)
 
-  * Duy will work on this
-
-
-* **US Census Population Data**
-
-  https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html
-
-  https://www.ers.usda.gov/data-products/rural-urban-commuting-area-codes/
-  * Joseph - completed
+  * Duy/Joseph - get case density from past 7 days
 
 
 * **COVID Tracking Project**
 
-  https://www.aei.org/covid-2019-action-tracker/
-  * Joseph - testing density per state, cases (from previous week) density per county
+  https://www.covidtracking.com/
+
+  * Joseph - get testing density from past 7 days
+
+
+* **MIT Projections**
+
+  https://github.com/youyanggu/covid19_projections/blob/master/projections/combined/latest_us.csv
+
+  * Joseph - get current r value and case density for next 7 days
 
 
 * **IHME Datasets**
 
   http://ghdx.healthdata.org/us-data
+
   * Joseph - completed
 
 
@@ -128,10 +129,21 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 
   * Joseph - completed
 
+
 * **CCVI Index**
 
   https://docs.google.com/spreadsheets/d/1qEPuziEpxj-VG11IAZoa5RWEr4GhNoxMn7aBdU76O5k/edit#gid=549685106
-  * Joseph - get CCVI for each county
+
+  * Joseph - completed
+
+
+* **US Census Population Data**
+
+  https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html
+
+  https://www.ers.usda.gov/data-products/rural-urban-commuting-area-codes/
+
+  * Joseph - completed
 
 
 **Websites with interesting data:**
