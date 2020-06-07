@@ -187,9 +187,13 @@ def google_mobility_to_pd(): # process Google Mobility Report
         df_google['sub_region_1'] + ' ' + df_google['sub_region_2'] + '-',\
         allow_duplicates=False)
     pd.options.mode.chained_assignment=None
+    df_google['id'] = df_google['id'].str.replace(' City and Borough-', '')
     df_google['id'] = df_google['id'].str.replace(' County-', '')
     df_google['id'] = df_google['id'].str.replace(' Borough-', '')
     df_google['id'] = df_google['id'].str.replace(' Parish-', '')
+    df_google['id'] = df_google['id'].str.replace(' City-', '')
+    df_google['id'] = df_google['id'].str.replace(' Island-', '')
+    df_google['id'] = df_google['id'].str.replace(' Municipality-', '')
     # Drop rows that do not represent county properly
     df_google = df_google.dropna(subset=['sub_region_1', 'sub_region_2'])
     # Remove unnecessary columns
@@ -232,6 +236,8 @@ def merger(dst='processed_data/mobility'): # merge all the mobility reports into
     df_google = google_mobility_to_pd()
     df_apple = apple_mobility_to_pd()
     df_merged = pd.merge(df_google, df_apple, how='outer', on=['fips', 'date'])
+    if os.path.exists(dst): # overwrite the old dataset (if any)
+        os.remove(dst)
     df_merged.to_csv(dst, index=False) # export as csv file
     return df_merged
 
