@@ -97,7 +97,7 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 
   [https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports)
 
-  * Duy/Joseph - get case density from past 7 days
+  * Duy/Joseph - completed
 
 
 * **COVID Tracking Project**
