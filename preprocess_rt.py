@@ -251,6 +251,7 @@ projections = projections[(projections['region'].notnull()) & (projections['date
 projections.insert(0, "state", projections['region'].apply(lambda x : stateMap[x]))
 projections = projections.drop(['datetime', 'region'], axis=1).reset_index(drop=True)
 
+
 merged_df = pd.merge(left=df, right=rt_data, how='left', on=['state', 'date'], copy=False)
 merged_df = merged_df[merged_df['region'].notnull()]
 merged_df = merged_df.rename({'mean':'rt_mean'},axis=1)

@@ -104,7 +104,7 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 
   https://www.covidtracking.com/
 
-  * Joseph - get testing density from past 7 days
+  * Joseph - completed
 
 
 * **MIT Projections**
