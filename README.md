@@ -83,16 +83,20 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 
   [https://www.apple.com/covid19/mobility](https://www.apple.com/covid19/mobility)
 
+  * Duy - get average movement for past 7 days
+
 
 * **Google Community Mobility Reports**
 
   [https://www.google.com/covid19/mobility/](https://www.google.com/covid19/mobility/)
 
+  * Duy - get average movement for past 7 days
 
 * **Unacast**
 
   [https://www.unacast.com/covid19](https://www.unacast.com/covid19)
-  * Duy will work on this
+
+  * Duy - get average movement for past 7 days
 
 
 * **Johns Hopkins CSSEGISandData**
