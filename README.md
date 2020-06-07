@@ -92,12 +92,6 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 
   * Duy - get average movement for past 7 days
 
-* **Unacast**
-
-  [https://www.unacast.com/covid19](https://www.unacast.com/covid19)
-
-  * Duy - get average movement for past 7 days
-
 
 * **Johns Hopkins CSSEGISandData**
 
@@ -157,6 +151,10 @@ Here is a list of datasets we have used so far. We thank you for your great effo
   https://dataforgood.fb.com/docs/covid19/
 
   https://visualization.covid19mobility.org/
+
+* **Unacast**
+
+  [https://www.unacast.com/covid19](https://www.unacast.com/covid19)
 
 
 * COVID Tracking Project
