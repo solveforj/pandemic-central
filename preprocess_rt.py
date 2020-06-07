@@ -221,6 +221,11 @@ fipsData = pd.read_csv("raw_data/health_data/all-geocodes-v2017.csv",encoding = 
 stateData = fipsData[fipsData['Summary Level'] == 40]
 stateData['state_abbrev'] = stateData['Area Name (including legal/statistical area description)'].apply(lambda x : us_state_abbrev[x])
 stateMap = pd.Series(stateData['State Code (FIPS)'].values,index=stateData['state_abbrev']).to_dict()
+stateMap['AS'] = "60"
+stateMap['GU'] = "66"
+stateMap['MP'] = "69"
+stateMap['PR'] = "72"
+stateMap['VI'] = "78"
 
 # Get all county fips codes
 fipsData = fipsData[fipsData['Summary Level'] == 50]
@@ -239,7 +244,17 @@ df['date'] = [date_list]*len(fips_list)
 df = df.explode('date').reset_index(drop=True)
 df['state'] = df['FIPS'].apply(lambda x : x[0:2])
 
+# MIT Model
+projections = pd.read_csv("https://raw.githubusercontent.com/youyanggu/covid19_projections/master/projections/combined/latest_us.csv", usecols=['date', 'region', 'r_values_mean'])
+projections['datetime'] = projections['date'].apply(lambda x: pd.datetime.strptime(x, '%Y-%m-%d'))
+projections = projections[(projections['region'].notnull()) & (projections['datetime'] < pd.to_datetime('today'))]
+projections.insert(0, "state", projections['region'].apply(lambda x : stateMap[x]))
+projections = projections.drop(['datetime', 'region'], axis=1).reset_index(drop=True)
+
 merged_df = pd.merge(left=df, right=rt_data, how='left', on=['state', 'date'], copy=False)
 merged_df = merged_df[merged_df['region'].notnull()]
 merged_df = merged_df.rename({'mean':'rt_mean'},axis=1)
-merged_df.to_csv("raw_data/rt_data/rt_data.csv", index=False, sep=',')
+
+new_merged_df = pd.merge(left=merged_df, right=projections, on=['state', 'date'], copy=False)
+
+new_merged_df.to_csv("raw_data/rt_data/rt_data.csv", index=False, sep=',')

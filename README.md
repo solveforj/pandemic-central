@@ -111,7 +111,7 @@ Here is a list of datasets we have used so far. We thank you for your great effo
 
   https://github.com/youyanggu/covid19_projections/blob/master/projections/combined/latest_us.csv
 
-  * Joseph - get current r value and case density for next 7 days
+  * Joseph - completed
 
 
 * **IHME Datasets**
