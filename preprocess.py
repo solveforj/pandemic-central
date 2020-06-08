@@ -8,7 +8,7 @@ import os, sys
 import numpy as np
 import pandas as pd
 from datetime import datetime, date
-from jhu_rename import rename_em
+from preprocess_jhu_rename import rename_em
 import csv
 import ast
 from preprocess_fips_dict import get_fips_dict
