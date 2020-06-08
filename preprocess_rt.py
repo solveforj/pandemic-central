@@ -254,7 +254,7 @@ projections = projections.drop(['datetime', 'region'], axis=1).reset_index(drop=
 
 merged_df = pd.merge(left=df, right=rt_data, how='left', on=['state', 'date'], copy=False)
 merged_df = merged_df[merged_df['region'].notnull()]
-merged_df = merged_df.rename({'mean':'rt_mean'},axis=1)
+merged_df = merged_df.rename({'mean':'rt_mean_MIT'},axis=1)
 
 new_merged_df = pd.merge(left=merged_df, right=projections, on=['state', 'date'], copy=False)
 
