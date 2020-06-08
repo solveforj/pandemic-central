@@ -77,7 +77,18 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         path = dir + src + '/county/' + lastest_file
 
     if src == 'mobility':
-        files = os.listdir()
+        files = os.listdir('processed_data/' + src)
+        new_files = []
+        for file in files:
+            new_file = file.replace('mobility-', '')
+            new_file = new_file.replace('.csv', '')
+            new_file = new_file.replace('-', '')
+            new_files.append(new_file)
+        max_ = max(new_files)
+        lastest_file = 'mobility-' + max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + \
+            '.csv'
+        path = 'processed_data/' + src + '/' + lastest_file
+
     return path
 
 def check_lastest_file(dir): # verify the lastest file with system time
@@ -251,11 +262,11 @@ def merger(dst='processed_data/mobility'): # merge all the mobility reports into
     df_merged.to_csv(dst, index=False) # export as csv file
     return df_merged
 
-def final(dst='processed_data/7d-mobility-'):
+def final(dst='processed_data/7-days-mobility/7d-mobility-'):
     t = date.today().isoformat()
     dst = dst + t + '.csv'
-    mobility = pd.read_csv("processed_data/mobility-2020-06-07.csv",\
-        dtype={'fips':str})
+    path = get_latest_file('mobility')
+    mobility = pd.read_csv(path, dtype={'fips':str})
     # drop rows with empty entries in any column
     mobility = mobility.sort_values(['fips', 'date'], axis=0).dropna()
     fips_list = pd.read_csv("raw_data/census/census-2018.csv",\
@@ -270,6 +281,9 @@ def final(dst='processed_data/7d-mobility-'):
         mobility[new_cols[i]] = \
             pd.Series(mobility.groupby('fips')[cols[i]].rolling(7).mean()).reset_index(drop=True)
 
+    if os.path.exists(dst): # to overwrite the old data (if any)
+        os.remove(dst)
+
     mobility.to_csv(dst, index=False)
 
     return mobility
@@ -280,7 +294,7 @@ if __name__ == '__main__':
     test = get_latest_file('google')
     print(test)
     print(check_lastest_file(test))
-    #print(apple_mobility_to_pd())
-    #print(google_mobility_to_pd())
-    #print(merger())
+    print(apple_mobility_to_pd())
+    print(google_mobility_to_pd())
+    print(merger())
     print(final())
