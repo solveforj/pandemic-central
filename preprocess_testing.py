@@ -77,11 +77,13 @@ testing['state'] = testing['state'].apply(lambda x : stateMap[x])
 testing['date'] = pd.to_datetime(testing['date'])
 testing = testing.sort_values(['state','date']).reset_index(drop=True)
 
+print(testing.head(20))
 # ==============================================================================
 # The two lines below each perform a rolling average of a column of the DataFrame
 testing['positiveIncrease'] = pd.Series(testing.groupby("state")['positiveIncrease'].rolling(7).mean()).reset_index(drop=True)
 testing['totalTestResultsIncrease'] = pd.Series(testing.groupby("state")['totalTestResultsIncrease'].rolling(7).mean()).reset_index(drop=True)
-
+df[column] = df[column].astype(str)
+print(testing.head(20))
 # Rolling average applies to the previous week for the day of interest, thus, dates need to be incremented up by 1, which is done below
 testing['date'] = testing['date'].apply(pd.DateOffset(1))
 # ==============================================================================
