@@ -76,6 +76,8 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
             '-sds-v3-full-county.csv'
         path = dir + src + '/county/' + lastest_file
 
+    if src == 'mobility':
+        files = os.listdir()
     return path
 
 def check_lastest_file(dir): # verify the lastest file with system time
@@ -162,7 +164,7 @@ def apple_mobility_to_pd(): # process Apple Mobility Report as Pandas dataframe
 
     # Switch the date header columns into row of dates
     df_apple = df_apple.melt(id_vars=['fips'], var_name='date', \
-        value_name='driving_change_rate').sort_values(['fips', 'date'])
+        value_name='apple_mobility').sort_values(['fips', 'date'])
     df_apple = df_apple.dropna(subset=['fips']).sort_values(['fips', 'date'])
     df_apple = df_apple.reset_index(drop=True)
 
@@ -207,6 +209,14 @@ def google_mobility_to_pd(): # process Google Mobility Report
     pd.options.mode.chained_assignment='warn' # return to default
     df_google = df_google.drop(['id'], 1) # drop ID column
 
+    cols = cols[4:] # get the column names of mobility records
+    # Take the average of the categories as a new column
+    df_google['google_mobility'] = df_google[cols].mean(axis=1, skipna=True)
+
+    df_google = df_google.drop(cols, 1) # drop all the unnecessary columns
+
+    df_google = df_google.reset_index(drop=True)
+
     return df_google
 
 def unacast_to_pd(): # process Unacast data as Pandas dataframe
@@ -241,12 +251,36 @@ def merger(dst='processed_data/mobility'): # merge all the mobility reports into
     df_merged.to_csv(dst, index=False) # export as csv file
     return df_merged
 
+def final(dst='processed_data/7d-mobility-'):
+    t = date.today().isoformat()
+    dst = dst + t + '.csv'
+    mobility = pd.read_csv("processed_data/mobility-2020-06-07.csv",\
+        dtype={'fips':str})
+    # drop rows with empty entries in any column
+    mobility = mobility.sort_values(['fips', 'date'], axis=0).dropna()
+    fips_list = pd.read_csv("raw_data/census/census-2018.csv",\
+        dtype={'FIPS': str})['FIPS'].tolist()
+    mobility = mobility[mobility['fips'].isin(fips_list)].sort_values(['fips',\
+        'date']).reset_index(drop=True)
+
+    cols = ['google_mobility', 'apple_mobility']
+    new_cols = ['google_mobility_7d', 'apple_mobility_7d']
+
+    for i in range(len(cols)):
+        mobility[new_cols[i]] = \
+            pd.Series(mobility.groupby('fips')[cols[i]].rolling(7).mean()).reset_index(drop=True)
+
+    mobility.to_csv(dst, index=False)
+
+    return mobility
+
 if __name__ == '__main__':
     rename_em()
     get_fips_dict()
-    test = get_latest_file('apple')
+    test = get_latest_file('google')
     print(test)
     print(check_lastest_file(test))
     #print(apple_mobility_to_pd())
     #print(google_mobility_to_pd())
-    print(merger())
+    #print(merger())
+    print(final())

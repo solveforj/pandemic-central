@@ -216,8 +216,6 @@ def get_fips_dict(): # Read Johns Hopkins dataset and export FIPS dictionary for
     dict['Idaho Shoshone'] = '16079'
     dict['Minnesota Cook'] = '17031'
     dict['Colorado Kiowa'] = '08061'
-
-
     # Export dictionary of FIPS codes as text file
     if not os.path.exists('raw_data/dicts'):
         os.mkdir('raw_data/dicts')
