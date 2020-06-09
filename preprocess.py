@@ -276,7 +276,7 @@ def unacast_to_pd(): # process Unacast data as Pandas dataframe
         'grade_encounters', 'n_grade_encounters'], 1)
     return df_unacast
 
-def merger(dst='processed_data/mobility'): # merge all the mobility reports into one csv file
+def merger(dst='processed_data/mobility/mobility-'): # merge all the mobility reports into one csv file
     t = date.today().isoformat()
     dst = dst + '-' + t + '.csv'
     df_google = google_mobility_to_pd()
@@ -291,11 +291,11 @@ def final(dst='processed_data/7-days-mobility/7d-mobility-'):
     t = date.today().isoformat()
     dst = dst + t + '.csv'
     path = get_latest_file('mobility')
-    mobility = pd.read_csv(path, dtype={'fips':str})
+    mobility = pd.read_csv(path, dtype={'fips':int})
     # drop rows with empty entries in any column
     mobility = mobility.sort_values(['fips', 'date'], axis=0).dropna()
     fips_list = pd.read_csv("raw_data/census/census-2018.csv",\
-        dtype={'FIPS': str})['FIPS'].tolist()
+        dtype={'FIPS': int})['FIPS'].tolist()
     mobility = mobility[mobility['fips'].isin(fips_list)].sort_values(['fips',\
         'date']).reset_index(drop=True)
 
@@ -305,6 +305,10 @@ def final(dst='processed_data/7-days-mobility/7d-mobility-'):
     for i in range(len(cols)):
         mobility[new_cols[i]] = \
             pd.Series(mobility.groupby('fips')[cols[i]].rolling(7).mean()).reset_index(drop=True)
+    # Shift the col down by one row to make sense (past 7 days from a date)
+    mobility['date'] = pd.to_datetime(mobility['date'])
+    mobility['date'] = mobility['date'].apply(pd.DateOffset(1))
+    mobility['date'] = mobility['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
 
     if os.path.exists(dst): # to overwrite the old data (if any)
         os.remove(dst)
