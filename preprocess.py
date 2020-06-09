@@ -102,7 +102,7 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
             '.csv'
         path = 'processed_data/' + src + '/' + lastest_file
 
-    if src == 'facebook': # get path to lastest facebook Mobility Data
+    if src == 'facebook': # get path to lastest Facebook Mobility Data
         files = os.listdir(dir + src)
         new_files = []
         for file in files:
@@ -113,6 +113,18 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         lastest_file = max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + \
             '.csv'
         path = dir + src + '/' + lastest_file
+
+    if src == 'merged': # get path to the lastest merged file
+        files = os.listdir('processed_data/' + src)
+        new_files = []
+        for file in files:
+            new_file = file.replace('.csv', '')
+            new_file = new_file.replace('-', '')
+            new_files.append(new_file)
+        max_ = max(new_files)
+        lastest_file = max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + \
+            '.csv'
+        path = 'processed_data/' + src + '/' + lastest_file
 
     return path
 
