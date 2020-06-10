@@ -1,13 +1,25 @@
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 from urllib.request import urlopen
 from zipfile import ZipFile
 from io import BytesIO
 import os
 
-z = urlopen('https://data.humdata.org/dataset/c3429f0e-651b-4788-bb2f-4adbf222c90e/resource/92ea5ec1-c87c-4210-92ac-abeb7aace2c7/download/movement-range-data-2020-06-07.zip')
+link = "https://data.humdata.org/dataset/movement-range-maps"
+page = requests.get(link).content
+soup = BeautifulSoup(page, 'html.parser')
+dataLink = soup.find_all('a', {"class": "btn btn-empty btn-empty-blue hdx-btn resource-url-analytics ga-download"}, href=True)[0]['href']
+dataLink = "https://data.humdata.org" + dataLink
+
+dataFile = dataLink.split("/")[-1].split(".")[0].replace("-data", "") + ".txt"
+print(dataLink)
+print(dataFile)
+
+z = urlopen(dataLink)
 myzip = ZipFile(BytesIO(z.read()))
 print(myzip.infolist())
-df = pd.read_csv(myzip.open('movement-range-2020-06-07.txt'), sep='\t', dtype={'polygon_id':str})
+df = pd.read_csv(myzip.open(dataFile), sep='\t', dtype={'polygon_id':str})
 df = df[df['country'] == 'USA']
 #df.to_csv("raw_data/facebook/facebook_raw.csv", sep=',', index=False)
 #df = pd.read_csv("raw_data/facebook/facebook_raw.csv", dtype={'polygon_id':str})

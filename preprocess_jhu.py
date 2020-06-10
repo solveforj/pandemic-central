@@ -42,8 +42,11 @@ brooklyn = readNYCounty(brooklyn, "brooklyn")
 manhattan = readNYCounty(manhattan, "manhattan")
 queens = readNYCounty(queens, "queens")
 staten_island = readNYCounty(staten_island, "staten_island")
+print(jhu_data[jhu_data['FIPS'] == '36061'])
+print(manhattan)
 
-full_data = pd.concat([jhu_data, bronx, brooklyn,manhattan,queens,staten_island]).sort_values(['FIPS','date']).reset_index(drop=True)
+nyFIPSList = ["36005","36047","36061", "36081", "36085"]
+full_data = pd.concat([jhu_data[~jhu_data['FIPS'].isin(nyFIPSList)], bronx, brooklyn,manhattan,queens,staten_island]).sort_values(['FIPS','date']).reset_index(drop=True)
 full_data['confirmed_cases'] = pd.Series(full_data.groupby("FIPS")['confirmed_cases'].rolling(7).mean()).reset_index(drop=True)
 full_data = full_data[full_data['confirmed_cases'].notnull()]
 full_data['date'] = pd.to_datetime(full_data['date'])
