@@ -214,56 +214,86 @@ def apple_mobility_to_pd(): # process Apple Mobility Report as Pandas dataframe
     df_apple = df_apple.melt(id_vars=['fips'], var_name='date', \
         value_name='apple_mobility').sort_values(['fips', 'date'])
     df_apple = df_apple.dropna(subset=['fips']).sort_values(['fips', 'date'])
+    df_apple = df_apple.astype({'fips': 'int32'})
     df_apple = df_apple.reset_index(drop=True)
 
     return df_apple
 
 def google_mobility_to_pd(): # process Google Mobility Report
     path = get_latest_file('google')
-    with open(path) as data:
-        reader = csv.reader(data)
-        cols = next(reader)
-    _ = cols.pop(1) # filter out 'country_region'
-    df_load = pd.read_csv(
-        path,
-        header=0,
-        usecols=cols,
-        low_memory=False
-    )
-    # Keep only rows that are in the US
-    df_google = df_load.loc[df_load['country_region_code'] == 'US']
-    # Insert a new 'id' column (state name + county name)
-    df_google.insert(len(df_google.columns), 'id', \
-        df_google['sub_region_1'] + ' ' + df_google['sub_region_2'] + '-',\
-        allow_duplicates=False)
-    pd.options.mode.chained_assignment=None
-    df_google['id'] = df_google['id'].str.replace(' City and Borough-', '')
-    df_google['id'] = df_google['id'].str.replace(' County-', '')
-    df_google['id'] = df_google['id'].str.replace(' Borough-', '')
-    df_google['id'] = df_google['id'].str.replace(' Parish-', '')
-    df_google['id'] = df_google['id'].str.replace(' City-', '')
-    df_google['id'] = df_google['id'].str.replace(' Island-', '')
-    df_google['id'] = df_google['id'].str.replace(' Municipality-', '')
-    # Drop rows that do not represent county properly
-    df_google = df_google.dropna(subset=['sub_region_1', 'sub_region_2'])
-    # Remove unnecessary columns
-    df_google = df_google.drop(['sub_region_1', 'sub_region_2', \
-     'country_region_code'], 1)
-    # Read FIPS dictionary
-    with open('raw_data/dicts/fips_codes.txt', 'r') as f:
-        contents = f.read()
-        fips_dict = ast.literal_eval(contents)
-    df_google['fips'] = df_google['id'].replace(fips_dict)
-    pd.options.mode.chained_assignment='warn' # return to default
-    df_google = df_google.drop(['id'], 1) # drop ID column
+    new_path = path
+    date = new_path.replace('raw_data/google/', '')
+    date = date.replace('.csv', '')
+    date = date.replace('-', '')
+    if int(date) < 20200611: # Google added new columns
 
-    cols = cols[4:] # get the column names of mobility records
-    # Take the average of the categories as a new column
-    df_google['google_mobility'] = df_google[cols].mean(axis=1, skipna=True)
+        with open(path) as data:
+            reader = csv.reader(data)
+            cols = next(reader)
+        _ = cols.pop(1) # filter out 'country_region'
+        df_load = pd.read_csv(
+            path,
+            header=0,
+            usecols=cols,
+            low_memory=False
+        )
+        # Keep only rows that are in the US
+        df_google = df_load.loc[df_load['country_region_code'] == 'US']
+        # Insert a new 'id' column (state name + county name)
+        df_google.insert(len(df_google.columns), 'id', \
+            df_google['sub_region_1'] + ' ' + df_google['sub_region_2'] + '-',\
+            allow_duplicates=False)
+        pd.options.mode.chained_assignment=None
+        df_google['id'] = df_google['id'].str.replace(' City and Borough-', '')
+        df_google['id'] = df_google['id'].str.replace(' County-', '')
+        df_google['id'] = df_google['id'].str.replace(' Borough-', '')
+        df_google['id'] = df_google['id'].str.replace(' Parish-', '')
+        df_google['id'] = df_google['id'].str.replace(' City-', '')
+        df_google['id'] = df_google['id'].str.replace(' Island-', '')
+        df_google['id'] = df_google['id'].str.replace(' Municipality-', '')
+        # Drop rows that do not represent county properly
+        df_google = df_google.dropna(subset=['sub_region_1', 'sub_region_2'])
+        # Remove unnecessary columns
+        df_google = df_google.drop(['sub_region_1', 'sub_region_2', \
+         'country_region_code'], 1)
+        # Read FIPS dictionary
+        with open('raw_data/dicts/fips_codes.txt', 'r') as f:
+            contents = f.read()
+            fips_dict = ast.literal_eval(contents)
+        df_google['fips'] = df_google['id'].replace(fips_dict)
+        pd.options.mode.chained_assignment='warn' # return to default
+        df_google = df_google.drop(['id'], 1) # drop ID column
 
-    df_google = df_google.drop(cols, 1) # drop all the unnecessary columns
+        cols = cols[4:] # get the column names of mobility records
+        # Take the average of the categories as a new column
+        df_google['google_mobility'] = df_google[cols].mean(axis=1, skipna=True)
 
-    df_google = df_google.reset_index(drop=True)
+        df_google = df_google.drop(cols, 1) # drop all the unnecessary columns
+
+        df_google = df_google.reset_index(drop=True)
+
+    else:
+        with open(path) as data:
+            reader = csv.reader(data)
+            cols = next(reader)
+        for i in range(5):
+            _ = cols.pop(0)
+        df_load = pd.read_csv(
+            path,
+            header=0,
+            usecols=cols,
+            dtype={'census_fips_code':np.str},
+            low_memory=False
+        )
+        # Drop rows that do not represent county properly
+        df_google = df_load.dropna(subset=['census_fips_code'])
+        df_google = df_google.rename(columns={'census_fips_code': 'fips'})
+        cols = cols[2:] # get the column names of mobility records
+        # Take the average of the categories as a new column
+        df_google['google_mobility'] = df_google[cols].mean(axis=1, skipna=True)
+        df_google = df_google.drop(cols, 1) # drop all the unnecessary columns
+        df_google = df_google.astype({'fips': 'int32'})
+        df_google = df_google.reset_index(drop=True)
 
     return df_google
 
@@ -288,7 +318,7 @@ def unacast_to_pd(): # process Unacast data as Pandas dataframe
         'grade_encounters', 'n_grade_encounters'], 1)
     return df_unacast
 
-def merger(dst='processed_data/mobility/mobility-'): # merge all the mobility reports into one csv file
+def merger(dst='processed_data/mobility/mobility'): # merge all the mobility reports into one csv file
     t = date.today().isoformat()
     dst = dst + '-' + t + '.csv'
     df_google = google_mobility_to_pd()
@@ -299,9 +329,9 @@ def merger(dst='processed_data/mobility/mobility-'): # merge all the mobility re
     df_merged.to_csv(dst, index=False) # export as csv file
     return df_merged
 
-def final(dst='processed_data/7-days-mobility/7d-mobility-'):
+def final(dst='processed_data/7-days-mobility/7d-mobility'):
     t = date.today().isoformat()
-    dst = dst + t + '.csv'
+    dst = dst + '-' + t + '.csv'
     path = get_latest_file('mobility')
     mobility = pd.read_csv(path, dtype={'fips':int})
     # drop rows with empty entries in any column
