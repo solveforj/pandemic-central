@@ -27,8 +27,8 @@ df = df[['ds', 'polygon_id', 'all_day_bing_tiles_visited_relative_change', 'all_
 df = df.rename({'polygon_id':'FIPS','ds':'date','all_day_bing_tiles_visited_relative_change':'fb_movement_change', 'all_day_ratio_single_tile_users':'fb_stationary'}, axis=1)
 df = df.reset_index(drop=True)
 
-df['fb_movement_change1'] = pd.Series(df.groupby("FIPS")['fb_movement_change'].rolling(7).mean()).reset_index(drop=True)
-df['fb_stationary1'] = pd.Series(df.groupby("FIPS")['fb_stationary'].rolling(7).mean()).reset_index(drop=True)
+df['fb_movement_change'] = pd.Series(df.groupby("FIPS")['fb_movement_change'].rolling(7).mean()).reset_index(drop=True)
+df['fb_stationary'] = pd.Series(df.groupby("FIPS")['fb_stationary'].rolling(7).mean()).reset_index(drop=True)
 
 df['date'] = pd.to_datetime(df['date'])
 df['date'] = df['date'].apply(pd.DateOffset(1))
