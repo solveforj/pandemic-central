@@ -39,19 +39,6 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         lastest_file = max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + '.csv'
         path = dir + src + '/county_renamed/' + lastest_file
 
-    if src == 'kaggle': # WE ARE TEMPORARILY NOT USING THIS ANYMORE
-        files = os.listdir(dir + src + '/county')
-        new_files = []
-        for file in files:
-            new_file = file.replace('county-', '')
-            new_file = new_file.replace('.csv', '')
-            new_file = new_file.replace('-', '')
-            new_files.append(new_file)
-        max_ = max(new_files)
-        lastest_file = 'county-' + max_[:4] + '-' + max_[4:6] + \
-            '-' + max_[6:] + '.csv'
-        path = dir + src + '/county/' + lastest_file
-
     if src == 'google': # get path of the lastest Google Mobility Report
         files = os.listdir(dir + src)
         new_files = []
@@ -62,19 +49,6 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         max_ = max(new_files)
         lastest_file = max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + '.csv'
         path = dir + src + '/' + lastest_file
-
-    if src == 'unacast': # WE ARE TEMPORARILY NOT USING THIS ANYMORE
-        files = os.listdir(dir + src + '/county')
-        new_files = []
-        for file in files:
-            new_file = file.replace('COVID-', '')
-            new_file = new_file.replace('-sds-v3-full-county.csv', '')
-            new_file = new_file.replace('-', '')
-            new_files.append(new_file)
-        max_ = max(new_files)
-        lastest_file = 'COVID-' + max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + \
-            '-sds-v3-full-county.csv'
-        path = dir + src + '/county/' + lastest_file
 
     if src == 'mobility': # get path to the lastest mobility (google + apple)
         files = os.listdir('processed_data/' + src)
@@ -137,13 +111,6 @@ def check_lastest_file(dir): # verify the lastest file with system time
         else:
             return False
 
-    if src == 'kaggle':
-        t = date.today().isoformat()
-        if t == dir.split('county-')[1].replace('.csv', ''):
-            return True
-        else:
-            return False
-
     if src == 'jhu':
         t = date.today().isoformat()
         if t == dir.replace('.csv', ''):
@@ -154,9 +121,6 @@ def check_lastest_file(dir): # verify the lastest file with system time
 def get_file_on_date(src, date, dir='raw_data/'): # get the directory of the file on specified date
     if src == 'apple':
         path = dir + src + '/' + 'applemobilitytrends-' + date + '.csv'
-    if src == 'unacast':
-        path = dir + src + '/county/' + 'COVID_' + date + \
-            '_sds-v3-full-county.csv'
     if src == 'jhu':
         path = dir + src + '/county_renamed/' + date + '.csv'
     return path
@@ -272,7 +236,7 @@ def google_mobility_to_pd(): # process Google Mobility Report
 
         df_google = df_google.reset_index(drop=True)
 
-    else:
+    else: # Google Mobility Data already includes FIPS after 2020-06-11
         with open(path) as data:
             reader = csv.reader(data)
             cols = next(reader)
