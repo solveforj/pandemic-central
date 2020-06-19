@@ -71,15 +71,15 @@ def build_model():
         tf.keras.layers.Dense(64, activation='relu'),
         tf.keras.layers.Dense(1)
       ])
-    optimizer = tf.keras.optimizers.RMSprop(0.001)
-    model.compile(loss='mse', optimizer=optimizer, metrics=['mae', 'mse'])
+    optimizer = tf.keras.optimizers.RMSprop(learning_rate=0.001)
+    model.compile(loss='mae', optimizer=optimizer, metrics=['mae', 'mse', 'mape'])
     return model
 
 model = build_model()
 print(model.summary())
 
 early_stop_callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', \
-    patience=100, mode='min')
+    patience=70, mode='min')
 
 if not os.path.exists('models'):
     os.mkdir('models')
@@ -108,5 +108,5 @@ print(test_predictions)
 test_dataset['predicted'] = test_predictions
 test_dataset.to_csv('models/tensorflow/demo.csv', index=False)
 
-loss, mae, mse = model.evaluate(normed_test_data, test_labels, verbose=2)
+loss, mae, mse, mape = model.evaluate(normed_test_data, test_labels, verbose=2)
 print("Testing set Mean Abs Error: {:5.2f} cases".format(mae))
