@@ -1,3 +1,8 @@
+"""
+This module loads processed and merged data into Pandas dataframe, and does
+predictions in Scikit-learn.
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -8,6 +13,13 @@ import matplotlib.pyplot as plt
 import pickle
 import os
 from sklearn.preprocessing import StandardScaler
+
+__author__ = 'Duy Cao, Joseph Galasso'
+__copyright__ = '© Pandamic Central, 2020'
+__license__ = 'MIT'
+__version__ = '1.0.0'
+__status__ = 'released'
+__url__ = 'https://github.com/solveforj/pandemic-central'
 
 data = pd.read_csv("processed_data/merged/2020-06-19.csv")
 print("Original number of FIPS")

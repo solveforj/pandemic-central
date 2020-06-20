@@ -1,3 +1,8 @@
+"""
+This module preprocesses Facebook Mobility data, health data, census data and
+merges them with Apple and Google data.
+"""
+
 import pandas as pd
 import os
 import requests
@@ -12,6 +17,12 @@ import numpy as np
 from preprocess import get_latest_file
 from datetime import date
 
+__author__ = 'Duy Cao, Joseph Galasso'
+__copyright__ = '© Pandamic Central, 2020'
+__license__ = 'MIT'
+__version__ = '1.0.0'
+__status__ = 'released'
+__url__ = 'https://github.com/solveforj/pandemic-central'
 
 def preprocess_census(year = 2018):
     # Import census data file (in Github folder)
@@ -557,4 +568,5 @@ def merge_data():
 
     merged_DF.to_csv(dst, sep=',', index=False)
 
-merge_data()
+if __name__ == '__main__':
+    merge_data()

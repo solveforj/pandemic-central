@@ -1,75 +1,67 @@
-# pandemic-central
-An AI that predicts the next location to be severely hit by COVID-19.
+# Pandemic Central
+Use Machine Learning to predict the number of COVID-19 cases in the next 7 days. We are also on [Twitter](https://twitter.com/PandemicCentral)!
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/solveforj/pandemic-central/blob/master/LICENSE.txt)
 
+## Getting Started
+Follow these instructions to get the project up and running on your local machine.
+
+### Prerequisites
+These are what you **must** install before using our project.
+1. [Scikit-learn](https://scikit-learn.org/stable/install.html)
+
+2. [TensorFlow](https://www.tensorflow.org/install) (release 2.0.0 or later)
+
+### GitHub
+Make sure you clone and pull the lastest data from Pandemic Central.
+Notice that our repository can always be found at https://github.com/solveforj/pandemic-central.
+This is still in its early stages, so feel free to comment or pull request.
+Your contributions are very valuable to us and this project.
+
+### Run
+  ```
+  python3 pandemic-central
+  ```
+or you can also run individual modules for your own purposes.
+
 ## Project Structure
+This is not complete project structure, read USAGE.md for more details.
 ```
 pandemic-central/
-│
-├── raw_data/
-│    ├── apple
-│    ├── census
-│    ├── dicts
-│    ├── google
-│    ├── health_data
-│    ├── jhu
-│    ├── kaggle
-│    └── unacast
-│
-├── jhu_rename.py
-├── LICENSE.txt
-├── preprocess_census.py
-├── preprocess_health.py
-├── preprocess.py
-└── README.md
+  ├── __init__.py
+  ├── __main__.py
+  │
+  ├── raw_data/
+  ├── processed_data/
+  ├── models/
+  │
+  ├── generate_data.py
+  ├── LICENSE.txt
+  ├── preprocess.py
+  ├── README.md
+  ├── tf_predict.py
+  ├── train_scikit.py
+  └── USAGE.md
 ```
 In which:
-- `raw_data/` contains the raw datasets (in csv or txt formats) that we have collected or generated locally.
+- `raw_data/` contains the raw datasets (in csv or txt formats) for preprocessing.
 
+- `processed_data/` contains processed and merged data and ready for training.
 
-- `jhu_rename.py` automates the process of renaming Johns Hopkins datasets into isoformat date.
+- `models/` contains saved model from training and ready for deployment.
 
+- `generate_data.py` and `preprocess.py` process raw data.
+
+- `train_scikit.py` uses processed data and trains in deep neural network using Scikit-learn.
+
+- `tf_predict.py` does similar thing as train_scikit module but using TensorFlow. *This module is experimental at this moment.*
 
 - `LICENSE.txt` is MIT license.
 
-
-- `preprocess_census.py` preprocesses the 2010-2018 Census data (to shrink the size for our need only)
-
-
-- `preprocess_health.py` preprocesses and merges datasets in `raw_data/health_data/`
-
-
-- `preprocess.py` preprocesses and merges Apple, Google Mobility Reports and Unacast datasets.
-
 - `README.md` is what you are reading.
 
-
-## Database
-In this project, we take advantage of these specific variables.
-
-* From **Apple Maps Mobility Trends Reports**:
-  - `geo_type`: country, region, sub-region, city, or county
-  - `region` and `country`
-  - `transportation`: _driving_ or _walking_
-  - Date columns from `1/13/2020`
-
-
-* From **Novel Corona Virus 2019 Dataset** _(Kaggle)_
-  - `date`
-  - `fips`: FIPS codes for county/ state _(see reference in Unacast section)_
-  - `cases`
-  - `deaths`
-
-
-* From **Unacast**:
-  - `state_fips`: FIPS codes for state. [_See a list here._](https://www.nrcs.usda.gov/wps/portal/nrcs/detail/?cid=nrcs143_013696)
-  - `state_name`
-  - `county_fips`: FIPS codes for county. [_See a list here._](https://www.nrcs.usda.gov/wps/portal/nrcs/detail/national/home/?cid=nrcs143_013697)
-  - `county_name`
-  - `date`
-  - `n_grade_total`, `n_grade_distance`, `n_grade_visitation`, and `n_grade_encounters`
+- `USAGE.md` is a detailed manual for specific use case.
 
 ## Authors
 * [**Joseph Galasso**](https://github.com/solveforj/)
@@ -77,72 +69,29 @@ In this project, we take advantage of these specific variables.
 * [**Kimberly Diwa**](https://github.com/kdiwa/)
 
 ## Credits
-Here is a list of datasets we have used so far. We thank you for your great efforts and supports.
+Here is a list of datasets we have used so far. Our project can not be completed without these great and open sources.
 
-* **Apple Maps Mobility Trends Reports**
+1. [Apple Maps Mobility Trends Reports](https://www.apple.com/covid19/mobility)
 
-  [https://www.apple.com/covid19/mobility](https://www.apple.com/covid19/mobility)
+2. [Google Community Mobility Reports](https://www.google.com/covid19/mobility/)
 
-  * Duy - Done
+3. [Johns Hopkins CSSEGISandData](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports)
 
+4. [COVID Tracking Project](https://www.covidtracking.com/)
 
-* **Google Community Mobility Reports**
+5. [MIT Projections](https://github.com/youyanggu/covid19_projections/blob/master/projections/combined/latest_us.csv)
 
-  [https://www.google.com/covid19/mobility/](https://www.google.com/covid19/mobility/)
+6. [IHME Datasets](http://ghdx.healthdata.org/us-data)
 
-  * Duy - Done
+7. [Rt.live Reproduction Rate](https://rt.live/)
 
+8. [CCVI Index](https://docs.google.com/spreadsheets/d/1qEPuziEpxj-VG11IAZoa5RWEr4GhNoxMn7aBdU76O5k/edit#gid=549685106)
 
-* **Johns Hopkins CSSEGISandData**
+9. [US Census Population Data](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html)
 
-  [https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports)
+10. [USDA FIPS Code List](https://www.ers.usda.gov/data-products/rural-urban-commuting-area-codes/)
 
-  * Duy/Joseph - completed
-
-
-* **COVID Tracking Project**
-
-  https://www.covidtracking.com/
-
-  * Joseph - completed
-
-
-* **MIT Projections**
-
-  https://github.com/youyanggu/covid19_projections/blob/master/projections/combined/latest_us.csv
-
-  * Joseph - completed
-
-
-* **IHME Datasets**
-
-  http://ghdx.healthdata.org/us-data
-
-  * Joseph - completed
-
-
-* **Rt.live Reproduction Rate**
-
-  https://rt.live/
-
-  * Joseph - completed
-
-
-* **CCVI Index**
-
-  https://docs.google.com/spreadsheets/d/1qEPuziEpxj-VG11IAZoa5RWEr4GhNoxMn7aBdU76O5k/edit#gid=549685106
-
-  * Joseph - completed
-
-
-* **US Census Population Data**
-
-  https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html
-
-  https://www.ers.usda.gov/data-products/rural-urban-commuting-area-codes/
-
-  * Joseph - completed
-
+We also thank you TensorFlow and community for very detailed and helpful official documentations.
 
 **Websites with interesting data:**
 
