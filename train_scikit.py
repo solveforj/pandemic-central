@@ -7,47 +7,82 @@ from sklearn.svm import SVR
 import matplotlib.pyplot as plt
 import pickle
 import os
+from sklearn.preprocessing import StandardScaler
 
-data = pd.read_csv("processed_data/merged/2020-06-09.csv")
-
+data = pd.read_csv("processed_data/merged/2020-06-19.csv")
+print("Original number of FIPS")
+print(len(set(data['FIPS'])))
 diff = data.groupby('FIPS')['confirmed_cases'].shift(periods=-7)
-percent_change = diff
 
-#print(percent_change)
-data['label'] = percent_change
-data = data.replace([np.inf, -np.inf], np.nan)
-data = data.dropna()
+data['label'] = diff
 
-
-print(data['Male_Obesity_%'].corr(data['label']))
-#ax = data.boxplot(column=['label'])
-#plt.show()
+data_mobility = data.drop(['Location', 'google_mobility_7d','apple_mobility_7d'], axis=1)
+data_mobility = data_mobility.replace([np.inf, -np.inf], np.nan)
+print(len(data_mobility))
+data_mobility = data_mobility.dropna()
+print(len(data_mobility))
 
 
-data = data.drop(['Location', 'fb_movement_change', 'fb_stationary'], axis=1)
-
-data1 = data[data['POP_DENSITY'] > 300]
-print(len(data1))
-X = data1[data.columns[:-1]]
-y = data1['label']
-print(X.columns)
-
+print("Number of FIPS with mobility")
+print(len(set(data_mobility['FIPS'])))
+X = data_mobility[data_mobility.columns[:-1]]
+scaler = StandardScaler()
+X = scaler.fit_transform(X.iloc[:,2:])
+y = data_mobility['label']
 X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, train_size=0.9)
-#regr = MLPRegressor(random_state=1, max_iter=1000).fit(X_train.iloc[:,2:], y_train)
-regr = RandomForestRegressor(random_state=1, n_estimators=10, n_jobs=4).fit(X_train.iloc[:,2:], y_train)
-
-print(regr.score(X_test.iloc[:,2:], y_test))
-
+#regr = MLPRegressor(random_state=1, max_iter=1000).fit(X_train, y_train)
+regr = RandomForestRegressor(random_state=1, n_estimators=10, n_jobs=4).fit(X_train, y_train)
+print(regr.score(X_test, y_test))
 #if os.path.exists:
 #    os.mkdir("models")
-
-
-pkl_filename = "models/sk-learn-model-rf.pkl"
+pkl_filename = "models/sk-learn-model-rf-mobility.pkl"
 with open(pkl_filename, 'wb') as file:
     pickle.dump(regr, file)
 
 with open(pkl_filename, 'rb') as file:
     model = pickle.load(file)
 
-data1['predictions'] = model.predict(data1[data.columns[:-1]].iloc[:,2:])
-data1.to_csv("models/sk-learn-predictions.csv", index=None, sep=",")
+nscaler = StandardScaler()
+nX = scaler.fit_transform(data_mobility[data_mobility.columns[:-1]].iloc[:,2:])
+data_mobility['predictions'] = model.predict(nX)
+data_mobility.to_csv("models/sk-learn-predictions-mobility.csv", index=None, sep=",")
+
+
+
+
+data_no_mobility = data.drop(['Location', 'google_mobility_7d','apple_mobility_7d', 'fb_movement_change','fb_stationary'], axis=1)
+data_no_mobility = data_no_mobility[~data_no_mobility['FIPS'].isin(set(data_mobility['FIPS']))]
+data_no_mobility = data_no_mobility.replace([np.inf, -np.inf], np.nan)
+print(len(data_no_mobility))
+data_no_mobility = data_no_mobility.dropna()
+print(len(data_no_mobility))
+
+print("Number of FIPS without mobility")
+print(len(set(data_no_mobility['FIPS'])))
+X = data_no_mobility[data_no_mobility.columns[:-1]]
+scaler = StandardScaler()
+X = scaler.fit_transform(X.iloc[:,2:])
+y = data_no_mobility['label']
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, train_size=0.9)
+#regr = MLPRegressor(random_state=1, max_iter=1000).fit(X_train, y_train)
+regr = RandomForestRegressor(random_state=1, n_estimators=10, n_jobs=4).fit(X_train, y_train)
+print(regr.score(X_test, y_test))
+#if os.path.exists:
+#    os.mkdir("models")
+pkl_filename = "models/sk-learn-model-rf-no-mobility.pkl"
+with open(pkl_filename, 'wb') as file:
+    pickle.dump(regr, file)
+
+with open(pkl_filename, 'rb') as file:
+    model = pickle.load(file)
+
+nscaler = StandardScaler()
+nX = scaler.fit_transform(data_no_mobility[data_no_mobility.columns[:-1]].iloc[:,2:])
+data_no_mobility['predictions'] = model.predict(nX)
+data_no_mobility.to_csv("models/sk-learn-predictions-no-mobility.csv", index=None, sep=",")
+
+original_fips = set(list(data['FIPS']))
+data_fips = set(list(data_no_mobility['FIPS']) + list(data_mobility['FIPS']))
+unused_fips = list(original_fips - data_fips)
+unused_data = data[data['FIPS'].isin(unused_fips)]
+unused_data.to_csv("models/sk-learn-unused-data.csv", index=None, sep=",",)
