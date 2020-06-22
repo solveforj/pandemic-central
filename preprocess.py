@@ -287,7 +287,8 @@ def unacast_to_pd(): # process Unacast data as Pandas dataframe
         'grade_encounters', 'n_grade_encounters'], 1)
     return df_unacast
 
-def merger(dst='processed_data/mobility/mobility'): # merge all the mobility reports into one csv file
+# merge all the mobility reports into one csv file
+def merger(dst='processed_data/mobility/mobility'):
     t = date.today().isoformat()
     dst = dst + '-' + t + '.csv'
     df_google = google_mobility_to_pd()
@@ -328,8 +329,8 @@ def final(dst='processed_data/7-days-mobility/7d-mobility'):
 
     return mobility
 
-def get_fips_dict(): # Read Johns Hopkins dataset and export FIPS dictionary for county
-    # Please don't run this again
+# Read Johns Hopkins dataset and export FIPS dictionary for county
+def get_fips_dict():
     src = get_latest_file('jhu')
     dataset_path = get_latest_file('jhu')
     # Read Johns Hopkins lastest dataset

@@ -24,12 +24,11 @@ __version__ = '1.0.0'
 __status__ = 'developing'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 
-FEATURES = ['confirmed_cases', 'google_mobility_7d', \
-    'apple_mobility_7d', 'fb_movement_change', 'asbestosis_mortality', \
-    'pneumoconiosis_mortality', 'diarrheal_mortality', \
-    'other_pneumoconiosis_mortality', 'silicosis_mortality', 'COPD_mortality', \
-    'chronic_respiratory_mortality', 'interstitial_lung_mortality', \
-    'other_resp_mortality', 'POP_DENSITY']
+FEATURES = ['confirmed_cases', 'apple_mobility_7d', 'google_mobility_7d',\
+    'fb_movement_change', 'asbestosis_mortality', 'pneumoconiosis_mortality',\
+    'diarrheal_mortality', 'other_pneumoconiosis_mortality',\
+    'silicosis_mortality', 'COPD_mortality', 'chronic_respiratory_mortality',\
+    'interstitial_lung_mortality', 'other_resp_mortality', 'POP_DENSITY']
 FEATURE_COLS = FEATURES[1:]
 LABEL = 'confirmed_cases'
 MIN_POP = 500
