@@ -42,12 +42,16 @@ def make_ML_model(data, output, density = 0):
     with open(pkl_filename, 'wb') as file:
         pickle.dump(regr, file)
 
-training_mobility, training_no_mobility = merge_data(mode="training", save_files=True)
+def main():
+    training_mobility, training_no_mobility = merge_data(mode="training", save_files=True)
 
-print("Making mobility model")
-training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv")
-make_ML_model(training_mobility, "mobility")
+    print("Making mobility model")
+    training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv")
+    make_ML_model(training_mobility, "mobility")
 
-print("Making non-mobility model")
-training_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv")
-make_ML_model(training_no_mobility, "no_mobility")
+    print("Making non-mobility model")
+    training_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv")
+    make_ML_model(training_no_mobility, "no_mobility")
+
+if __name__ == '__main__':
+    main()

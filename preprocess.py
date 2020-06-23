@@ -97,12 +97,12 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         files = os.listdir('processed_data/' + src)
         new_files = []
         for file in files:
-            new_file = file.replace('.csv', '')
+            new_file = file.replace('.csv.gz', '')
             new_file = new_file.replace('-', '')
             new_files.append(new_file)
         max_ = max(new_files)
         lastest_file = max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + \
-            '.csv'
+            '.csv.gz'
         path = 'processed_data/' + src + '/' + lastest_file
 
     return path
@@ -322,6 +322,8 @@ def final(dst='processed_data/7-days-mobility/7d-mobility'):
     mobility['date'] = mobility['date'].apply(pd.DateOffset(1))
     mobility['date'] = mobility['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
 
+    mobility = mobility.drop(cols, 1)
+
     if os.path.exists(dst): # to overwrite the old data (if any)
         os.remove(dst)
 
@@ -492,13 +494,22 @@ def renamer(src='raw_data/jhu/county', dst='raw_data/jhu/county_renamed'):
 def main():
     renamer()
     get_fips_dict()
-    test = get_latest_file('google')
-    print(test)
-    print(check_lastest_file(test))
-    print(apple_mobility_to_pd())
-    print(google_mobility_to_pd())
-    print(merger())
-    print(final())
+
+    print('[ ] Preprocess Apple Mobility Data', end='\r')
+    apple_mobility_to_pd()
+    print('[' + u'\u2713' + ']\n')
+
+    print('[ ] Preprocess Google Mobility Data', end='\r')
+    google_mobility_to_pd()
+    print('[' + u'\u2713' + ']\n')
+
+    print('[ ] Merging data', end='\r')
+    merger()
+    print('[' + u'\u2713' + ']\n')
+
+    print('[ ] Calculating 7-day moving average', end='\r')
+    final()
+    print('[' + u'\u2713' + ']\n')
 
 if __name__ == '__main__':
     main()

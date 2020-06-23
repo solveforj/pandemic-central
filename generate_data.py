@@ -472,7 +472,8 @@ def preprocess_testing():
 
     return merged_df
 
-def merge_data(save_files = False, mode = "training"):
+def merge_data(save_files = False, mode = "training", ag=False):
+    pd.options.mode.chained_assignment = None
 
     census = preprocess_census(use_reduced=True)
 
@@ -480,19 +481,29 @@ def merge_data(save_files = False, mode = "training"):
     health = merge_health_data()
     smoking = preprocess_smoking_prevalence()
 
-    print("Updating Facebook Data - This will take a while")
+    other_mobility_path = get_latest_file('7-days-mobility')
+    google_apple_mobility = pd.read_csv(other_mobility_path)
+    google_apple_mobility = google_apple_mobility.rename(columns={'fips':'FIPS'})
+    saving_path = 'processed_data/merged/' + date.today().isoformat() + '.csv.gz'
+
+    print("[ ] Update Facebook Data", end='\r')
     mobility = preprocess_facebook()
+    print('[' + u'\u2713' + ']\n')
 
-    print("Updating JHU Data - This will take a while")
+    print("[ ] Update JHU Data", end='\r')
     cases = preprocess_JHU()
+    print('[' + u'\u2713' + ']\n')
 
-    print("Updating Rt Data - This will take a while")
+    print("[ ] Update Rt Data", end='\r')
     rt = preprocess_Rt()
+    print('[' + u'\u2713' + ']\n')
 
-    print("Updating Testing Data - This will take a while")
+    print("[ ] Update Testing Data", end='\r')
     testing = preprocess_testing()
+    print('[' + u'\u2713' + ']\n')
 
-    print("Processing and exporting data")
+    print("[ ] Process and export data", end='\r')
+
     census['FIPS'] = census['FIPS'].astype(int)
     disparities['FIPS'] = disparities['FIPS'].astype(int)
     health['FIPS'] = health['FIPS'].astype(int)
@@ -512,10 +523,16 @@ def merge_data(save_files = False, mode = "training"):
     merged_DF = pd.merge(left=merged_DF, right=disparities, how='left', on=['FIPS'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right = smoking, how='left', on=['region', 'Location'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=census, how='left', on=['FIPS'], copy=False).sort_values(['FIPS', 'date']).reset_index(drop=True)
+    if ag: # do not delete
+        merged_DF = pd.merge(left=merged_DF, right=google_apple_mobility, how='left', on=['FIPS', 'date'], copy=False).sort_values(['FIPS', 'date']).reset_index(drop=True)
 
     locations = merged_DF['Location']
     merged_DF = merged_DF.drop('Location', axis=1)
     merged_DF.insert(0, 'Location', locations)
+
+    if ag: # do not delete
+        apple_google_df = merged_DF.dropna() # do not delete
+        merged_DF = merged_DF.drop(['google_mobility_7d', 'apple_mobility_7d'], 1) # do not delete
 
     columns = merged_DF.columns.tolist()
     columns.remove('fb_stationary')
@@ -533,16 +550,23 @@ def merge_data(save_files = False, mode = "training"):
     training_no_mobility = cleaned_DF.drop(['fb_stationary', 'fb_movement_change'], axis=1)
 
     if save_files == True:
-        unused_DF.to_csv(os.path.split(os.getcwd())[0] + "/unused_data.csv", index=False)
-        training_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv", index=False)
-        latest_mobility.to_csv(os.path.split(os.getcwd())[0] + "/latest_mobility.csv", index=False)
-        latest_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/latest_no_mobility.csv", index=False)
-        training_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv", index=False)
+        if ag:
+            apple_google_df.to_csv(saving_path, compression='gzip', index=False) # DO NOT DELETE
+        if not ag:
+            unused_DF.to_csv(os.path.split(os.getcwd())[0] + "/unused_data.csv", index=False)
+            training_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv", index=False)
+            latest_mobility.to_csv(os.path.split(os.getcwd())[0] + "/latest_mobility.csv", index=False)
+            latest_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/latest_no_mobility.csv", index=False)
+            training_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv", index=False)
+
+    print('[' + u'\u2713' + ']\n')
 
     if mode == "training":
         return training_mobility, training_no_mobility
     if mode == "predictions":
         return latest_mobility, latest_no_mobility
+
+    pd.options.mode.chained_assignment = 'warn' # return to default
 
 if __name__ == '__main__':
     merge_data(save_files=True)
