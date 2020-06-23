@@ -112,7 +112,7 @@ def get_state_fips():
 def preprocess_census(year = 2018, drop_tot = True, use_reduced = False):
     # The original census file is too large for repository, but the preprocessed and reduced version may be used
     if use_reduced == True:
-        data = pd.read_csv("data/census.csv")
+        data = pd.read_csv("data/census.csv", dtype={'FIPS': str})
         return data
 
     # Import census data file (in same directory as repository)
@@ -384,7 +384,7 @@ def preprocess_JHU():
     full_data['date'] = full_data['date'].apply(pd.DateOffset(1))
 
     # Normalize confirmed cases for population and export to csv
-    census_data = preprocess_census(drop_tot = False)[['TOT_POP', 'FIPS']]
+    census_data = preprocess_census(drop_tot = False, use_reduced=True)[['TOT_POP', 'FIPS']].reset_index(drop=True)
 
     merged_df = pd.merge(left=census_data, right=full_data, how='left', on='FIPS', copy=False)
     merged_df['confirmed_cases'] = (merged_df['confirmed_cases']/merged_df['TOT_POP'] * 100000).round()
