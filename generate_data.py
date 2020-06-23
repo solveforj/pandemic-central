@@ -113,6 +113,7 @@ def preprocess_census(year = 2018, drop_tot = True, use_reduced = False):
     # The original census file is too large for repository, but the preprocessed and reduced version may be used
     if use_reduced == True:
         data = pd.read_csv("data/census.csv")
+        return data
 
     # Import census data file (in same directory as repository)
     # Source: US census
