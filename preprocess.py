@@ -15,7 +15,7 @@ import shutil
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 __status__ = 'released'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 
@@ -195,7 +195,6 @@ def google_mobility_to_pd(): # process Google Mobility Report
     date = date.replace('.csv', '')
     date = date.replace('-', '')
     if int(date) < 20200611: # Google added new columns
-
         with open(path) as data:
             reader = csv.reader(data)
             cols = next(reader)
@@ -206,8 +205,10 @@ def google_mobility_to_pd(): # process Google Mobility Report
             usecols=cols,
             low_memory=False
         )
+
         # Keep only rows that are in the US
         df_google = df_load.loc[df_load['country_region_code'] == 'US']
+
         # Insert a new 'id' column (state name + county name)
         df_google.insert(len(df_google.columns), 'id', \
             df_google['sub_region_1'] + ' ' + df_google['sub_region_2'] + '-',\
@@ -220,11 +221,14 @@ def google_mobility_to_pd(): # process Google Mobility Report
         df_google['id'] = df_google['id'].str.replace(' City-', '')
         df_google['id'] = df_google['id'].str.replace(' Island-', '')
         df_google['id'] = df_google['id'].str.replace(' Municipality-', '')
+
         # Drop rows that do not represent county properly
         df_google = df_google.dropna(subset=['sub_region_1', 'sub_region_2'])
+
         # Remove unnecessary columns
         df_google = df_google.drop(['sub_region_1', 'sub_region_2', \
          'country_region_code'], 1)
+
         # Read FIPS dictionary
         with open('raw_data/dicts/fips_codes.txt', 'r') as f:
             contents = f.read()
@@ -232,13 +236,13 @@ def google_mobility_to_pd(): # process Google Mobility Report
         df_google['fips'] = df_google['id'].replace(fips_dict)
         pd.options.mode.chained_assignment='warn' # return to default
         df_google = df_google.drop(['id'], 1) # drop ID column
-
         cols = cols[4:] # get the column names of mobility records
+
         # Take the average of the categories as a new column
         df_google['google_mobility'] = df_google[cols].mean(axis=1, skipna=True)
 
-        df_google = df_google.drop(cols, 1) # drop all the unnecessary columns
-
+        # drop all the unnecessary columns
+        df_google = df_google.drop(cols, 1)
         df_google = df_google.reset_index(drop=True)
 
     else: # Google Mobility Data already includes FIPS after 2020-06-11
@@ -268,19 +272,23 @@ def google_mobility_to_pd(): # process Google Mobility Report
 
 def unacast_to_pd(): # process Unacast data as Pandas dataframe
     path = get_latest_file('unacast')
+
     with open(path) as data:
         reader = csv.reader(data)
         cols = next(reader)
+
     for i in range(3):
         _ = cols.pop(0) # remove 'state_code', 'state_fips', and 'state_name'
     _ = cols.pop(1) # remove 'county_name'
     _ = cols.pop(2) # remove 'last_updated'
+
     df_unacast = pd.read_csv(
         path,
         header=0,
         usecols=cols,
         low_memory=False
     )
+
     # drop unnecessary columns
     df_unacast = df_unacast.drop(['covid', 'grade_total', 'n_grade_total', \
         'grade_distance', 'n_grade_distance', 'grade_visitation', 'n_grade_visitation',
@@ -304,6 +312,7 @@ def final(dst='processed_data/7-days-mobility/7d-mobility'):
     dst = dst + '-' + t + '.csv'
     path = get_latest_file('mobility')
     mobility = pd.read_csv(path, dtype={'fips':int})
+
     # drop rows with empty entries in any column
     mobility = mobility.sort_values(['fips', 'date'], axis=0).dropna()
     fips_list = pd.read_csv("raw_data/census/census-2018.csv",\
@@ -317,6 +326,7 @@ def final(dst='processed_data/7-days-mobility/7d-mobility'):
     for i in range(len(cols)):
         mobility[new_cols[i]] = \
             pd.Series(mobility.groupby('fips')[cols[i]].rolling(7).mean()).reset_index(drop=True)
+
     # Shift the col down by one row to make sense (past 7 days from a date)
     mobility['date'] = pd.to_datetime(mobility['date'])
     mobility['date'] = mobility['date'].apply(pd.DateOffset(1))
@@ -335,6 +345,7 @@ def final(dst='processed_data/7-days-mobility/7d-mobility'):
 def get_fips_dict():
     src = get_latest_file('jhu')
     dataset_path = get_latest_file('jhu')
+
     # Read Johns Hopkins lastest dataset
     df_jhu = pd.read_csv(
         dataset_path,
@@ -344,9 +355,11 @@ def get_fips_dict():
     )
     df_jhu.insert(len(df_jhu.columns), 'id', df_jhu['Province_State'] + ' ' + \
         df_jhu['Admin2'])
+
     # Drop the rows that do not represent county properly
     df_jhu = df_jhu.dropna(subset=['FIPS', 'id'])
     dict = pd.Series(df_jhu['FIPS'].values, index=df_jhu['id']).to_dict()
+
     # Add the following missing county FIPS, too
     dict['Virginia Winchester-'] = '51840'
     dict['Virginia Williamsburg-'] = '51830'
@@ -471,6 +484,7 @@ def get_fips_dict():
     dict['Idaho Shoshone'] = '16079'
     dict['Minnesota Cook'] = '17031'
     dict['Colorado Kiowa'] = '08061'
+
     # Export dictionary of FIPS codes as text file
     if not os.path.exists('raw_data/dicts'):
         os.mkdir('raw_data/dicts')

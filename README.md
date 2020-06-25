@@ -1,5 +1,11 @@
 # Pandemic Central
-Use Machine Learning to predict the number of COVID-19 cases in the next 7 days. We are also on [Twitter](https://twitter.com/PandemicCentral)!
+
+<p align="center">
+  <img width="460" src="https://i.ibb.co/s65MwMK/pandemic-central-github.png"><br>
+  <b>An application of Machine Learning in predicting COVID-19 cases</b>
+</p>
+
+Follow us on [Twitter](https://twitter.com/PandemicCentral)!
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/solveforj/pandemic-central/blob/master/LICENSE.txt)
@@ -9,21 +15,26 @@ Follow these instructions to get the project up and running on your local machin
 
 ### Prerequisites
 These are what you **must** install before using our project.
-1. [Scikit-learn](https://scikit-learn.org/stable/install.html)
 
-2. [TensorFlow](https://www.tensorflow.org/install) (release 2.0.0 or later)
+1. [NumPy](https://pypi.org/project/numpy/) and [Matplotlib](https://pypi.org/project/matplotlib/)
 
-### GitHub
-Make sure you clone and pull the lastest data from Pandemic Central.
-Notice that our repository can always be found at https://github.com/solveforj/pandemic-central.
-This is still in its early stages, so feel free to comment or pull request.
-Your contributions are very valuable to us and this project.
+2. [Scikit-learn](https://scikit-learn.org/stable/install.html)
+
+3. [TensorFlow](https://www.tensorflow.org/install) (release ≥ 2.0.0)
 
 ### Run
+To run project, first clone this repository, then run this command
   ```
   python3 pandemic-central
   ```
-or you can also run individual modules for your own purposes.
+or you can also download the zip package from Lastest Release **(we recommend cloning and pulling method since it contains the lastest data files and hot fixes.)**
+
+For more details, please also read USAGE.md.
+
+### GitHub
+Make sure you always clone and pull the lastest data from Pandemic Central.
+**Notice that our repository can always be found at https://github.com/solveforj/pandemic-central.**
+
 
 ## Project Structure
 This is not complete project structure, read USAGE.md for more details.
@@ -32,6 +43,7 @@ pandemic-central/
   ├── __init__.py
   ├── __main__.py
   │
+  ├── data/
   ├── raw_data/
   ├── processed_data/
   ├── models/
@@ -41,7 +53,7 @@ pandemic-central/
   ├── preprocess.py
   ├── README.md
   ├── tf_predict.py
-  ├── train_scikit.py
+  ├── train.py
   └── USAGE.md
 ```
 In which:
@@ -49,11 +61,13 @@ In which:
 
 - `processed_data/` contains processed and merged data and ready for training.
 
-- `models/` contains saved model from training and ready for deployment.
+- `data/` contains other necessary datasets such as census or epidemiology.
+
+- `models/` contains saved model from training and for later deployment.
 
 - `generate_data.py` and `preprocess.py` process raw data.
 
-- `train_scikit.py` uses processed data and trains in deep neural network using Scikit-learn.
+- `train.py` uses processed data and trains in deep neural network using Scikit-learn.
 
 - `tf_predict.py` does similar thing as train_scikit module but using TensorFlow. *This module is experimental at this moment.*
 
@@ -68,12 +82,23 @@ In which:
 * [**Duy Cao**](https://github.com/caominhduy/)
 * [**Kimberly Diwa**](https://github.com/kdiwa/)
 
+## Support
+Since this is still in its first versions, bugs and incompletions are unavoidable. Please feel free to comment or do pull request.
+Your contributions are very valuable to us and this project.
+
+For techical support, please email our developers:
+jgalasso@udallas.edu (Joseph) or dcao@udallas.edu (Duy). Thank you for your patience.
+
 ## Credits
-Here is a list of datasets we have used so far. Our project can not be completed without these great and open sources.
+ Our project can not be completed without these great sources. We do not own any data, all input data we use are open-source or permission-granted.
+
+ **Here is a list of datasets we have used so far:**
 
 1. [Apple Maps Mobility Trends Reports](https://www.apple.com/covid19/mobility)
 
 2. [Google Community Mobility Reports](https://www.google.com/covid19/mobility/)
+
+3. [Facebook Movement Range](https://data.humdata.org/dataset/movement-range-maps)
 
 3. [Johns Hopkins CSSEGISandData](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports)
 
@@ -93,7 +118,7 @@ Here is a list of datasets we have used so far. Our project can not be completed
 
 We also thank you TensorFlow and community for very detailed and helpful official documentations.
 
-**Websites with interesting data:**
+**Don't forget to visit our friend websites with interesting data:**
 
 * Facebook Data for Good
 
@@ -119,7 +144,3 @@ We also thank you TensorFlow and community for very detailed and helpful officia
 * Kaggle COVID-19 Database
 
   https://www.kaggle.com/sudalairajkumar/novel-corona-virus-2019-dataset
-
-**Full Data Google Drive Link**
-
-https://drive.google.com/drive/folders/1gBTJ_Gq7qE0zkzLBxJpxq65ydMfODHBl?usp=sharing
