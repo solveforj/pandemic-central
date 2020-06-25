@@ -39,8 +39,8 @@ def make_ML_model(data, output, density = 0):
     n['value'] = regr.feature_importances_
     print(n.sort_values('value'))
     eval = pd.DataFrame()
-    eval['training_label'] = y
-    eval['model_predictions'] = regr.predict(nX)
+    eval['training_label'] = y_test
+    eval['model_predictions'] = regr.predict(X_test)
     eval.to_csv(os.path.split(os.getcwd())[0] + "/" + output + "_training_predictions.csv", index=False)
     pkl_filename = os.path.split(os.getcwd())[0] + "/" + output +".pkl"
     with open(pkl_filename, 'wb') as file:
