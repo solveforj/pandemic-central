@@ -11,6 +11,8 @@ from datetime import datetime, date
 import csv
 import ast
 import shutil
+import requests
+import json
 
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
@@ -26,11 +28,11 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         for file in files:
             new_file = file.replace('applemobilitytrends', '')
             new_file = new_file.replace('-', '')
-            new_file = new_file.replace('.csv', '')
+            new_file = new_file.replace('.csv.gz', '')
             new_files.append(new_file)
         max_ = max(new_files)
         lastest_file = 'applemobilitytrends-' + max_[:4] + '-' + max_[4:6] + \
-            '-' + max_[6:] + '.csv'
+            '-' + max_[6:] + '.csv.gz'
         path = dir + src + '/' + lastest_file
 
     if src == 'jhu': # get path to the lastest Johns Hopkins Report
@@ -49,10 +51,10 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         new_files = []
         for file in files:
             new_file = file.replace('-', '')
-            new_file = new_file.replace('.csv', '')
+            new_file = new_file.replace('.csv.gz', '')
             new_files.append(new_file)
         max_ = max(new_files)
-        lastest_file = max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + '.csv'
+        lastest_file = max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + '.csv.gz'
         path = dir + src + '/' + lastest_file
 
     if src == 'mobility': # get path to the lastest mobility (google + apple)
@@ -60,12 +62,12 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         new_files = []
         for file in files:
             new_file = file.replace('mobility-', '')
-            new_file = new_file.replace('.csv', '')
+            new_file = new_file.replace('.csv.gz', '')
             new_file = new_file.replace('-', '')
             new_files.append(new_file)
         max_ = max(new_files)
         lastest_file = 'mobility-' + max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + \
-            '.csv'
+            '.csv.gz'
         path = 'processed_data/' + src + '/' + lastest_file
 
     if src == '7-days-mobility': # get path to the lastest 7-days-mobility (google + apple)
@@ -111,7 +113,7 @@ def check_lastest_file(dir): # verify the lastest file with system time
     src = dir.split('/')[1]
     if src == 'apple':
         t = date.today().isoformat()
-        if t == dir.split('applemobilitytrends-')[1].replace('.csv', ''):
+        if t == dir.split('applemobilitytrends-')[1].replace('.csv.gz', ''):
             return True
         else:
             return False
@@ -125,24 +127,37 @@ def check_lastest_file(dir): # verify the lastest file with system time
 
 def get_file_on_date(src, date, dir='raw_data/'): # get the directory of the file on specified date
     if src == 'apple':
-        path = dir + src + '/' + 'applemobilitytrends-' + date + '.csv'
+        path = dir + src + '/' + 'applemobilitytrends-' + date + '.csv.gz'
     if src == 'jhu':
         path = dir + src + '/county_renamed/' + date + '.csv'
     return path
 
+def get_google_data():
+    filename = date.today().isoformat() + '.csv.gz'
+    filepath = 'raw_data/google/' + filename
+    url = 'https://www.gstatic.com/covid19/mobility/Global_Mobility_Report.csv'
+    google_df = pd.read_csv(url, low_memory=False)
+    google_df.to_csv(filepath, compression='gzip', index=False)
+
+def get_apple_data():
+    json_url = 'https://covid19-static.cdn-apple.com/covid19-mobility-data/current/v3/index.json'
+    content = requests.get(json_url).text
+    js = json.loads(content)
+    url = 'https://covid19-static.cdn-apple.com' + js['basePath'] + \
+        js['regions']['en-us']['csvPath']
+    apple_df = pd.read_csv(url, low_memory=False)
+    filename = url.split('/')[-1] + '.gz'
+    filepath = 'raw_data/apple/' + filename
+    apple_df.to_csv(filepath, compression='gzip', index=False)
+
 def apple_mobility_to_pd(): # process Apple Mobility Report as Pandas dataframe
     path = get_latest_file('apple')
-    with open(path) as data:
-        reader = csv.reader(data)
-        cols = next(reader)
-    _ = cols.pop(3) # filter out 'alternative_name'
-    _ = cols.pop(4) # filter out 'country'
     df_load = pd.read_csv(
         path,
         header=0,
-        usecols=cols # final move for filtering
+        low_memory=False
     )
-
+    df_load = df_load.drop(['alternative_name', 'country'], 1)
     # Keep only rows that belong to some 'county'
     df_apple = df_load.loc[df_load['geo_type'] == 'county']
     # Keep only rows that represent 'driving'
@@ -183,6 +198,7 @@ def apple_mobility_to_pd(): # process Apple Mobility Report as Pandas dataframe
     df_apple = df_apple.melt(id_vars=['fips'], var_name='date', \
         value_name='apple_mobility').sort_values(['fips', 'date'])
     df_apple = df_apple.dropna(subset=['fips']).sort_values(['fips', 'date'])
+    df_apple = df_apple.astype({'fips': 'float'})
     df_apple = df_apple.astype({'fips': 'int32'})
     df_apple = df_apple.reset_index(drop=True)
 
@@ -192,20 +208,15 @@ def google_mobility_to_pd(): # process Google Mobility Report
     path = get_latest_file('google')
     new_path = path
     date = new_path.replace('raw_data/google/', '')
-    date = date.replace('.csv', '')
+    date = date.replace('.csv.gz', '')
     date = date.replace('-', '')
-    if int(date) < 20200611: # Google added new columns
-        with open(path) as data:
-            reader = csv.reader(data)
-            cols = next(reader)
-        _ = cols.pop(1) # filter out 'country_region'
+    if int(date) < 20200611: # Google added new columns after this date
         df_load = pd.read_csv(
             path,
             header=0,
-            usecols=cols,
             low_memory=False
         )
-
+        df_load = df_load.drop(['country_region'], 1) # filter out 'country_region'
         # Keep only rows that are in the US
         df_google = df_load.loc[df_load['country_region_code'] == 'US']
 
@@ -236,6 +247,7 @@ def google_mobility_to_pd(): # process Google Mobility Report
         df_google['fips'] = df_google['id'].replace(fips_dict)
         pd.options.mode.chained_assignment='warn' # return to default
         df_google = df_google.drop(['id'], 1) # drop ID column
+        cols = df_google.columns.tolist()
         cols = cols[4:] # get the column names of mobility records
 
         # Take the average of the categories as a new column
@@ -246,25 +258,24 @@ def google_mobility_to_pd(): # process Google Mobility Report
         df_google = df_google.reset_index(drop=True)
 
     else: # Google Mobility Data already includes FIPS after 2020-06-11
-        with open(path) as data:
-            reader = csv.reader(data)
-            cols = next(reader)
-        for i in range(5):
-            _ = cols.pop(0)
+        drop_list = ['country_region_code', 'country_region', 'sub_region_1', \
+            'sub_region_2', 'iso_3166_2_code']
         df_load = pd.read_csv(
             path,
             header=0,
-            usecols=cols,
             dtype={'census_fips_code':np.str},
             low_memory=False
         )
+        df_load = df_load.drop(drop_list, 1)
         # Drop rows that do not represent county properly
         df_google = df_load.dropna(subset=['census_fips_code'])
         df_google = df_google.rename(columns={'census_fips_code': 'fips'})
+        cols = df_google.columns.tolist()
         cols = cols[2:] # get the column names of mobility records
         # Take the average of the categories as a new column
         df_google['google_mobility'] = df_google[cols].mean(axis=1, skipna=True)
         df_google = df_google.drop(cols, 1) # drop all the unnecessary columns
+        df_google = df_google.astype({'fips': 'float'})
         df_google = df_google.astype({'fips': 'int32'})
         df_google = df_google.reset_index(drop=True)
 
@@ -298,13 +309,13 @@ def unacast_to_pd(): # process Unacast data as Pandas dataframe
 # merge all the mobility reports into one csv file
 def merger(dst='processed_data/mobility/mobility'):
     t = date.today().isoformat()
-    dst = dst + '-' + t + '.csv'
+    dst = dst + '-' + t + '.csv.gz'
     df_google = google_mobility_to_pd()
     df_apple = apple_mobility_to_pd()
     df_merged = pd.merge(df_google, df_apple, how='outer', on=['fips', 'date'])
     if os.path.exists(dst): # overwrite the old dataset (if any)
         os.remove(dst)
-    df_merged.to_csv(dst, index=False) # export as csv file
+    df_merged.to_csv(dst, index=False, compression='gzip') # export as csv file
     return df_merged
 
 def final(dst='processed_data/7-days-mobility/7d-mobility'):
@@ -508,6 +519,14 @@ def renamer(src='raw_data/jhu/county', dst='raw_data/jhu/county_renamed'):
 def main():
     renamer()
     get_fips_dict()
+
+    print('[ ] Get Apple Mobility Data', end='\r')
+    get_apple_data()
+    print('[' + u'\u2713' + ']\n')
+
+    print('[ ] Get Google Mobility Data', end='\r')
+    get_google_data()
+    print('[' + u'\u2713' + ']\n')
 
     print('[ ] Preprocess Apple Mobility Data', end='\r')
     apple_mobility_to_pd()
