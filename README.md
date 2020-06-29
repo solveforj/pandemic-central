@@ -2,7 +2,7 @@
 
 <p align="center">
   <img width="460" src="https://i.ibb.co/s65MwMK/pandemic-central-github.png"><br>
-  <b>An application of Machine Learning in predicting COVID-19 cases</b>
+  <b>An application of Machine Learning in predicting U.S. COVID-19 cases (by county)</b>
 </p>
 
 Follow us on [Twitter](https://twitter.com/PandemicCentral)!
@@ -14,6 +14,7 @@ Follow us on [Twitter](https://twitter.com/PandemicCentral)!
 Follow these instructions to get the project up and running on your local machine.
 
 ### Prerequisites
+
 These are what you **must** install before using our project.
 
 1. [NumPy](https://pypi.org/project/numpy/) and [Matplotlib](https://pypi.org/project/matplotlib/)
@@ -21,6 +22,8 @@ These are what you **must** install before using our project.
 2. [Scikit-learn](https://scikit-learn.org/stable/install.html)
 
 3. [TensorFlow](https://www.tensorflow.org/install) (release ≥ 2.0.0)
+
+Your local machine must also have Python 3 (≥ 3.7) installed beforehand.
 
 ### Run
 To run project, first clone this repository, then run this command

@@ -14,7 +14,7 @@ from urllib.request import urlopen
 import io
 from datetime import datetime
 import numpy as np
-from preprocess import get_latest_file
+from preprocess import get_latest_file, get_facebook_data
 from datetime import date
 
 __author__ = 'Duy Cao, Joseph Galasso'
@@ -173,17 +173,10 @@ def preprocess_facebook():
     # Get name of correct data file, which is in same directory as repository
     # Source: COVID-19 Mobility Data Network
     # Link: data.humdata.org/dataset/movement-range-maps
-    link = "https://data.humdata.org/dataset/movement-range-maps"
-    page = requests.get(link).content
-    soup = BeautifulSoup(page, 'html.parser')
-    data_link = soup.find_all('a', {"class": "btn btn-empty btn-empty-blue hdx-btn resource-url-analytics ga-download"}, href=True)[0]['href']
-    data_link = "https://data.humdata.org" + data_link
-    data_file = data_link.split("/")[-1].split(".")[0].replace("-data", "") + ".txt"
-    data_path = os.path.split(os.getcwd())[0] + "/" + data_file
 
     # Preprocess file
-    df = pd.read_csv(data_path, sep='\t', dtype={'polygon_id':str})
-    df = df[df['country'] == 'USA']
+    data_path = get_latest_file('facebook')
+    df = pd.read_csv(data_path, dtype={'polygon_id':str})
     df = df[['ds', 'polygon_id', 'all_day_bing_tiles_visited_relative_change', 'all_day_ratio_single_tile_users']]
     df = df.rename({'polygon_id':'FIPS','ds':'date','all_day_bing_tiles_visited_relative_change':'fb_movement_change', 'all_day_ratio_single_tile_users':'fb_stationary'}, axis=1)
     df = df.reset_index(drop=True)
@@ -486,7 +479,15 @@ def merge_data(save_files = False, mode = "training", ag=False):
     google_apple_mobility = google_apple_mobility.rename(columns={'fips':'FIPS'})
     saving_path = 'processed_data/merged/' + date.today().isoformat() + '.csv.gz'
 
-    print("[ ] Update Facebook Data", end='\r')
+    print('[ ] Get Facebook Mobility Data', end='\r')
+    status = get_facebook_data()
+    if status == 'success':
+        print('[' + u'\u2713' + ']\n')
+    else:
+        print('[' + u'\u2718' + ']\n')
+        print('\n Facebook Mobility Data could not be found\n')
+
+    print("[ ] Preprocess Facebook Mobility Data", end='\r')
     mobility = preprocess_facebook()
     print('[' + u'\u2713' + ']\n')
 

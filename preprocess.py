@@ -13,6 +13,8 @@ import ast
 import shutil
 import requests
 import json
+from zipfile import ZipFile
+from bs4 import BeautifulSoup
 
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
@@ -87,12 +89,13 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
         files = os.listdir(dir + src)
         new_files = []
         for file in files:
-            new_file = file.replace('.csv', '')
+            new_file = file.replace('.csv.gz', '')
+            new_file = new_file.replace('movement-range-', '')
             new_file = new_file.replace('-', '')
             new_files.append(new_file)
         max_ = max(new_files)
-        lastest_file = max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + \
-            '.csv'
+        lastest_file = 'movement-range-' + max_[:4] + '-' + max_[4:6] + \
+            '-' + max_[6:] + '.csv.gz'
         path = dir + src + '/' + lastest_file
 
     if src == 'merged': # get path to the lastest merged file
@@ -132,23 +135,75 @@ def get_file_on_date(src, date, dir='raw_data/'): # get the directory of the fil
         path = dir + src + '/county_renamed/' + date + '.csv'
     return path
 
+# Download Google Mobility Data and compress
 def get_google_data():
     filename = date.today().isoformat() + '.csv.gz'
     filepath = 'raw_data/google/' + filename
     url = 'https://www.gstatic.com/covid19/mobility/Global_Mobility_Report.csv'
-    google_df = pd.read_csv(url, low_memory=False)
-    google_df.to_csv(filepath, compression='gzip', index=False)
+    url_health = requests.get(url).status_code
+    if url_health == requests.codes.ok:
+        google_df = pd.read_csv(url, low_memory=False)
+        google_df.to_csv(filepath, compression='gzip', index=False)
+        return 'success'
+    else:
+        return 'fail'
 
+# Download Apple Mobility Data and compress
 def get_apple_data():
     json_url = 'https://covid19-static.cdn-apple.com/covid19-mobility-data/current/v3/index.json'
-    content = requests.get(json_url).text
-    js = json.loads(content)
-    url = 'https://covid19-static.cdn-apple.com' + js['basePath'] + \
-        js['regions']['en-us']['csvPath']
-    apple_df = pd.read_csv(url, low_memory=False)
-    filename = url.split('/')[-1] + '.gz'
-    filepath = 'raw_data/apple/' + filename
-    apple_df.to_csv(filepath, compression='gzip', index=False)
+    url_health = requests.get(json_url).status_code
+    if url_health == requests.codes.ok:
+        content = requests.get(json_url).text
+        js = json.loads(content)
+        url = 'https://covid19-static.cdn-apple.com' + js['basePath'] + \
+            js['regions']['en-us']['csvPath']
+        apple_df = pd.read_csv(url, low_memory=False)
+        filename = url.split('/')[-1] + '.gz'
+        filepath = 'raw_data/apple/' + filename
+        apple_df.to_csv(filepath, compression='gzip', index=False)
+        return 'success'
+    else:
+        return 'fail'
+
+# Download Facebook Mobility Data and compress
+def get_facebook_data():
+    url = 'https://data.humdata.org/dataset/movement-range-maps'
+    content = requests.get(url).content
+    soup = BeautifulSoup(content, 'html.parser')
+    download_url = soup.find_all('a',\
+        {"class": "btn btn-empty btn-empty-blue hdx-btn resource-url-analytics ga-download"},\
+         href=True)[0]['href']
+    download_url = 'https://data.humdata.org' + download_url
+    url_health = requests.get(download_url).status_code
+    if url_health == requests.codes.ok:
+        zip = requests.get(download_url)
+        os.mkdir('raw_data/facebook/temp')
+        temp_path = ('raw_data/facebook/temp/data.zip')
+        with open(temp_path, 'wb') as temp:
+            temp.write(zip.content)
+        with ZipFile(temp_path, 'r') as unzip:
+            unzip.extractall('raw_data/facebook/temp')
+
+        files = os.listdir('raw_data/facebook/temp/')
+        for filename in files:
+            if filename.startswith('movement-range'):
+                path = 'raw_data/facebook/temp/' + filename
+
+        # Read and compress data file
+        df_load = pd.read_csv(path, sep='\t', dtype={'polygon_id':str})
+        df_load = df_load[df_load['country'] == 'USA']
+        final = 'raw_data/facebook/' + \
+            path.split('/')[-1].replace('.txt', '.csv') + '.gz'
+        df_load.to_csv(final, compression='gzip', index=False)
+
+        # Remove temp
+        for filename in files:
+            os.remove('raw_data/facebook/temp/' + filename)
+        os.rmdir('raw_data/facebook/temp/')
+
+        return 'success'
+    else:
+        return 'fail'
 
 def apple_mobility_to_pd(): # process Apple Mobility Report as Pandas dataframe
     path = get_latest_file('apple')
@@ -520,14 +575,25 @@ def main():
     renamer()
     get_fips_dict()
 
+    # Download and compress Apple Mobility Data
     print('[ ] Get Apple Mobility Data', end='\r')
-    get_apple_data()
-    print('[' + u'\u2713' + ']\n')
+    status = get_apple_data()
+    if status == 'success':
+        print('[' + u'\u2713' + ']\n')
+    else:
+        print('[' + u'\u2718' + ']\n')
+        print('\n Apple Mobility Data could not be found\n')
 
+    # Download and compress Apple Mobility Data
     print('[ ] Get Google Mobility Data', end='\r')
-    get_google_data()
-    print('[' + u'\u2713' + ']\n')
+    status = get_google_data()
+    if status == 'success':
+        print('[' + u'\u2713' + ']\n')
+    else:
+        print('[' + u'\u2718' + ']\n')
+        print('\n Google Mobility Data could not be found\n')
 
+    # PREPROCESS APPLE AND GOOGLE DATA
     print('[ ] Preprocess Apple Mobility Data', end='\r')
     apple_mobility_to_pd()
     print('[' + u'\u2713' + ']\n')
