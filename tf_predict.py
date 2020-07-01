@@ -116,6 +116,7 @@ def main():
     test_predictions = model.predict(normed_test_data).flatten()
     print(test_predictions)
     test_dataset['predicted'] = test_predictions
+    test_dataset['real_values'] = test_labels
     test_dataset.to_csv('models/tensorflow/demo.csv', index=False)
 
     loss, mae, mse, mape = model.evaluate(normed_test_data, test_labels, verbose=2)

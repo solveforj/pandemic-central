@@ -1,7 +1,7 @@
 # Pandemic Central
 
 <p align="center">
-  <img width="460" src="https://i.ibb.co/s65MwMK/pandemic-central-github.png"><br>
+  <img width="460" src="https://i.ibb.co/xYSCLt7/Pandemic-Central-clear-background.png"><br>
   <b>An application of Machine Learning in predicting U.S. COVID-19 cases (by county)</b>
 </p>
 
@@ -90,7 +90,7 @@ Since this is still in its first versions, bugs and incompletions are unavoidabl
 Your contributions are very valuable to us and this project.
 
 For techical support, please email our developers:
-jgalasso@udallas.edu (Joseph) or dcao@udallas.edu (Duy). Thank you for your patience.
+[jgalasso@udallas.edu](mailto:jgalasso@udallas.edu) (Joseph) or [dcao@udallas.edu](mailto:dcao@udallas.edu) (Duy). Thank you for your patience.
 
 ## Credits
  Our project can not be completed without these great sources. We do not own any data, all input data we use are open-source or permission-granted.

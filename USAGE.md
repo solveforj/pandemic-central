@@ -1,13 +1,13 @@
 <p align="center">
-  <img width="460" src="https://i.ibb.co/s65MwMK/pandemic-central-github.png"><br>
+  <img width="460" src="https://i.ibb.co/xYSCLt7/Pandemic-Central-clear-background.png"><br>
   <b>An application of Machine Learning in predicting COVID-19 cases</b>
 </p>
 
 ## Introduction
-This provides you a high level overview of the package: how to understand the options, how to feed your own data, and how to read the output.
+This provides you a high level overview of the package: understanding the menu, how preprocessing works, etc.
 
 ### Disclaimer
- This does not aim to give you all detailed problems, or full knowledge of Machine Learning in a highly technical manner. Thus, if you have question such as "What is Random Forest?" and "What is an estimator?" then this is not for you. Official documentations are always the best sources to learn it!
+ This does not aim to give you everything in high details. Thus, if you have question such as "What is Random Forest?" and "What is an estimator?" then this is not for you. Official documentations and Google are always best friends!
 
 ### Decide your use case
 Before you proceed to read any further, please first do the following steps:
@@ -26,40 +26,44 @@ Before you proceed to read any further, please first do the following steps:
 
 3. **How comfortable do you feel with programming, especially Python, and Machine Learning platforms**
 
-If you are simply concerned of COVID-19, blogger, or reporter, and you only want to predict the information, then please visit our [Twitter](https://twitter.com/PandemicCentral) or [website](https://itsonit.com) first. These should always cover the lastest information about our project, with visuals, and also related information.
+If you are simply concerned of COVID-19, blogger, politician, or reporter, etc, or you only want to keep yourself updated with predicted information, then please visit our [Twitter](https://twitter.com/PandemicCentral) or [website](https://itsonit.com) first. These should always cover the lastest information about our project, visualized, and also related information.
 
-If you are a developer, then please proceed. Also, even if you do not use prediction, but are needing for a great source of related data about COVID-19 in USA, then we do believe that our project is also very useful for you. We have mobility data, epidemiological data, census, number of cases, facts, sorted to the precision of U.S. county and date!
+If you are a developer, then please proceed. Also, even if you do not use prediction, but are simply looking for a useful source of related data about COVID-19 in USA, then we do believe that our project is also very useful for you. We have mobility data, epidemiological data, census, number of cases, facts, etc. All are merged and sorted by U.S. county and timestamp!
 
 ## Understand The Menu
-Here is a menu, if you run it correctly without errors (well hopefully), here is what you should expect to see:
+Here is the menu, what you should expect to see:
 ![Main_Menu](https://i.ibb.co/NsdY2Qk/Screen-Shot-2020-06-24-at-1-59-10-PM.png)
 
-1. **Option 1:** you will use this option to create a full dataset of all necessary information, up-to-date (or at least to the lastest date that our source can provide data). If you clone and pull from Pandemic Central's repository frequently then you should have the latest processed data already, so unless you know what you are doing, you do not have to run this.
+1. **Option 1:** this will preprocess raw data and export into a CSV compressed, with up-to-date data (to the lastest date that all sources can provide data).
+Tip: If you clone and pull from Pandemic Central's repository frequently then you should have the latest processed data already, as we will try to push new data everyday.
 
-   * Output file size: around 12-30 MB after it completes (as zipped), make sure you have enough storage (at least 700 MB) for downloading some data from sources (will be erased after it is done).
+   * Output file size: make sure you have enough storage (at least 700 MB) for downloading some data from sources (most heavy files will be erased after its job is done).
 
    * Location: the output file will be placed inside the project folder, in `processed_data/merge/` with the name as the date when it is generated.
 
-   * How to view: first you need to unzip the file, it is in gzip format, so you may need special tool (Windows users) to unzip it. The unzipped will be in Comma-separated-values format (csv) and you can view it in many ways, but we recommend excel.
+   * How to view: first you need to unzip the file, it is in gzip format, so you may need special tool (for Windows users) to unzip it. The unzipped will be in Comma-separated-values format (csv) and you can view it in many ways, like Excel.
 
 
-2. **Option 2:** you will use this option to create a full datasets of information but Google and Apple mobility, these files (although not required to be generated) should give you a visual look of the input training data of Scikit-learn models.
+2. **Option 2:** this is similar to option 1, but the exported data will not include Google and Apple mobility data.
 
-    * Output file sizes: there will be 5 files, around 2-250 MB / ea, after it completes (as csv files), make sure you have enough storage.
+    * Output file sizes: *see option 1.*
 
     * Location: the output files will be placed **outside** the project folder.
 
-    * How to view: first you need to unzip the file, it is in gzip format, so you may need special tool (Windows users) to unzip it. The unzipped will be in Comma-separated-values format (csv) and you can view it in many ways, but we recommend Microsoft Excel.
+    * How to view: output data are CSV files, so you can view it directly.
 
 
-3. **Option 3:** this option is initially similar to *option 2* (except datasets are not exported into local csv files), before the processed dataframe is feeded into Scikit-learn (module `train.py`) for training and printing predictions.
+3. **Option 3:** this option is initially similar to *option 2* (except datasets are not exported into local csv files), then the processed dataframes are feeded into Scikit-learn (module `train.py`) for training and predicting with Machine Learning.
 
-  * Output file sizes: there will be 2 files, around 130-200 MB / ea, after it completes (as Pickle files), these will be our models for further evaluation or prediction.
+  * Output file sizes:
 
-  * Location: the output files will be placed **outside** the project folder.
+    - Models: there will be 2 files, around 130-200 MB / ea, after it completes (as Pickle files), these will be our models for further implementations.
 
-4. **Option 4:** this option assumes that you have already preprocessed the lastest data using option 1 or by cloning and pulling from our repository frequently. The lastest zipped dataset in `processed_data/merge/` will be used for TensorFlow training.
+    - Predictions: there will be 3 files, under 20 MB / ea, these will be CSV files and store all predicted data.
 
+  * Location: the models will be stored **outside** the project folder, the predicted data can be found at `predictions/`
+
+4. **Option 4:** this option assumes that you have already had the lastest data using option 1 or by pulling the lastest data from our repository frequently. The lastest zipped dataset in `processed_data/merge/` will be used for TensorFlow training. At this point, TensorFlow models are still in development as the mean absolute error is still about 70 cases (as comparison to apprx. 10 cases with Scikit-learn)
 
 5. **Option 5:** exit Python.
 
@@ -78,13 +82,13 @@ Indeed, in this project, we consider data preprocessing is the most important st
 Our project uses data from a variety of sources.
 
 #### Google Community Mobility Reports
-These are one of the first datasets that we have used in this project. For these kind of datasets, the latest file is the most important one since it should contain all of the data up to a point it is created. Here's how you can also collect this data for yourself!
+These are one of the first datasets that we have used in this project. For these kind of datasets, the latest file is the most important one since it should contain all of the data up to a point it is created.
 
-First, you need to visit [Google Community Mobility Reports](https://www.google.com/covid19/mobility/).
+You can visit Google Community Mobility Reports [here](https://www.google.com/covid19/mobility/).
 
 ![google_mobility_data_1](https://i.ibb.co/XCtyDsP/Screen-Shot-2020-06-24-at-5-23-08-PM.png)
 
-Right-click on "Download global CSV" and save as csv into your local machine. Then what you need to do is to rename it into the exact iso-formatted string after "Reports created ..." For example, if the CSV is created on 2020-06-22, then rename your download file from `Global_Mobility_Report.csv` to `2020-06-22.csv`. Then you copy that file to this directory: `raw_data/google/` and it is done!
+When running, the global mobility data will be downloaded and store at: `raw_data/google/`.
 
 With Google Data, as you may see in the CSV there have been a lot of empty values in the dataset showing that there is no record in many points of time and locations. So, after calculating the correlation between categories, we decide to go forward and average out the columns with the number of available entries on rows instead of dropping rows with NaNs. For example, a row with values
 
@@ -92,7 +96,7 @@ Retail |  Grocery and Pharmacy |  Park |  Transit |  Workplace |  Residential
 --|---|---|---|---|--
 1  |  2 |  3 |  4 |  5 | 6
 
-will be saved as 3.5.
+will be noticed as 3.5.
 
 Meanwhile, a row with entries
 
@@ -100,28 +104,70 @@ Retail |  Grocery and Pharmacy |  Park |  Transit |  Workplace |  Residential
 --|---|---|---|---|--
 NaN  |  Nan |  3 |  NaN |  NaN | NaN
 
-will be noticed as 3.
+will have value of 3.
 
 #### Apple Maps Mobility Trends Reports
 
-To collect lastest Apple Mobility data, first you need to visit [Apple Maps Mobility Trends Reports](https://www.apple.com/covid19/mobility).
+You can visit it [here](https://www.apple.com/covid19/mobility).
 
 ![apple_mobility_1](https://i.ibb.co/gyKFf87/Screen-Shot-2020-06-24-at-5-48-15-PM.png)
 
-Go ahead download the CSV file, then copy it into this directory: `raw_data/merged`. Leave the name as it is.
+The CSV file will be downloaded and compressed in this directory: `raw_data/merged`.
 
-In Apple Mobility Data, we have used rows with transportation type as `driving` since driving fit Google Mobility data better.
+In Apple Mobility Data, we have sorted to only use rows with transportation type as `driving` since *driving* suggests larger movement range as well as carpooling.
 
-#### Facebook Movement Range, Johns Hopkins COVID-19 and geographical data
+#### Facebook Movement Range
 
-For the rest data, they will be downloaded online automatically (since the link is permanent) for preprocessing, or data is constant and already saved in our repository (`data/`) (for example census or locally health statistics).
+You can visit our Facebook Movement Range source [here](https://data.humdata.org/dataset/movement-range-maps)
 
-#### 7-day Moving Average
+![Facebook Movement Range Maps](https://i.ibb.co/mzV2kdH/facebook-movement-range.png)
+
+Since the zip file has more than just data file, so when running, our program downloads, unzips, reads the data txt file, sorts out US data and compresses it in this directory `raw_data/facebook`.
+
+Then, the data is preprocessed by keeping the necessary columns, changing column names and exporting into `data/facebook_data.csv`.
+
+#### Other related health data
+
+For this part, we use data from variety of sources.
+
+1. **Racial Disparities** from *Surgo*.
+
+
+2. **Diabetes Data** from Institute for Health Metrics and Evaluation (IHME). Diagnosed and Undiagnosed Diabetes Prevalence by County in the U.S.
+
+
+3. **Obesity Data** from IHME [(source)](http://ghdx.healthdata.org/record/ihme-data/united-states-physical-activity-and-obesity-prevalence-county-2001-2011). We use the Obesity Prevalence 2011 data and separate male and female obesity data.
+
+4. **Motality Data** from IHME [(source)](http://ghdx.healthdata.org/record/ihme-data/united-states-life-expectancy-and-age-specific-mortality-risk-county-1980-2014)
+
+5. **Infectious Disease Mobility** from IHME [(source)](http://ghdx.healthdata.org/record/ihme-data/united-states-infectious-disease-mortality-rates-county-1980-2014)
+
+6. **Respiratory Disease Mortality** from IHME [(source)](http://ghdx.healthdata.org/record/ihme-data/united-states-chronic-respiratory-disease-mortality-rates-county-1980-2014)
+
+7. **Smoking Prevalence** from IHME [(source)](ghdx.healthdata.org/record/ihme-data/united-states-smoking-prevalence-county-1996-2012)
+
+8. And COVID-19 Data. For this part, our source code should explain better (see in `generate_data.py` from line 321).
+
+#### 14-day Moving Average
 
 In stock markets, Moving Average is a very well-known method to smooth out the fluctuations (if any) and to point out the trends of data.
 
 **But, why do we need it for COVID-19?**
 
-As you may have noticed, COVID-19 scenario is very time-sensitive. Situations change daily, even hours, it can also be rephrased as time series data. Also, the data report is really inconsitent between dates and counties.
+As you may have noticed, COVID-19 scenario is also time-sensitive. Situations change daily, even hours, thus it is considered as time series data. Normally, symptoms may appear after up to 14 days after exposure with COVID-19. Also, the data report techniques and testing procedures maybe inconsitent between dates, counties, and human behaviors.
 
-For example, as common sense, one may argue that since people are more available on weekends than weekdays, people normally test COVID-19 more on weekends (just an example to clarify the point, do not quote us on this!). There are many similar factors can make the pikes in data occur, so smoothing the data is never redundant.
+There are many factors causing the pikes in data to occur, so smoothing the data is very helpful in this case.
+
+## Training
+
+### Scikit-learn
+
+First we split the data into 2 datasets (90% as training dataset and 10% as testing dataset).
+
+For training in Scikit-learn, we use an built-in estimator called [*Random Forest Regressor*](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html).
+
+The accuracy metric is then scored using coefficient of determination of the predicted data on testing dataset (R^2), where 1.00 is the best.
+
+### TensorFlow
+
+*This part is still in development.*
