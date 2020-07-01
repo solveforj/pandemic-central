@@ -56,9 +56,8 @@ latest_no_mobility = make_predictions(latest_no_mobility, "latest_no_mobility", 
 combined_predictions = latest_mobility.append(latest_no_mobility, ignore_index=True)
 combined_predictions = combined_predictions.sort_values(['FIPS', 'date']).groupby(['FIPS']).tail(1)
 print(combined_predictions)
-#mobility_fips = set(latest_mobility['FIPS'].tolist())
-#filtered_no_mobility = latest_no_mobility[~latest_no_mobility['FIPS'].isin(mobility_fips)]
-#combined_predictions = latest_mobility.append(filtered_no_mobility, ignore_index=True)
+
+
 combined_predictions.iloc[:, 5:] = combined_predictions.iloc[:, 5:].round(2)
 
 id = combined_predictions['Location'] + ", " + combined_predictions['FIPS'].astype(str) + ", " + combined_predictions['region']
