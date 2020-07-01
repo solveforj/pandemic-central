@@ -21,7 +21,7 @@ __status__ = 'released'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 
 def make_ML_model(data, output, density = 0):
-    data['label'] = data.groupby('FIPS')['confirmed_cases'].shift(periods=-7)
+    data['label'] = data.groupby('FIPS')['confirmed_cases'].shift(periods=-14)
     data = data.drop('confirmed_cases', axis=1)
     data = data[data['POP_DENSITY'] >= density]
     data = data.replace([np.inf, -np.inf], np.nan).dropna()

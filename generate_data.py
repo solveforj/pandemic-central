@@ -183,8 +183,8 @@ def preprocess_facebook():
     df = df.reset_index(drop=True)
 
     # Compute 7 day (weekly) rolling averages for movement data
-    df['fb_movement_change'] = pd.Series(df.groupby("FIPS")['fb_movement_change'].rolling(7).mean()).reset_index(drop=True)
-    df['fb_stationary'] = pd.Series(df.groupby("FIPS")['fb_stationary'].rolling(7).mean()).reset_index(drop=True)
+    df['fb_movement_change'] = pd.Series(df.groupby("FIPS")['fb_movement_change'].rolling(14).mean()).reset_index(drop=True)
+    df['fb_stationary'] = pd.Series(df.groupby("FIPS")['fb_stationary'].rolling(14).mean()).reset_index(drop=True)
 
     # Move dates forward by 1 day so that movement averages represent data from past week
     df['date'] = pd.to_datetime(df['date'])
@@ -343,6 +343,7 @@ def preprocess_JHU():
             df.insert(0,"FIPS", [nyFIPS[fips]]*len(df))
             df = df.drop(['Hospitalizations','Deaths'], axis=1)
             df = df.rename({'DATE_OF_INTEREST':'date', 'Cases':'confirmed_cases'}, axis=1)
+            df['date'] = pd.to_datetime(df['date'])
             return df
 
     def process_FIPS(fips):
@@ -357,7 +358,6 @@ def preprocess_JHU():
     manhattan = read_NYC_county(manhattan, "manhattan")
     queens = read_NYC_county(queens, "queens")
     staten_island = read_NYC_county(staten_island, "staten_island")
-    print(staten_island)
 
     # Get all other data from Johns Hopkins
     jhu_data = pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv", dtype={"FIPS": str})
@@ -365,13 +365,22 @@ def preprocess_JHU():
     jhu_data['FIPS'] = jhu_data['FIPS'].apply(lambda x : process_FIPS(x))
     jhu_data = jhu_data.drop(["Admin2","Province_State","Country_Region","Lat","Long_","Combined_Key","UID","iso2","iso3","code3"], axis=1)
     jhu_data = jhu_data.melt(id_vars=['FIPS'], var_name = 'date', value_name = 'confirmed_cases')
+    jhu_data['date'] = pd.to_datetime(jhu_data['date'])
+    jhu_data = jhu_data.sort_values(['FIPS', 'date'])
+
+    # Case counts are cumulative and will be converted into daily change
+    jhu_data['confirmed_cases'] = jhu_data.groupby('FIPS')['confirmed_cases'].diff().dropna()
 
     # Merge Johns Hopkins Data with NYC data
     ny_fips_list = ["36005","36047","36061", "36081", "36085"]
-    full_data = pd.concat([jhu_data[~jhu_data['FIPS'].isin(ny_fips_list)], bronx, brooklyn,manhattan,queens,staten_island]).sort_values(['FIPS','date']).reset_index(drop=True)
+    jhu_data = jhu_data[~jhu_data['FIPS'].isin(ny_fips_list)]
+    full_data = pd.concat([jhu_data, bronx, brooklyn, manhattan, queens, staten_island])
+
+    full_data = full_data.sort_values(['FIPS','date'], axis=0)
+    full_data = full_data.reset_index(drop=True)
 
     # Compute 7-day (weekly) rolling average of cases for each county
-    full_data['confirmed_cases'] = pd.Series(full_data.groupby("FIPS")['confirmed_cases'].rolling(7).mean()).reset_index(drop=True)
+    full_data['confirmed_cases'] = pd.Series(full_data.groupby("FIPS")['confirmed_cases'].rolling(14).mean()).reset_index(drop=True)
     full_data = full_data[full_data['confirmed_cases'].notnull()]
 
     # Move dates forward by 1 day so that movement averages represent data from past week
@@ -421,6 +430,7 @@ def preprocess_Rt():
     merged_df = merged_df.rename({'mean':'rt_mean_MIT'},axis=1)
     merged_df = pd.merge(left=merged_df, right=projections, on=['state', 'date'], copy=False)
 
+    merged_df = merged_df.sort_values(['FIPS', 'state'])
     merged_df.to_csv("data/rt_data.csv", index=False, sep=',')
 
     return merged_df
@@ -436,8 +446,8 @@ def preprocess_testing():
     testing = testing.sort_values(['state','date']).reset_index(drop=True)
 
     # Compute 7 day (weekly) rolling averages for state testing data
-    testing['positiveIncrease'] = pd.Series(testing.groupby("state")['positiveIncrease'].rolling(7).mean()).reset_index(drop=True)
-    testing['totalTestResultsIncrease'] = pd.Series(testing.groupby("state")['totalTestResultsIncrease'].rolling(7).mean()).reset_index(drop=True)
+    testing['positiveIncrease'] = pd.Series(testing.groupby("state")['positiveIncrease'].rolling(14).mean()).reset_index(drop=True)
+    testing['totalTestResultsIncrease'] = pd.Series(testing.groupby("state")['totalTestResultsIncrease'].rolling(14).mean()).reset_index(drop=True)
 
     # Move dates forward by 1 day so that movement averages represent data from past week
     testing['date'] = testing['date'].apply(pd.DateOffset(1))
@@ -577,3 +587,4 @@ def merge_data(save_files = False, mode = "training", ag=False):
 
 if __name__ == '__main__':
     merge_data(save_files=True)
+    #preprocess_JHU()
