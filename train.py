@@ -22,6 +22,7 @@ __url__ = 'https://github.com/solveforj/pandemic-central'
 
 def make_ML_model(data, output, density = 0):
     data['label'] = data.groupby('FIPS')['confirmed_cases'].shift(periods=-7)
+    data = data.drop('confirmed_cases', axis=1)
     data = data[data['POP_DENSITY'] >= density]
     data = data.replace([np.inf, -np.inf], np.nan).dropna()
     X = data[data.columns[5:-2]]
@@ -47,14 +48,14 @@ def make_ML_model(data, output, density = 0):
         pickle.dump(regr, file)
 
 def main():
-    training_mobility, training_no_mobility = merge_data(mode="training", save_files=True)
+    #training_mobility, training_no_mobility = merge_data(mode="training", save_files=True)
 
     print("Making mobility model")
-    training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv")
+    training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz")
     make_ML_model(training_mobility, "mobility")
 
     print("Making non-mobility model")
-    training_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv")
+    training_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz")
     make_ML_model(training_no_mobility, "no_mobility")
 
 if __name__ == '__main__':
