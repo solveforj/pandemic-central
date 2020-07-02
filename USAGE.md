@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="460" src="https://i.ibb.co/xYSCLt7/Pandemic-Central-clear-background.png"><br>
+  <img alt="pandemic-central-logo" width="460" src="https://i.ibb.co/xYSCLt7/Pandemic-Central-clear-background.png"><br>
   <b>An application of Machine Learning in predicting COVID-19 cases</b>
 </p>
 
@@ -7,7 +7,7 @@
 This provides you a high level overview of the package: understanding the menu, how preprocessing works, etc.
 
 ### Disclaimer
- This does not aim to give you everything in high details. Thus, if you have question such as "What is Random Forest?" and "What is an estimator?" then this is not for you. Official documentations and Google are always best friends!
+ This does not aim to give you everything in details. Thus, if you have question such as "What is Random Forest?" and "What is an estimator?" then this is not for you. Official documentations and googling are always best friends!
 
 ### Decide your use case
 Before you proceed to read any further, please first do the following steps:
@@ -170,4 +170,19 @@ The accuracy metric is then scored using coefficient of determination of the pre
 
 ### TensorFlow
 
-*This part is still in development.*
+The input pipeline is similar to the one we use with Sklearn. However, for TensorFlow training, we use Google and Apple Mobility data along with Facebook Mobility data.
+
+For training, TensorFlow builds model with 3 layers, with ReLU activation and RMSprop gradient optimization.
+
+At this moment, the Mean Abosulte Error we have for TensorFlow model is about 1.09 - 1.5 cases for testing dataset (after about 700 epochs).
+
+<p align="center">
+  <img width="500" alt="tensorflow-report" src="https://i.ibb.co/mhHfLfC/overfit.png"><br>
+  <i>Figure 1: TensorFlow MAE</i>
+  <br><br>
+  <img width="500" alt="tensorflow-projections" src="https://i.ibb.co/w0jFs2R/tf-projection-demo.png"><br>
+  <i>Figure 2: Side-by-side projections by predicted data and real data</i>
+  <br><br>
+</p>
+
+*TensorFlow module is still in development and we are doing our best to improve the result.*

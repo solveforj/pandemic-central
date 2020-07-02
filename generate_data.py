@@ -488,8 +488,8 @@ def merge_data(save_files = False, mode = "training", ag=False):
     print('[' + u'\u2713' + ']\n')
 
 
-    print("[ ] Downloading Google and Apple Mobility Data", end='\r')
-    other_mobility_path = get_latest_file('7-days-mobility')
+    print("[ ] Reading Google and Apple Mobility Data", end='\r')
+    other_mobility_path = get_latest_file('14-days-mobility')
     google_apple_mobility = pd.read_csv(other_mobility_path)
     google_apple_mobility = google_apple_mobility.rename(columns={'fips':'FIPS'})
     saving_path = 'processed_data/merged/' + date.today().isoformat() + '.csv.gz'
@@ -549,7 +549,7 @@ def merge_data(save_files = False, mode = "training", ag=False):
 
     if ag: # do not delete
         apple_google_df = merged_DF.dropna() # do not delete
-        merged_DF = merged_DF.drop(['google_mobility_7d', 'apple_mobility_7d'], 1) # do not delete
+        merged_DF = merged_DF.drop(['google_mobility_14d', 'apple_mobility_14d'], 1) # do not delete
 
     columns = merged_DF.columns.tolist()
     columns.remove('fb_stationary')

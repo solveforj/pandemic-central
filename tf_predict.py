@@ -24,7 +24,7 @@ __version__ = '1.0.1'
 __status__ = 'developing'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 
-FEATURES = ['confirmed_cases', 'apple_mobility_7d', 'google_mobility_7d',\
+FEATURES = ['confirmed_cases', 'apple_mobility_14d', 'google_mobility_14d',\
     'fb_movement_change', 'asbestosis_mortality', 'pneumoconiosis_mortality',\
     'diarrheal_mortality', 'other_pneumoconiosis_mortality',\
     'silicosis_mortality', 'COPD_mortality', 'chronic_respiratory_mortality',\
@@ -88,7 +88,7 @@ def main():
 
     # Train
     early_stop_callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', \
-        patience=70, mode='min')
+        patience=50, mode='min')
 
     if not os.path.exists('models'):
         os.mkdir('models')
@@ -117,7 +117,7 @@ def main():
     print(test_predictions)
     test_dataset['predicted'] = test_predictions
     test_dataset['real_values'] = test_labels
-    test_dataset.to_csv('models/tensorflow/demo.csv', index=False)
+    test_dataset.to_csv('models/tensorflow/predict-demo.csv', index=False)
 
     loss, mae, mse, mape = model.evaluate(normed_test_data, test_labels, verbose=2)
     print("Testing set Mean Abs Error: {:5.2f} cases".format(mae))

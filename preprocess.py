@@ -72,16 +72,16 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
             '.csv.gz'
         path = 'processed_data/' + src + '/' + lastest_file
 
-    if src == '7-days-mobility': # get path to the lastest 7-days-mobility (google + apple)
+    if src == '14-days-mobility': # get path to the lastest 14-days-mobility (google + apple)
         files = os.listdir('processed_data/' + src)
         new_files = []
         for file in files:
-            new_file = file.replace('7d-mobility-', '')
+            new_file = file.replace('14d-mobility-', '')
             new_file = new_file.replace('.csv', '')
             new_file = new_file.replace('-', '')
             new_files.append(new_file)
         max_ = max(new_files)
-        lastest_file = '7d-mobility-' + max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + \
+        lastest_file = '14d-mobility-' + max_[:4] + '-' + max_[4:6] + '-' + max_[6:] + \
             '.csv'
         path = 'processed_data/' + src + '/' + lastest_file
 
@@ -373,7 +373,7 @@ def merger(dst='processed_data/mobility/mobility'):
     df_merged.to_csv(dst, index=False, compression='gzip') # export as csv file
     return df_merged
 
-def final(dst='processed_data/7-days-mobility/7d-mobility'):
+def final(dst='processed_data/14-days-mobility/14d-mobility'):
     t = date.today().isoformat()
     dst = dst + '-' + t + '.csv'
     path = get_latest_file('mobility')
@@ -387,11 +387,11 @@ def final(dst='processed_data/7-days-mobility/7d-mobility'):
         'date']).reset_index(drop=True)
 
     cols = ['google_mobility', 'apple_mobility']
-    new_cols = ['google_mobility_7d', 'apple_mobility_7d']
+    new_cols = ['google_mobility_14d', 'apple_mobility_14d']
 
     for i in range(len(cols)):
         mobility[new_cols[i]] = \
-            pd.Series(mobility.groupby('fips')[cols[i]].rolling(7).mean()).reset_index(drop=True)
+            pd.Series(mobility.groupby('fips')[cols[i]].rolling(14).mean()).reset_index(drop=True)
 
     # Shift the col down by one row to make sense (past 7 days from a date)
     mobility['date'] = pd.to_datetime(mobility['date'])
@@ -606,7 +606,7 @@ def main():
     merger()
     print('[' + u'\u2713' + ']\n')
 
-    print('[ ] Calculating 7-day moving average', end='\r')
+    print('[ ] Calculating 14-day moving average', end='\r')
     final()
     print('[' + u'\u2713' + ']\n')
 
