@@ -180,9 +180,12 @@ At this moment, the Mean Abosulte Error we have for TensorFlow model is about 1.
   <img width="500" alt="tensorflow-report" src="https://i.ibb.co/mhHfLfC/overfit.png"><br>
   <i>Figure 1: TensorFlow MAE</i>
   <br><br>
-  <img width="500" alt="tensorflow-projections" src="https://i.ibb.co/w0jFs2R/tf-projection-demo.png"><br>
-  <i>Figure 2: Side-by-side projections by predicted data and real data</i>
-  <br><br>
 </p>
 
-*TensorFlow module is still in development and we are doing our best to improve the result.*
+<a href="https://ibb.co/j6sPRjT"><img src="https://i.ibb.co/FxCLVdK/tf-projection-demo.png" alt="tf-projection-demo" border="0" /></a>
+
+<p align="center">
+<i>Figure 2: Side-by-side projections by predicted data and real data</i></p>
+
+
+*TensorFlow module is still in development and we are doing our best to improve the result*
