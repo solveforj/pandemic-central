@@ -182,7 +182,9 @@ At this moment, the Mean Abosulte Error we have for TensorFlow model is about 1.
   <br><br>
 </p>
 
+<p align="center">
 <a href="https://ibb.co/j6sPRjT"><img src="https://i.ibb.co/FxCLVdK/tf-projection-demo.png" alt="tf-projection-demo" border="0" /></a>
+</p>
 
 <p align="center">
 <i>Figure 2: Side-by-side projections by predicted data and real data</i></p>
