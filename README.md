@@ -5,7 +5,9 @@
   <b>An application of Machine Learning in predicting U.S. COVID-19 cases (by county)</b>
 </p>
 
-Follow us on [Twitter](https://twitter.com/PandemicCentral)!
+Visit [**Pandemic Central**](https://itsonit.com).
+
+We are also on [Twitter](https://twitter.com/PandemicCentral)!
 
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![License](http://img.shields.io/:license-mit-blue.svg)](https://github.com/solveforj/pandemic-central/blob/master/LICENSE.txt)

@@ -7,8 +7,8 @@
 This provides you a high level overview of the package: understanding the menu, how preprocessing works, etc.
 
 <p align="center">
-  <img alt="pandemic-central-logo" width="460" src="https://i.ibb.co/S6LwC3M/Pandemic-Central-Pipeline.png"><br>
-  <i>Figure 1: Project pipeline from input to processing and output</i>
+  <img alt="pandemic-central-pipeline" width="460" src="https://i.ibb.co/S6LwC3M/Pandemic-Central-Pipeline.png"><br>
+  <i>Figure 1: Graphic pipeline from input to processing and output</i>
 </p>
 
 ### Disclaimer
