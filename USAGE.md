@@ -6,6 +6,11 @@
 ## Introduction
 This provides you a high level overview of the package: understanding the menu, how preprocessing works, etc.
 
+<p align="center">
+  <img alt="pandemic-central-logo" width="460" src="https://i.ibb.co/S6LwC3M/Pandemic-Central-Pipeline.png"><br>
+  <i>Figure 1: Project pipeline from input to processing and output</i>
+</p>
+
 ### Disclaimer
  This does not aim to give you everything in details. Thus, if you have question such as "What is Random Forest?" and "What is an estimator?" then this is not for you. Official documentations and googling are always best friends!
 
@@ -178,7 +183,7 @@ At this moment, the Mean Abosulte Error we have for TensorFlow model is about 1.
 
 <p align="center">
   <img width="500" alt="tensorflow-report" src="https://i.ibb.co/mhHfLfC/overfit.png"><br>
-  <i>Figure 1: TensorFlow MAE</i>
+  <i>Figure 2: TensorFlow MAE</i>
   <br><br>
 </p>
 
@@ -187,7 +192,7 @@ At this moment, the Mean Abosulte Error we have for TensorFlow model is about 1.
 </p>
 
 <p align="center">
-<i>Figure 2: Side-by-side projections by predicted data and real data</i></p>
+<i>Figure 3: Side-by-side projections by predicted data and real data</i></p>
 
 
 *TensorFlow module is still in development and we are doing our best to improve the result*
