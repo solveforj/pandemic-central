@@ -497,7 +497,7 @@ def merge_data(save_files = False, ag=False):
     saving_path = 'processed_data/merged/' + date.today().isoformat() + '.csv.gz'
     print('[' + u'\u2713' + ']\n')
 
-    print('[ ] Get Facebook Mobility Data\n', end='\r')
+    print('[ ] Get Facebook Mobility Data', end='\r')
     status = get_facebook_data()
     if status == 'success':
         print('[' + u'\u2713' + ']\n')

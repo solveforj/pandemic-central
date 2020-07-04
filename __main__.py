@@ -16,7 +16,7 @@ from colorama import init, Fore, Back, Style
 import generate_data
 import train
 
-path = os.getcwd() + ('/pandemic-central')
+path = os.getcwd() + ('/pandemic-central-1.0.2')
 os.chdir(path)
 init()
 
