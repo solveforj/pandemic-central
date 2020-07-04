@@ -30,10 +30,10 @@ def main(state='on'):
     print()
     print(Style.DIM + 'An application of Machine Learning in predicting COVID-19\n')
     while state == 'on':
-        menu = ['1. Preprocess and export data only (for TensorFlow)\n',\
-            '2. Preprocess and export data only (without Apple Google data)\n',\
-            '3. Preprocess, train and predict with Scikit-learn\n',\
-            '4. Train and predict data using TensorFlow (EXPERIMENTAL)\n',\
+        menu = ['1. Preprocess and export data for TensorFlow model\n',\
+            '2. Preprocess and export data for SciKit-Learn model\n',\
+            '3. Execute full SciKit-Learn pipeline (preprocess data, train model, generate predictions)\n',\
+            '4. Train TensorFlow model and generate predictions (EXPERIMENTAL)\n',\
             '5. Exit']
         print(Fore.BLACK + Back.WHITE + Style.NORMAL)
         print('\nOPTIONS:\n')
@@ -49,7 +49,9 @@ def main(state='on'):
             preprocess.main()
             generate_data.merge_data(save_files=True, ag=False)
         elif user_input == '3':
+            generate_data.merge_data(save_files=True, ag=False)
             train.main()
+            predict.main()
         elif user_input == '4':
             tf_predict.main()
         elif user_input == '5':
