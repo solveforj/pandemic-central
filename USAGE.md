@@ -78,6 +78,8 @@ Tip: If you clone and pull from Pandemic Central's repository frequently then yo
 
     * Output files are placed in the **same directory** that the project folder is located in.
 
+    * Statistics about the performance of the model on training and validation will also be printed to screen.
+
   * `predict.py` will be run on the latter two of the datasets produced by `train.py` to produce a merged .csv file of counties with and without mobility, in addition to data for our website.
 
     * Output files (size < 50 Mb):
