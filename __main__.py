@@ -5,7 +5,7 @@ Please read README.md before using
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __status__ = 'released'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 

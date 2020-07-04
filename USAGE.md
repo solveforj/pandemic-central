@@ -7,8 +7,8 @@
 This provides you a high level overview of the package: understanding the menu, how preprocessing works, etc.
 
 <p align="center">
-  <img alt="pandemic-central-logo" width="460" src="https://i.ibb.co/S6LwC3M/Pandemic-Central-Pipeline.png"><br>
-  <i>Figure 1: Project pipeline from input to processing and output</i>
+  <img alt="pandemic-central-pipeline" width="460" src="https://i.ibb.co/S6LwC3M/Pandemic-Central-Pipeline.png"><br>
+  <i>Figure 1: Graphic pipeline from input to processing and output</i>
 </p>
 
 ### Disclaimer
@@ -31,7 +31,7 @@ Before you proceed to read any further, please first do the following steps:
 
 3. **How comfortable do you feel with programming, especially Python, and Machine Learning platforms**
 
-If you are simply concerned of COVID-19, blogger, politician, or reporter, etc, or you only want to keep yourself updated with predicted information, then please visit our [Twitter](https://twitter.com/PandemicCentral) or [website](https://itsonit.com) first. These should always cover the lastest information about our project, visualized, and also related information.
+If you are simply concerned of COVID-19, blogger, politician, or reporter, etc, or you only want to keep yourself updated with predicted information, then please visit our [website](https://itsonit.com) first. It should always cover the lastest information about our project, visualized, and also related information.
 
 If you are a developer, then please proceed. Also, even if you do not use prediction, but are simply looking for a useful source of related data about COVID-19 in USA, then we do believe that our project is also very useful for you. We have mobility data, epidemiological data, census, number of cases, facts, etc. All are merged and sorted by U.S. county and timestamp!
 
