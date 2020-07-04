@@ -31,13 +31,13 @@ Before you proceed to read any further, please first do the following steps:
 
 3. **How comfortable do you feel with programming, especially Python, and Machine Learning platforms**
 
-If you are simply concerned of COVID-19, blogger, politician, or reporter, etc, or you only want to keep yourself updated with predicted information, then please visit our [website](https://itsonit.com) first. It should always cover the lastest information about our project, visualized, and also related information.
+If you are simply concerned of COVID-19, blogger, politician, or reporter, etc, or you only want to keep yourself updated with predicted information, then please visit our [website](https://itsonit.com) first. It should always cover the latest information about our project, visualized, and also related information.
 
 If you are a developer, then please proceed. Also, even if you do not use prediction, but are simply looking for a useful source of related data about COVID-19 in USA, then we do believe that our project is also very useful for you. We have mobility data, epidemiological data, census, number of cases, facts, etc. All are merged and sorted by U.S. county and timestamp!
 
 ## Understand The Menu
 Here is the menu, what you should expect to see:
-![Main_Menu](https://i.ibb.co/NsdY2Qk/Screen-Shot-2020-06-24-at-1-59-10-PM.png)
+![Main_Menu](https://i.ibb.co/phWFd0Z/Screen-Shot-2020-07-04-at-3-24-18-AM.png)
 
 1. **Option 1:** this will preprocess raw data and export into a CSV compressed, with up-to-date data (to the lastest date that all sources can provide data).
 Tip: If you clone and pull from Pandemic Central's repository frequently then you should have the latest processed data already, as we will try to push new data everyday.
@@ -49,24 +49,44 @@ Tip: If you clone and pull from Pandemic Central's repository frequently then yo
    * How to view: first you need to unzip the file, it is in gzip format, so you may need special tool (for Windows users) to unzip it. The unzipped will be in Comma-separated-values format (csv) and you can view it in many ways, like Excel.
 
 
-2. **Option 2:** this is similar to option 1, but the exported data will not include Google and Apple mobility data.
+2. **Option 2:** This will run the `generate_data.py` file, generating two training datasets, one with Facebook mobility data and the other without.
 
-    * Output file sizes: *see option 1.*
+    * Output files (size < 50 Mb):
 
-    * Location: the output files will be placed **outside** the project folder.
+      1. training_mobility.csv.gz
 
-    * How to view: output data are CSV files, so you can view it directly.
+      2. training_no_mobility.csv.gz
+
+    * Output files are placed in the **same directory** that the project folder is located in.
 
 
-3. **Option 3:** this option is initially similar to *option 2* (except datasets are not exported into local csv files), then the processed dataframes are feeded into Scikit-learn (module `train.py`) for training and predicting with Machine Learning.
+3. **Option 3:** This will run the entire SciKit-Learn data processing, training, and predictions pipeline.
 
-  * Output file sizes:
+  * *Option 2* will be run first, generating the aforementioned datasets
 
-    - Models: there will be 2 files, around 130-200 MB / ea, after it completes (as Pickle files), these will be our models for further implementations.
+  * `train.py` will be run on these datasets, creating a Random Forest Regression model that will generate predictions on these datasets.
 
-    - Predictions: there will be 3 files, under 20 MB / ea, these will be CSV files and store all predicted data.
+    * Output files (size < 50 Mb):
 
-  * Location: the models will be stored **outside** the project folder, the predicted data can be found at `predictions/`
+        1. mobility_full_predictions.csv.gz
+
+        2. no_mobility_full_predictions.csv.gz
+
+        3. mobility_latest.csv.gz
+
+        4. no_mobility_latest.csv.gz
+
+    * Output files are placed in the **same directory** that the project folder is located in.
+
+  * `predict.py` will be run on the latter two of the datasets produced by `train.py` to produce a merged .csv file of counties with and without mobility, in addition to data for our website.
+
+    * Output files (size < 50 Mb):
+
+        1. full_predictions_yyyy-mm-dd.csv
+
+        2. yyyy-mm-dd_webdata.csv
+
+    * The first output file is placed in the `pandemic-central/predictions` folder and the second is placed in the **same directory** that the project folder is located in.
 
 4. **Option 4:** this option assumes that you have already had the lastest data using option 1 or by pulling the lastest data from our repository frequently. The lastest zipped dataset in `processed_data/merge/` will be used for TensorFlow training. At this point, TensorFlow models are still in development as the mean absolute error is still about 70 cases (as comparison to apprx. 10 cases with Scikit-learn)
 
