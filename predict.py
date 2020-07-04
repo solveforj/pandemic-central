@@ -16,22 +16,11 @@ from sklearn.preprocessing import StandardScaler
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __status__ = 'released'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 
 date_today = date.today().strftime('%Y-%m-%d')
-
-def timeseries(df, days, col):
-    # dataframe must (1) have a 'FIPS' column and a date column
-    df = df.sort_values(['FIPS', 'date'], axis=0, ascending=True)
-    grouped_df = df.groupby(['FIPS']).tail(30)
-    joined = grouped_df.groupby(['FIPS'])[col].apply(lambda x: ",".join(x.apply(str)))
-    joined_df = pd.DataFrame(joined).reset_index(drop=True)
-    joined_df.insert(0, 'FIPS', joined.index)
-    joined_df = joined_df.rename({col:col+"_graph"}, axis=1)
-    return joined_df
-
 
 def make_predictions(data, output, model):
     with open(os.path.split(os.getcwd())[0] + "/" + model, 'rb') as file:
@@ -44,26 +33,23 @@ def make_predictions(data, output, model):
     file.close()
     return data
 
-#latest_mobility, latest_no_mobility = merge_data(mode="predictions", save_files=True)
-latest_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/latest_mobility.csv.gz")
-latest_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/latest_no_mobility.csv.gz")
-print("Making mobility predictions")
-latest_mobility = make_predictions(latest_mobility, "latest_mobility", "mobility.pkl")
-
-print("Making non-mobility predictions")
-latest_no_mobility = make_predictions(latest_no_mobility, "latest_no_mobility", "no_mobility.pkl")
+latest_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/mobility_latest.csv.gz")
+latest_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/no_mobility_latest.csv.gz")
 
 combined_predictions = latest_mobility.append(latest_no_mobility, ignore_index=True)
-combined_predictions = combined_predictions.sort_values(['FIPS', 'date']).groupby(['FIPS']).tail(1)
-print(combined_predictions)
-
-
-combined_predictions.iloc[:, 5:] = combined_predictions.iloc[:, 5:].round(2)
+combined_predictions = combined_predictions.sort_values(['FIPS', 'date', 'fb_movement_change'], na_position='first').groupby(['FIPS', 'date']).tail(1)
+combined_predictions['fb_movement_change'] = combined_predictions['fb_movement_change'].astype(float)
+combined_predictions['fb_stationary'] = combined_predictions['fb_stationary'].astype(float)
+combined_predictions.iloc[:, 5:] = combined_predictions.iloc[:, 5:].round(3)
+combined_predictions = combined_predictions.astype(str)
 
 id = combined_predictions['Location'] + ", " + combined_predictions['FIPS'].astype(str) + ", " + combined_predictions['region']
 combined_predictions.insert(0, 'ID', id)
-cases_data = pd.read_csv('data/jhu_data.csv')
-cases_graph = timeseries(df=cases_data, days=30, col='confirmed_cases')
-combined_predictions = pd.merge(left=combined_predictions, right=cases_graph, how='left', on='FIPS', copy=False)
 
 combined_predictions.to_csv("predictions/full_predictions_" + date_today + ".csv", index=False)
+
+combined_predictions = combined_predictions[['ID', 'FIPS','date', 'fb_movement_change', 'test_positivity',\
+'rt_mean_MIT', 'confirmed_cases','model_predictions','POP_DENSITY', 'ELDERLY_POP',\
+'BA_MALE', 'BA_FEMALE', 'H_MALE','H_FEMALE']]
+
+combined_predictions.to_csv(os.path.split(os.getcwd())[0] + "/" + date_today + "_webdata.csv", index=False)

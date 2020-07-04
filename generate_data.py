@@ -20,7 +20,7 @@ from datetime import date
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __status__ = 'released'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 
@@ -466,6 +466,8 @@ def preprocess_testing():
     testing_pop['positiveIncrease'] = (testing_pop['positiveIncrease']/testing_pop['population']) * 100000
     testing_pop['totalTestResultsIncrease'] = (testing_pop['totalTestResultsIncrease']/testing_pop['population']) * 100000
     testing_pop = testing_pop.dropna().drop('population', axis=1)
+    testing_pop['test_positivity'] = testing_pop['positiveIncrease'] / testing_pop['totalTestResultsIncrease']
+    #testing_pop = testing_pop.drop(['positiveIncrease', 'totalTestResultsIncrease'], axis=1)
 
     # Get dataframe of all dates mapped to all FIPS from the Rt data
     fips_df = pd.read_csv("data/rt_data.csv", dtype={'FIPS':str,'state':str}, usecols=['FIPS','date','state'])
@@ -477,7 +479,7 @@ def preprocess_testing():
 
     return merged_df
 
-def merge_data(save_files = False, mode = "training", ag=False):
+def merge_data(save_files = False, ag=False):
     pd.options.mode.chained_assignment = None
 
     print("[ ] Preprocess Census and Health Data", end='\r')
@@ -495,7 +497,7 @@ def merge_data(save_files = False, mode = "training", ag=False):
     saving_path = 'processed_data/merged/' + date.today().isoformat() + '.csv.gz'
     print('[' + u'\u2713' + ']\n')
 
-    print('[ ] Get Facebook Mobility Data', end='\r')
+    print('[ ] Get Facebook Mobility Data\n', end='\r')
     status = get_facebook_data()
     if status == 'success':
         print('[' + u'\u2713' + ']\n')
@@ -558,12 +560,16 @@ def merge_data(save_files = False, mode = "training", ag=False):
     cleaned_DF = merged_DF.dropna(subset=columns)
     unused_DF = merged_DF[~merged_DF.index.isin(cleaned_DF.index)]
     training_mobility = cleaned_DF.dropna()
-    maxes = training_mobility.groupby('FIPS')['date'].transform(max)
-    latest_mobility = training_mobility.loc[training_mobility['date'] == maxes]
+    training_mobility = training_mobility.sort_values(['FIPS', 'date'])
+    #maxes = training_mobility.groupby('FIPS')['date'].transform(max)
+    #latest_mobility = training_mobility.loc[training_mobility['date'] == maxes]
+    #latest_mobility = training_mobility.groupby('FIPS', as_index=False).nth([-27, -20, -13, -7, -1])
     no_mobility = cleaned_DF[~cleaned_DF.index.isin(training_mobility.index)]
     no_mobility = no_mobility.drop(['fb_stationary', 'fb_movement_change'], axis=1)
-    maxes = no_mobility.groupby('FIPS')['date'].transform(max)
-    latest_no_mobility = no_mobility.loc[no_mobility['date'] == maxes]
+    no_mobility = no_mobility.sort_values(['FIPS', 'date'])
+    #maxes = no_mobility.groupby('FIPS')['date'].transform(max)
+    #latest_no_mobility = no_mobility.loc[no_mobility['date'] == maxes]
+    #latest_no_mobility = no_mobility.groupby('FIPS', as_index=False).nth([-27, -20, -13, -7, -1])
     training_no_mobility = cleaned_DF.drop(['fb_stationary', 'fb_movement_change'], axis=1)
 
     if save_files == True:
@@ -572,19 +578,15 @@ def merge_data(save_files = False, mode = "training", ag=False):
         if not ag:
             unused_DF.to_csv(os.path.split(os.getcwd())[0] + "/unused_data.csv.gz", index=False, compression='gzip')
             training_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz", index=False, compression='gzip')
-            latest_mobility.to_csv(os.path.split(os.getcwd())[0] + "/latest_mobility.csv.gz", index=False, compression='gzip')
-            latest_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/latest_no_mobility.csv.gz", index=False, compression='gzip')
+            #latest_mobility.to_csv(os.path.split(os.getcwd())[0] + "/latest_mobility.csv.gz", index=False, compression='gzip')
+            #latest_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/latest_no_mobility.csv.gz", index=False, compression='gzip')
             training_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz", index=False, compression='gzip')
 
     print('[' + u'\u2713' + ']\n')
 
-    if mode == "training":
-        return training_mobility, training_no_mobility
-    if mode == "predictions":
-        return latest_mobility, latest_no_mobility
-
     pd.options.mode.chained_assignment = 'warn' # return to default
+
+    return training_mobility, training_no_mobility
 
 if __name__ == '__main__':
     merge_data(save_files=True)
-    #preprocess_JHU()
