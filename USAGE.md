@@ -1,5 +1,5 @@
 <p align="center">
-  <img alt="pandemic-central-logo" width="460" src="https://i.ibb.co/xYSCLt7/Pandemic-Central-clear-background.png"><br>
+  <img alt="pandemic-central-logo" width="460" src="https://i.ibb.co/NZHV7dr/Pandemic-Central-clear-background.png"><br>
   <b>An application of Machine Learning in predicting COVID-19 cases</b>
 </p>
 

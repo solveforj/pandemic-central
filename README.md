@@ -1,7 +1,7 @@
 # Pandemic Central
 
 <p align="center">
-  <img width="460" src="https://i.ibb.co/xYSCLt7/Pandemic-Central-clear-background.png"><br>
+  <img width="460" src="https://i.ibb.co/NZHV7dr/Pandemic-Central-clear-background.png"><br>
   <b>An application of machine learning in forecasting U.S. COVID-19 cases</b>
 </p>
 
