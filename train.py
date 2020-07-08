@@ -44,7 +44,7 @@ def make_ML_model(data, output, density = 0):
     #y = nX['label']
     #nX = nX.drop(['kmeans', 'label'], axis=1)
     X_train, X_test, y_train, y_test = train_test_split(nX, y, train_size=0.9)
-    regr = RandomForestRegressor(n_estimators=40, n_jobs=4).fit(X_train, y_train)
+    regr = RandomForestRegressor(n_estimators=10, n_jobs=4).fit(X_train, y_train)
     #regr = MLPRegressor(random_state=1, max_iter=10000).fit(X_train, y_train)
     print("R^2 Score on unseen data subset:")
     print(regr.score(X_test, y_test))
