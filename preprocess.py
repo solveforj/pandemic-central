@@ -110,6 +110,19 @@ def get_latest_file(src, dir='raw_data/'): # get the directory of the lastest fi
             '.csv.gz'
         path = 'processed_data/' + src + '/' + lastest_file
 
+    if src == 'predictions': # get path to the lastest prediction file
+        files = os.listdir(src)
+        new_files = []
+        for file in files:
+            new_file = file.replace('full_predictions_', '')
+            new_file = new_file.replace('.csv', '')
+            new_file = new_file.replace('-', '')
+            new_files.append(new_file)
+        max_ = max(new_files)
+        lastest_file = 'full_predictions_' + max_[:4] + '-' + max_[4:6] + '-' + \
+            max_[6:] + '.csv'
+        path = src + '/' + lastest_file
+        
     return path
 
 def check_lastest_file(dir): # verify the lastest file with system time
