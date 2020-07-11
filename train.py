@@ -64,8 +64,6 @@ def make_ML_model(data, output, density = 0):
     data['model_predictions'] = regr.predict(nX)
     data = data.sort_values(['FIPS', 'date'])
     data.to_csv(os.path.split(os.getcwd())[0] + "/" + output + "_full_predictions.csv.gz", index=False, compression='gzip')
-    latest = data.groupby('FIPS', as_index=False).nth([-29, -22, -15, -8, -1])
-    latest.to_csv(os.path.split(os.getcwd())[0] + "/" + output + "_latest.csv.gz", index=False, compression='gzip')
 
     #pkl_filename = os.path.split(os.getcwd())[0] + "/" + output +".pkl"
     #with open(pkl_filename, 'wb') as file:
