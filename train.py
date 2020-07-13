@@ -92,8 +92,9 @@ def main():
     training_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz")
     n_r2_test, n_r2_train, n_mae_test, n_mae_train = make_ML_model(training_no_mobility, "no_mobility")
 
-    data_list = [[m_r2_train, m_mae_train, m_r2_test, m_mae_test], [n_r2_train, n_mae_train, n_r2_test, n_mae_test]]
-    modelstats = pd.DataFrame(data_list, columns=["trainingr2", "trainingmae", "testingr2", "testingmae"])
+    data_list = [["mobility",m_r2_train, m_mae_train, m_r2_test, m_mae_test], ["non-mobility",n_r2_train, n_mae_train, n_r2_test, n_mae_test]]
+    modelstats = pd.DataFrame(data_list, columns=["mobility","trainingr2", "trainingmae", "testingr2", "testingmae"])
+    modelstats.iloc[:, 1:] = modelstats.iloc[:, 1:].round(3)
     modelstats.to_csv("predictions/modelstats_" + date_today + ".csv", index=False)
 
 if __name__ == '__main__':
