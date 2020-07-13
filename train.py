@@ -11,10 +11,13 @@ from sklearn.neural_network import MLPRegressor
 import matplotlib.pyplot as plt
 import pickle
 import os
+from datetime import date
 from sklearn.preprocessing import StandardScaler
 from generate_data import merge_data
 from sklearn.cluster import KMeans
 from sklearn.metrics import mean_absolute_error
+
+date_today = date.today().strftime('%Y-%m-%d')
 
 np.random.seed(1)
 
@@ -47,13 +50,21 @@ def make_ML_model(data, output, density = 0):
     regr = RandomForestRegressor(n_estimators=10, n_jobs=4).fit(X_train, y_train)
     #regr = MLPRegressor(random_state=1, max_iter=10000).fit(X_train, y_train)
     print("R^2 Score on unseen data subset:")
-    print(regr.score(X_test, y_test))
+    r2_test = regr.score(X_test, y_test)
+    print(r2_test)
+
     print("R^2 Score on training data subset:")
-    print(regr.score(X_train, y_train))
+    r2_train = regr.score(X_train, y_train)
+    print(r2_train)
+
     print("Mean Absolute Error on unseen data subset:")
-    print(mean_absolute_error(y_test,regr.predict(X_test)))
+    mae_test = mean_absolute_error(y_test,regr.predict(X_test))
+    print(mae_test)
+
     print("Mean Absolute Error on unseen data subset:")
-    print(mean_absolute_error(y_train,regr.predict(X_train)))
+    mae_train = mean_absolute_error(y_train,regr.predict(X_train))
+    print(mae_train)
+
     print("Relative feature importances:")
     n = pd.DataFrame()
     n['features'] = X.columns
@@ -68,16 +79,22 @@ def make_ML_model(data, output, density = 0):
     #pkl_filename = os.path.split(os.getcwd())[0] + "/" + output +".pkl"
     #with open(pkl_filename, 'wb') as file:
     #    pickle.dump(regr, file)
+    return r2_test, r2_train, mae_test, mae_train
 
 def main():
 
+
     print("Making mobility model")
     training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz")
-    make_ML_model(training_mobility, "mobility")
+    m_r2_test, m_r2_train, m_mae_test, m_mae_train =  make_ML_model(training_mobility, "mobility")
 
     print("Making non-mobility model")
     training_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz")
-    make_ML_model(training_no_mobility, "no_mobility")
+    n_r2_test, n_r2_train, n_mae_test, n_mae_train = make_ML_model(training_no_mobility, "no_mobility")
+
+    data_list = [[m_r2_train, m_mae_train, m_r2_test, m_mae_test], [n_r2_train, n_mae_train, n_r2_test, n_mae_test]]
+    modelstats = pd.DataFrame(data_list, columns=["trainingr2", "trainingmae", "testingr2", "testingmae"])
+    modelstats.to_csv("predictions/modelstats_" + date_today + ".csv", index=False)
 
 if __name__ == '__main__':
     main()
