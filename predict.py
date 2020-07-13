@@ -61,7 +61,7 @@ combined_predictions = combined_predictions.astype(str)
 id = combined_predictions['Location'] + ", " + combined_predictions['FIPS'].astype(str) + ", " + combined_predictions['region']
 combined_predictions.insert(0, 'ID', id)
 
-combined_predictions.to_csv("predictions/full_predictions_" + date_today + ".csv", index=False)
+combined_predictions.to_csv("predictions/full_predictions_" + date_today + ".csv.gz", compression="gzip", index=False)
 
 combined_predictions = combined_predictions[['ID', 'FIPS','date', 'fb_movement_change', 'test_positivity',\
 'rt_mean_MIT', 'confirmed_cases','model_predictions','POP_DENSITY', 'ELDERLY_POP',\
