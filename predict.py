@@ -67,4 +67,5 @@ combined_predictions = combined_predictions[['ID', 'FIPS','date', 'fb_movement_c
 'rt_mean_MIT', 'confirmed_cases','model_predictions','POP_DENSITY', 'ELDERLY_POP',\
 'BA_MALE', 'BA_FEMALE', 'H_MALE','H_FEMALE']]
 
-#combined_predictions.to_csv(os.path.split(os.getcwd())[0] + "/" + date_today + "_webdata.csv", index=False)
+
+combined_predictions.to_csv(os.path.split(os.getcwd())[0] + "/" + date_today + "_webdata.csv", index=False)
