@@ -60,6 +60,7 @@ combined_predictions = combined_predictions.astype(str)
 
 id = combined_predictions['Location'] + ", " + combined_predictions['FIPS'].astype(str) + ", " + combined_predictions['region']
 combined_predictions.insert(0, 'ID', id)
+combined_predictions = combined_predictions.fillna("NULL")
 
 combined_predictions.to_csv("predictions/full_predictions_" + date_today + ".csv.gz", compression="gzip", index=False)
 
@@ -68,4 +69,4 @@ combined_predictions = combined_predictions[['ID', 'FIPS','date', 'fb_movement_c
 'BA_MALE', 'BA_FEMALE', 'H_MALE','H_FEMALE']]
 
 
-combined_predictions.to_csv(os.path.split(os.getcwd())[0] + "/" + date_today + "_webdata.csv", index=False)
+#combined_predictions.to_csv(os.path.split(os.getcwd())[0] + "/" + date_today + "_webdata.csv", index=False)
