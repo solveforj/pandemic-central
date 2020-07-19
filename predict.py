@@ -36,8 +36,8 @@ def make_predictions(data, output, model):
 #latest_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/mobility_latest.csv.gz")
 #latest_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/no_mobility_latest.csv.gz")
 
-mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "mobility_full_predictions.csv.gz")
-no_mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "no_mobility_full_predictions.csv.gz")
+mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "mobility_full_predictions.csv.gz", dtype={"label":float})
+no_mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "no_mobility_full_predictions.csv.gz",dtype={"label":float})
 
 latest_dates = list(range(((9*-7)-1), 6, 7))
 latest_mobility = mobility_data.groupby("FIPS", as_index=False).nth(latest_dates)
@@ -56,13 +56,15 @@ combined_predictions = combined_predictions.groupby("FIPS").tail(10)
 combined_predictions['fb_movement_change'] = combined_predictions['fb_movement_change'].astype(float)
 combined_predictions['fb_stationary'] = combined_predictions['fb_stationary'].astype(float)
 combined_predictions.iloc[:, 5:] = combined_predictions.iloc[:, 5:].round(3)
-combined_predictions = combined_predictions.astype(str)
 
 id = combined_predictions['Location'] + ", " + combined_predictions['FIPS'].astype(str) + ", " + combined_predictions['region']
 combined_predictions.insert(0, 'ID', id)
-combined_predictions = combined_predictions.fillna("NULL")
+combined_predictions.fillna("NULL", inplace=True)
+combined_predictions = combined_predictions.astype(str)
 
-combined_predictions.to_csv("predictions/full_predictions_" + date_today + ".csv.gz", compression="gzip", index=False)
+print(combined_predictions.tail())
+
+combined_predictions.to_csv("predictions/full_predictions_" + date_today + ".csv", index=False)
 
 combined_predictions = combined_predictions[['ID', 'FIPS','date', 'fb_movement_change', 'test_positivity',\
 'rt_mean_MIT', 'confirmed_cases','model_predictions','POP_DENSITY', 'ELDERLY_POP',\
