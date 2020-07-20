@@ -8,7 +8,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.neural_network import MLPRegressor
+from sklearn.svm import SVR
 import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
 import pickle
 import os
 from datetime import date
@@ -33,8 +35,17 @@ def make_ML_model(data, output, density = 0):
     data['label'] = data.groupby('FIPS')['confirmed_cases'].shift(periods=-14)
     data = data[data['POP_DENSITY'] >= density]
     data_train = data.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
-    to_drop = ['Land Area', 'positiveIncrease', 'confirmed_cases']
+
+    to_drop = ['Land Area', 'positiveIncrease','confirmed_cases','mortality_risk_25-45',\
+     'mortality_risk_45-65', 'meningitis_mortality', 'mortality_risk_65-85', 'mortality_risk_5-25', 'mortality_risk_0-5', \
+     'asthma_mortality', 'TOM_MALE', 'IA_FEMALE', 'IA_MALE', 'Female_Obesity_%', 'Housing Type & Transportation', \
+     'other_resp_mortality', 'BA_FEMALE', 'coal_pneumoconiosis_mortality', 'diarrheal_mortality', \
+     'interstitial_lung_mortality', 'COPD_mortality', 'other_pneumoconiosis_mortality', 'TOT_POP', 'TOM_FEMALE', 'H_FEMALE', 'lower_respiratory_mortality',\
+      'Household Composition & Disability', 'pneumoconiosis_mortality', 'NA_FEMALE', 'Male_Obesity_%', 'chronic_respiratory_mortality', \
+      'hepatitis_mortality', 'asbestosis_mortality', 'AIDS_mortality', 'silicosis_mortality']
+
     data_mod = data_train.drop(to_drop, axis=1)
+    print(data_mod.columns)
     X = data_mod[data_mod.columns[5:-1]]
     scaler = StandardScaler()
     nX = scaler.fit_transform(X)
@@ -47,7 +58,8 @@ def make_ML_model(data, output, density = 0):
     #y = nX['label']
     #nX = nX.drop(['kmeans', 'label'], axis=1)
     X_train, X_test, y_train, y_test = train_test_split(nX, y, train_size=0.9)
-    regr = RandomForestRegressor(n_estimators=10, n_jobs=4).fit(X_train, y_train)
+    regr = RandomForestRegressor(n_estimators=20, n_jobs=4).fit(X_train, y_train)
+    #regr = SVR().fit(X_train, y_train)
     #regr = MLPRegressor(random_state=1, max_iter=10000).fit(X_train, y_train)
     print("R^2 Score on unseen data subset:")
     r2_test = regr.score(X_test, y_test)
@@ -70,6 +82,7 @@ def make_ML_model(data, output, density = 0):
     n['features'] = X.columns
     n['value'] = regr.feature_importances_
     print(n.sort_values('value'))
+
     data_predict = data.drop(to_drop, axis=1)
     nX = scaler.fit_transform(data_predict[data_predict.columns[5:-1]])
     data['model_predictions'] = regr.predict(nX)
