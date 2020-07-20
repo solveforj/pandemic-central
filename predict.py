@@ -59,10 +59,8 @@ combined_predictions.iloc[:, 5:] = combined_predictions.iloc[:, 5:].round(3)
 
 id = combined_predictions['Location'] + ", " + combined_predictions['FIPS'].astype(str) + ", " + combined_predictions['region']
 combined_predictions.insert(0, 'ID', id)
-combined_predictions.fillna("NULL", inplace=True)
+combined_predictions = combined_predictions.fillna("NULL")
 combined_predictions = combined_predictions.astype(str)
-
-print(combined_predictions.tail())
 
 combined_predictions.to_csv("predictions/full_predictions_" + date_today + ".csv", index=False)
 
