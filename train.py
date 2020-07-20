@@ -37,12 +37,9 @@ def make_ML_model(data, output, density = 0):
     data_train = data.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
 
     to_drop = ['Land Area', 'positiveIncrease','confirmed_cases','mortality_risk_25-45',\
-     'mortality_risk_45-65', 'meningitis_mortality', 'mortality_risk_65-85', 'mortality_risk_5-25', 'mortality_risk_0-5', \
-     'asthma_mortality', 'TOM_MALE', 'IA_FEMALE', 'IA_MALE', 'Female_Obesity_%', 'Housing Type & Transportation', \
-     'other_resp_mortality', 'BA_FEMALE', 'coal_pneumoconiosis_mortality', 'diarrheal_mortality', \
-     'interstitial_lung_mortality', 'COPD_mortality', 'other_pneumoconiosis_mortality', 'TOT_POP', 'TOM_FEMALE', 'H_FEMALE', 'lower_respiratory_mortality',\
-      'Household Composition & Disability', 'pneumoconiosis_mortality', 'NA_FEMALE', 'Male_Obesity_%', 'chronic_respiratory_mortality', \
-      'hepatitis_mortality', 'asbestosis_mortality', 'AIDS_mortality', 'silicosis_mortality']
+     'mortality_risk_45-65', 'meningitis_mortality', 'mortality_risk_65-85', 'mortality_risk_5-25', \
+     'mortality_risk_0-5', 'diarrheal_mortality', 'interstitial_lung_mortality', 'other_pneumoconiosis_mortality', 'TOT_POP', \
+      'hepatitis_mortality', 'AIDS_mortality']
 
     data_mod = data_train.drop(to_drop, axis=1)
     print(data_mod.columns)
