@@ -36,8 +36,8 @@ def make_predictions(data, output, model):
 #latest_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/mobility_latest.csv.gz")
 #latest_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/no_mobility_latest.csv.gz")
 
-mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "mobility_full_predictions.csv.gz")
-no_mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "no_mobility_full_predictions.csv.gz")
+mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "mobility_full_predictions.csv.gz", dtype={"label":float})
+no_mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "no_mobility_full_predictions.csv.gz",dtype={"label":float})
 
 latest_dates = list(range(((9*-7)-1), 6, 7))
 latest_mobility = mobility_data.groupby("FIPS", as_index=False).nth(latest_dates)
