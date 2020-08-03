@@ -32,15 +32,13 @@ __status__ = 'released'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 
 def make_ML_model(data, output, density = 0):
-    data['label'] = data.groupby('FIPS')['confirmed_cases'].shift(periods=-14)
+    data['label'] = data.groupby('FIPS')['confirmed_cases_norm'].shift(periods=-14)
     data = data[data['POP_DENSITY'] >= density]
     data_train = data.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
+    print(data_train.columns)
+    to_drop = ['confirmed_cases', 'confirmed_cases_norm', 'normalized_cases_norm', 'positiveIncrease_norm', 'positiveIncrease', 'TOT_POP']
 
-    to_drop = ['Land Area', 'positiveIncrease','confirmed_cases','mortality_risk_25-45',\
-     'mortality_risk_45-65', 'meningitis_mortality', 'mortality_risk_65-85', 'mortality_risk_5-25', \
-     'mortality_risk_0-5', 'diarrheal_mortality', 'interstitial_lung_mortality', 'other_pneumoconiosis_mortality', 'TOT_POP', \
-      'hepatitis_mortality', 'AIDS_mortality']
-
+    #data_mod = data_train[to_drop]
     data_mod = data_train.drop(to_drop, axis=1)
     print(data_mod.columns)
     X = data_mod[data_mod.columns[5:-1]]
