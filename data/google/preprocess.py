@@ -43,19 +43,36 @@ def get_google_data():
 def google_mobility_to_pd(df_load):
     path = 'data/google/mobility.csv.gz'
     drop_list = ['country_region_code', 'country_region', 'sub_region_1', \
-        'sub_region_2', 'iso_3166_2_code']
+        'sub_region_2', 'iso_3166_2_code', 'metro_area']
     df_load = df_load.drop(drop_list, 1)
+
     # Drop rows that do not represent county properly
     df_google = df_load.dropna(subset=['census_fips_code'])
     df_google = df_google.rename(columns={'census_fips_code': 'fips'})
-    cols = df_google.columns.tolist()
-    cols = cols[2:] # get the column names of mobility records
+    
+    cols = ['retail_and_recreation_percent_change_from_baseline',\
+            'grocery_and_pharmacy_percent_change_from_baseline',\
+            'parks_percent_change_from_baseline',\
+            'transit_stations_percent_change_from_baseline',\
+            'workplaces_percent_change_from_baseline',\
+            'residential_percent_change_from_baseline']
+
     # Take the average of the categories as a new column
     df_google['google_mobility'] = df_google[cols].mean(axis=1, skipna=True)
     df_google = df_google.drop(cols, 1) # drop all the unnecessary columns
     df_google = df_google.astype({'fips': 'float'})
     df_google = df_google.astype({'fips': 'int32'})
     df_google = df_google.reset_index(drop=True)
+
+    # Compute 14 day rolling averages for movement data
+    df_google['google_mobility'] = pd.Series(df_google.groupby('fips')['google_mobility'].rolling(14).mean()).reset_index(drop=True)
+
+    # Move dates forward by 1 day so that movement averages represent data from past week
+    df_google['date'] = pd.to_datetime(df_google['date'])
+    df_google['date'] = df_google['date'].apply(pd.DateOffset(1))
+    df_google['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
+    df_google = df_google.dropna()
+
     df_google.to_csv(path, compression='gzip', index=False)
 
 def main():
