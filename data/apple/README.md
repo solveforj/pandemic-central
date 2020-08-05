@@ -6,6 +6,7 @@
   - **preprocess.py** cleans and processes the data to generate the output dataset (_mobility.csv.gz_) from [here](https://www.apple.com/covid19/mobility) (COVID-19 Mobility Trends Reports, Apple Inc.).
 
   - **mobility.csv.gz** is the output of _preprocess.py_ and contains the following columns:
+
     | Column      | Description |
     | ----------- | ----------- |
     | fips   | The FIPS of interest        |
