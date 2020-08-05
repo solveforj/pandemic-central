@@ -4,7 +4,7 @@
 
 - **Files**:
   - **preprocess.py** cleans and processes the data to generate the output dataset (_census.csv_)
-
+ 
   - **census.csv** is the output of _preprocess.py_ and contains the following columns:
 
     | Column      | Description |
