@@ -84,6 +84,16 @@ def apple_mobility_to_pd(df_load):
     df_apple = df_apple.sort_values(['fips', 'date'])
     df_apple = df_apple.reset_index(drop=True)
     df_apple = df_apple.interpolate()
+
+    # Compute 14 day rolling averages for movement data
+    df_apple['apple_mobility'] = pd.Series(df_apple.groupby('fips')['apple_mobility'].rolling(14).mean()).reset_index(drop=True)
+
+    # Move dates forward by 1 day so that movement averages represent data from past week
+    df_apple['date'] = pd.to_datetime(df_apple['date'])
+    df_apple['date'] = df_apple['date'].apply(pd.DateOffset(1))
+    df_apple['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
+    df_apple = df_apple.dropna()
+
     df_apple.to_csv('data/apple/mobility.csv.gz',\
                     compression='gzip',\
                     index=False)

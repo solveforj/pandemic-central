@@ -58,7 +58,7 @@ def facebook_mobility_to_pd(files):
     df = df.rename({'polygon_id':'FIPS','ds':'date','all_day_bing_tiles_visited_relative_change':'fb_movement_change', 'all_day_ratio_single_tile_users':'fb_stationary'}, axis=1)
     df = df.reset_index(drop=True)
 
-    # Compute 7 day (weekly) rolling averages for movement data
+    # Compute 14 day rolling averages for movement data
     df['fb_movement_change'] = pd.Series(df.groupby("FIPS")['fb_movement_change'].rolling(14).mean()).reset_index(drop=True)
     df['fb_stationary'] = pd.Series(df.groupby("FIPS")['fb_stationary'].rolling(14).mean()).reset_index(drop=True)
 
@@ -80,5 +80,3 @@ def main():
     files = get_facebook_data()
     facebook_mobility_to_pd(files)
     print('[' + '+' + ']\n')
-
-main()
