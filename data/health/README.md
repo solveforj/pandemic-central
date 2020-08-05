@@ -6,6 +6,7 @@
   - **preprocess.py** loads and cleans and cleans IHME datasets to make the output dataset (_health.csv_)
 
   - **health.csv** is the output of _preprocess.py_ and contains the following columns:
+  
   | Column                         | Description                                  |
   |--------------------------------|----------------------------------------------|
   | Location                       | County name                                  |
