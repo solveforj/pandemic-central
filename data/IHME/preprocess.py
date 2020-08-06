@@ -4,7 +4,7 @@ def preprocess_diabetes():
     # Source: Institute for Health Metrics and Evaluation (IHME). Diagnosed and Undiagnosed Diabetes Prevalence by County in the U.S.,
     #         1999-2012. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2016.
     # Note: Total sheet from .xslx file is exported as csv
-    diabetes_data = pd.read_csv("data/health/IHME_Diabetes.csv")
+    diabetes_data = pd.read_csv("data/IHME/IHME_Diabetes.csv")
 
     # Preprocess file
     diabetes_data = diabetes_data[diabetes_data['FIPS'] > 100]
@@ -19,7 +19,7 @@ def preprocess_obesity():
     # Source: Institute for Health Metrics and Evaluation (IHME). United States Physical Activity and Obesity Prevalence by County 2001-2011.
     #         Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2013.
     # Link: ghdx.healthdata.org/record/ihme-data/united-states-physical-activity-and-obesity-prevalence-county-2001-2011
-    obesity_data = pd.read_csv("data/health/IHME_USA_OBESITY_PHYSICAL_ACTIVITY_2001_2011.csv",dtype={'fips': str})
+    obesity_data = pd.read_csv("data/IHME/IHME_USA_OBESITY_PHYSICAL_ACTIVITY_2001_2011.csv",dtype={'fips': str})
 
     # Preprocess data
     obesity_data = obesity_data[obesity_data['Outcome'] == 'Obesity']
@@ -42,7 +42,7 @@ def preprocess_mortality():
     # Link: http://ghdx.healthdata.org/record/ihme-data/united-states-life-expectancy-and-age-specific-mortality-risk-county-1980-2014
     # Note: All columns for all sheets in the original .xlsx file were merged into 1 sheet by FIPS,
     #       which was exported into a csv file
-    mortality_data = pd.read_csv("data/health/IHME_Mortality.csv")
+    mortality_data = pd.read_csv("data/IHME/IHME_Mortality.csv")
 
     # Preprocess data
     mortality_data = mortality_data[mortality_data['FIPS'] > 100.0]
@@ -60,7 +60,7 @@ def preprocess_infectious_disease_mortality():
     # Link: http://ghdx.healthdata.org/record/ihme-data/united-states-infectious-disease-mortality-rates-county-1980-2014
     # Note: All columns for all sheets in the original .xlsx file were merged into 1 sheet by FIPS,
     #       which was exported into a csv file
-    mortality_data = pd.read_csv("data/health/IHME_Infections_Disease_Mortality.csv")
+    mortality_data = pd.read_csv("data/IHME/IHME_Infections_Disease_Mortality.csv")
 
     # Preprocess data
     mortality_data = mortality_data[mortality_data['FIPS'] > 100.0]
@@ -78,7 +78,7 @@ def preprocess_respiratory_disease_mortality():
     # Link: http://ghdx.healthdata.org/record/ihme-data/united-states-chronic-respiratory-disease-mortality-rates-county-1980-2014
     # Note: All columns for all sheets in the original .xlsx file were merged into 1 sheet by FIPS,
     #       which was exported into a csv file
-    mortality_data = pd.read_csv("data/health/IHME_Respiratory_Disease_Mortality.csv")
+    mortality_data = pd.read_csv("data/IHME/IHME_Respiratory_Disease_Mortality.csv")
 
     # Preprocess data
     mortality_data = mortality_data[mortality_data['FIPS'] > 100.0]
@@ -95,7 +95,7 @@ def preprocess_smoking_prevalence():
     #         Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2014
     # Link: ghdx.healthdata.org/record/ihme-data/united-states-smoking-prevalence-county-1996-2012
     # File: IHME_US_COUNTY_TOTAL_AND_DAILY_SMOKING_PREVALENCE_1996_2012.csv
-    smoking_data = pd.read_csv("data/health/IHME_US_COUNTY_TOTAL_AND_DAILY_SMOKING_PREVALENCE_1996_2012.csv")
+    smoking_data = pd.read_csv("data/IHME/IHME_US_COUNTY_TOTAL_AND_DAILY_SMOKING_PREVALENCE_1996_2012.csv")
 
     # Preprocess data
     smoking_data = smoking_data[(smoking_data['sex'] == 'Both') & (smoking_data['year'] == 2012) & (smoking_data['county'].notnull())]
@@ -120,10 +120,10 @@ def merge_health_data():
     merged_df = pd.merge(left=merged_df, right=id_mortality, how='left', on='FIPS', copy=False)
     merged_df = pd.merge(left=merged_df, right=rd_mortality, how='left', on='FIPS', copy=False)
 
-    merged_df.to_csv("data/health/health.csv", index=False)
+    merged_df.to_csv("data/IHME/IHME.csv", index=False)
 
 def main():
-    print('[ ] Process Health Data', end='\r')
+    print('[ ] Process IHME Data', end='\r')
     merge_health_data()
     print('[' + '+' + ']\n')
 
