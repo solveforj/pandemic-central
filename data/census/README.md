@@ -4,7 +4,7 @@
 
 - **Files**:
   - **preprocess.py** cleans and processes the data to generate the output dataset (_census.csv_)
- 
+
   - **census.csv** is the output of _preprocess.py_ and contains the following columns:
 
     | Column      | Description |
@@ -26,10 +26,10 @@
     | Land Area   | County area in sq. miles        |
 
 
-  - **county_fips_2017_06.csv**
+  - **county_fips_2017_06.csv** is generated from 2017 State, County, Minor Civil Division, and Incorporated Place FIPS Codes, found [here](https://www2.census.gov/programs-surveys/popest/geographies/2017/all-geocodes-v2017.xlsx). 
 
 
-  - **state_abbr.txt**
+  - **state_abbr.txt** is a dictionary for US 50 states and their abbreviations.
 
 
   - **cc-est2018-alldata.csv.gz** is found [here](www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html). The file is *Annual County Resident Population Estimates by Age, Sex, Race, and Hispanic Origin: April 1, 2010 to July 1, 2018 (CC-EST2018-ALLDATA)* and contains population demographics.
