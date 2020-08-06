@@ -1,6 +1,6 @@
 # CCVI Data
 
-- **Description**: Contains multiple files for 2018 census and demographic data for US counties. Relevant columns are selected from these datasets and normalized for county population if possible.
+- **Description**: Processes CCVI scores for US counties from the Surgo Foundation.  These metrics score various socioeconomic and health factors that are relevant for vulnerability to COVID-19 outbreaks.
 
 - **Files**:
 
