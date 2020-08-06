@@ -26,7 +26,7 @@
     | Land Area   | County area in sq. miles        |
 
 
-  - **county_fips_2017_06.csv** is generated from 2017 State, County, Minor Civil Division, and Incorporated Place FIPS Codes, found [here](https://www2.census.gov/programs-surveys/popest/geographies/2017/all-geocodes-v2017.xlsx). 
+  - **county_fips_2017_06.csv** is generated from _2017 State, County, Minor Civil Division, and Incorporated Place FIPS Codes_, found [here](https://www2.census.gov/programs-surveys/popest/geographies/2017/all-geocodes-v2017.xlsx). 
 
 
   - **state_abbr.txt** is a dictionary for US 50 states and their abbreviations.
