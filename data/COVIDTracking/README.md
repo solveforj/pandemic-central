@@ -16,4 +16,4 @@
     | totalTestResultsIncrease  | 14-day rolling average of daily total test results increase state the county of interest is in      |
     | positiveIncrease_norm   |  positiveIncrease normalized by state population       |
     | totalTestResultsIncrease_norm   |  totalTestResultsIncrease normalized by state population      |
-    | test_positivity   |  Positive test rate (division of positiveIncrease by totalTestResultsIncrease)  |
+    | test_positivity   |  Positive test rate (positiveIncrease / totalTestResultsIncrease)   |
