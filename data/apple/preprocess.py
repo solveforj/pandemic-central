@@ -98,7 +98,7 @@ def apple_mobility_to_pd(df_load):
                     compression='gzip',\
                     index=False)
 
-def main():
+def preprocess_apple():
     print('• Processing Apple Mobility Data')
     status = apple_url_health()
     if status:
@@ -107,3 +107,6 @@ def main():
         print('  Finished\n')
     else:
         print('  Error - Apple Mobility Data could not be found from server\n')
+
+if __name__ == "__main__":
+    preprocess_apple()

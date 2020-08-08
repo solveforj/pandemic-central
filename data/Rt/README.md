@@ -23,3 +23,21 @@
     | rt_mean_rt.live   |  rt.live state-level R<sub>t</sub>       |
     | rt_mean_MIT   |  covid19-projections.com state-level R<sub>t</sub>      |
     | RtIndicator   |  covidactnow.org county-level R<sub>t</sub>     |
+
+  - **align_Rt.py** utilizes _rt_data.csv_, testing data, and case data to align the R<sub>t</sub> to the case curve.  Data from all of these files is output into _aligned_rt.csv_.
+
+  - **with_county_rt.p** a Pickle-serialized dictionary containing alignment ranges for counties with covidactnow.org R<sub>t</sub> values
+
+  - **with_county_rt.p** a Pickle-serialized dictionary containing alignment ranges for counties without covidactnow.org R<sub>t</sub> values
+
+  - **aligned_rt.csv** is the output of _align_Rt.py_ and contains the following columns:
+
+    | Column      | Description |
+    | ----------- | ----------- |
+    | FIPS   | The full FIPS of interest        |
+    | date  | The date of interest      |
+    | state  | The state FIPS of interest      |
+    | region  | The state abbreviation of interest      |
+    | normalized_cases_norm   |  confirmed_cases_norm from `data/JHU/jhu_data.csv` further normalized by state-wide tests conducted and aligned such that it represents the cases expected 14 days into the future from the date of interest      |
+    | estimated_county_rt   |  Aligned R<sub>t</sub> value that is relevant for the desired prediction date (14 days in the future)    |
+    | prediction   |  Predicted value of normalized_case_norm 14 days into the future by estimated_county_rt     |

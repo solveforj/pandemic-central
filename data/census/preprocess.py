@@ -3,6 +3,8 @@ import sys
 import time
 
 def preprocess_census(year = 2018, drop_tot = False):
+    print('• Processing Census Data')
+
     # Import census data file (in same directory as repository)
     # Source: US census
     # Link: www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html
@@ -46,10 +48,7 @@ def preprocess_census(year = 2018, drop_tot = False):
 
     merged_df.to_csv("data/census/census.csv", index=False)
 
-def main():
-    print('• Processing Census Data')
-    preprocess_census()
     print('  Finished\n')
 
-
-main()
+if __name__ == "__main__":
+    preprocess_census()

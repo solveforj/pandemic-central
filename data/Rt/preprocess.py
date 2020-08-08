@@ -1,10 +1,12 @@
 import pandas as pd
 import sys
-import os
-sys.path.append(os.getcwd() + "/data/")
+sys.path.append(sys.path[0] + "/..")
 from geodata.utils import get_state_fips
+from align_Rt import align_rt
+
 
 def preprocess_Rt():
+    print("• Processing Rt Data")
 
     state_map, fips_data = get_state_fips()
 
@@ -47,9 +49,9 @@ def preprocess_Rt():
 
     final_rt.to_csv("data/Rt/rt_data.csv", index=False, sep=',')
 
-def main():
-    print("• Processing Rt Data")
-    preprocess_Rt()
+    align_rt()
+
     print("  Finished\n")
 
-main()
+if __name__ == "__main__":
+    preprocess_Rt()

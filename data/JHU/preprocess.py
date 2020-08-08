@@ -5,6 +5,8 @@ import os
 from datetime import datetime
 
 def preprocess_JHU():
+    print('• Processing JHU Case Data')
+
     # The Johns Hopkins COVID-19 dataset does not include data for individual counties in New York City
     # This data is retrieved from the New York City Public Health Department
     # Link: www1.nyc.gov/site/doh/covid/covid-19-data.page
@@ -83,9 +85,8 @@ def preprocess_JHU():
 
     merged_df.to_csv('data/JHU/jhu_data.csv', sep=",", index=False)
 
-def main():
-    print('• Processing JHU Case Data')
-    preprocess_JHU()
     print('  Finished\n')
 
-main()
+if __name__ == "__main__":
+    preprocess_JHU()
+    

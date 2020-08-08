@@ -75,8 +75,8 @@ def google_mobility_to_pd(df_load):
 
     df_google.to_csv(path, compression='gzip', index=False)
 
-def main():
-    print('•  Processing Google Mobility Data')
+def preprocess_google():
+    print('• Processing Google Mobility Data')
     status = google_url_health()
     if status:
         df = get_google_data()
@@ -84,3 +84,6 @@ def main():
         print('  Finished\n')
     else:
         print('  Error - Google Mobility Data could not be found from server\n')
+
+if __name__ == "__main__":
+    preprocess_google()

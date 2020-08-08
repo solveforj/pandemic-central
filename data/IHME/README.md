@@ -3,9 +3,9 @@
 - **Description**: Population health data released by [IHME](http://www.healthdata.org/) for US counties.
 
 - **Files**:
-  - **preprocess.py** loads and cleans and cleans IHME datasets to make the output dataset (_health.csv_)
+  - **preprocess.py** loads and cleans and cleans IHME datasets to make the output dataset _health.csv_ for all data except smoking prevalence, which is output _IHME_smoking.csv_
 
-  - **health.csv** is the output of _preprocess.py_ and contains the following columns:
+  - **IHME.csv** is one output file of _preprocess.py_ and contains the following columns:
 
     | Column                         | Description                                  |
     |--------------------------------|----------------------------------------------|
@@ -37,6 +37,15 @@
     | COPD_mortality                 | Mortality from COPD                          |
     | chronic_respiratory_mortality  | Mortality from chronic respiratory diseases  |
 
+  - **IHME_smoking.csv** is the second output of _preprocess.py_ and contains smoking prevalence data organized in the following columns:
+
+    | Column                         | Description                                  |
+    |--------------------------------|----------------------------------------------|
+    | region                         | State abbreviation code                      |
+    | Location                       | County name                                  |
+    | smoking_prevalence             | Percent of population that smokes            |
+
+
   - **IHME_Diabetes.csv**
     - _Citation_: Institute for Health Metrics and Evaluation (IHME). Diagnosed and Undiagnosed Diabetes Prevalence by County in the U.S., 1999-2012. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2016.
     - _Note_: "Total" sheet from XSLX file is exported as CSV in Excel
@@ -49,6 +58,7 @@
 
 
   - **IHME_Mortality.csv**
+  
     - _Citation_: Institute for Health Metrics and Evaluation (IHME). United States Life Expectancy and Age-specific Mortality Risk by County 1980-2014. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2017.
     - [_Link_](http://ghdx.healthdata.org/record/ihme-data/united-states-life-expectancy-and-age-specific-mortality-risk-county-1980-2014)
     - _Note_: All columns for all sheets in the original XLSX file were merged into 1 sheet by FIPS, which was exported into a CSV file in Excel

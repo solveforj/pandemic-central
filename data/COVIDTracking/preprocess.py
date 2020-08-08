@@ -1,10 +1,10 @@
 import pandas as pd
 import sys
-import os
-sys.path.append(os.getcwd() + "/data/")
+sys.path.append(sys.path[0] + "/..")
 from geodata.utils import get_state_fips
 
 def preprocess_testing():
+    print("• Processing COVID Tracking Project Testing Data")
 
     state_map, fips_data = get_state_fips()
 
@@ -47,9 +47,8 @@ def preprocess_testing():
 
     merged_df.to_csv("data/COVIDTracking/testing_data.csv", sep=',', index=False)
 
-def main():
-    print("• Processing COVID Tracking Project Testing Data")
-    preprocess_testing()
     print("  Finished\n")
 
-main()
+if __name__ == "__main__":
+    preprocess_testing()
+    

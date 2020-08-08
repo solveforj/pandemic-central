@@ -75,8 +75,11 @@ def facebook_mobility_to_pd(files):
         os.remove('temp/' + filename)
     os.rmdir('temp/')
 
-def main():
-    print('• Processing Facebook Mobility Data', end='\r')
+def preprocess_facebook():
+    print('• Processing Facebook Mobility Data')
     files = get_facebook_data()
     facebook_mobility_to_pd(files)
     print('  Finished\n')
+
+if __name__ == "__main__":
+    preprocess_facebook()
