@@ -9,7 +9,7 @@ def preprocess_disparities():
     disparities.to_csv("data/CCVI/CCVI.csv", index=False)
 
 def main():
-    print('[ ] Process CCVI Data', end='\r')
+    print('• Processing CCVI Data')
     preprocess_disparities()
-    print('[' + '+' + ']\n')
+    print('  Finished\n')
 main()

@@ -84,7 +84,8 @@ def preprocess_JHU():
     merged_df.to_csv('data/JHU/jhu_data.csv', sep=",", index=False)
 
 def main():
-    print('[ ] Process JHU Data', end='\r')
+    print('• Processing JHU Case Data')
     preprocess_JHU()
-    print('[' + '+' + ']\n')
+    print('  Finished\n')
+
 main()

@@ -49,7 +49,7 @@ def google_mobility_to_pd(df_load):
     # Drop rows that do not represent county properly
     df_google = df_load.dropna(subset=['census_fips_code'])
     df_google = df_google.rename(columns={'census_fips_code': 'fips'})
-    
+
     cols = ['retail_and_recreation_percent_change_from_baseline',\
             'grocery_and_pharmacy_percent_change_from_baseline',\
             'parks_percent_change_from_baseline',\
@@ -76,12 +76,11 @@ def google_mobility_to_pd(df_load):
     df_google.to_csv(path, compression='gzip', index=False)
 
 def main():
-    print('[ ] Process Google Mobility Data', end='\r')
+    print('•  Processing Google Mobility Data')
     status = google_url_health()
     if status:
         df = get_google_data()
         google_mobility_to_pd(df)
-        print('[' + '+' + ']\n')
+        print('  Finished\n')
     else:
-        print('[' + '+' + ']\n')
-        print('\n Google Mobility Data could not be found from server\n')
+        print('  Error - Google Mobility Data could not be found from server\n')

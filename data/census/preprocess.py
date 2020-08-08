@@ -1,4 +1,6 @@
 import pandas as pd
+import sys
+import time
 
 def preprocess_census(year = 2018, drop_tot = False):
     # Import census data file (in same directory as repository)
@@ -27,7 +29,7 @@ def preprocess_census(year = 2018, drop_tot = False):
     # Link: www.ers.usda.gov/data-products/rural-urban-commuting-area-codes/
     # File: 2010 Rural-Urban Commuting Area Codes (revised 7/3/2019)
     # Note: File was converted to csv format from xlsx without header
-    county_sizes = pd.read_csv("data/census/ruca2010revised.csv", dtype={'State-County FIPS Code':str}, encoding="ISO-8859-1")
+    county_sizes = pd.read_csv("data/geodata/ruca2010revised.csv", dtype={'State-County FIPS Code':str}, encoding="ISO-8859-1")
     county_sizes = county_sizes.rename({'State-County FIPS Code': 'FIPS', 'Land Area (square miles), 2010':'Land Area'}, axis=1)
     county_sizes['Land Area'] = county_sizes['Land Area'].apply(lambda x : float(x.replace(",", "")))
     individual_sizes = pd.DataFrame(county_sizes.groupby('FIPS')['Land Area'].apply(lambda x: x.sum()))
@@ -45,8 +47,9 @@ def preprocess_census(year = 2018, drop_tot = False):
     merged_df.to_csv("data/census/census.csv", index=False)
 
 def main():
-    print('[ ] Process Census Data', end='\r')
+    print('• Processing Census Data')
     preprocess_census()
-    print('[' + '+' + ']\n')
+    print('  Finished\n')
+
 
 main()

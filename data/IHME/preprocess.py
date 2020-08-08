@@ -123,8 +123,8 @@ def merge_health_data():
     merged_df.to_csv("data/IHME/IHME.csv", index=False)
 
 def main():
-    print('[ ] Process IHME Data', end='\r')
+    print('• Processing IHME Data')
     merge_health_data()
-    print('[' + '+' + ']\n')
+    print('  Finished\n')
 
 main()

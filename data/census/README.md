@@ -3,6 +3,7 @@
 - **Description**: Contains multiple files for 2018 census and demographic data for US counties. Relevant columns are selected from these datasets and normalized for county population if possible.
 
 - **Files**:
+
   - **preprocess.py** cleans and processes the data to generate the output dataset (_census.csv_)
 
   - **census.csv** is the output of _preprocess.py_ and contains the following columns:
@@ -26,13 +27,6 @@
     | Land Area   | County area in sq. miles        |
 
 
-  - **county_fips_2017_06.csv** is generated from _2017 State, County, Minor Civil Division, and Incorporated Place FIPS Codes_, found [here](https://www2.census.gov/programs-surveys/popest/geographies/2017/all-geocodes-v2017.xlsx). This contains FIPS codes for US counties.
+  - **cc-est2018-alldata.csv.gz** is found on [this webpage](www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html). The file is *Annual County Resident Population Estimates by Age, Sex, Race, and Hispanic Origin: April 1, 2010 to July 1, 2018 (CC-EST2018-ALLDATA)* and contains population demographics. To reduce file size, the original file has been gunzipped.
 
-
-  - **state_abbr.txt** is a dictionary for US 50 states and their abbreviations.
-
-
-  - **cc-est2018-alldata.csv.gz** is found [here](www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html). The file is *Annual County Resident Population Estimates by Age, Sex, Race, and Hispanic Origin: April 1, 2010 to July 1, 2018 (CC-EST2018-ALLDATA)* and contains population demographics.
-
-
-  - **ruca2010revised.csv** is found [here](https://www.ers.usda.gov/data-products/rural-urban-commuting-area-codes/). File is *2010 Rural-Urban Commuting Area Codes (revised 7/3/2019* and was converted into a CSV file in Excel. This contains the sizes of counties in sq. miles.
+  - **nst-est2019-alldata.csv** is found on [this webpage](www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/). The file is *nst-est2019-alldata.csv* and contains population demographics at the US state level.

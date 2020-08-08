@@ -76,7 +76,7 @@ def facebook_mobility_to_pd(files):
     os.rmdir('temp/')
 
 def main():
-    print('[ ] Process Facebook Mobility Data', end='\r')
+    print('• Processing Facebook Mobility Data', end='\r')
     files = get_facebook_data()
     facebook_mobility_to_pd(files)
-    print('[' + '+' + ']\n')
+    print('  Finished\n')

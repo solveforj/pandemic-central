@@ -46,7 +46,7 @@ def get_apple_data():
 
 # PROCESS
 def apple_mobility_to_pd(df_load):
-    with open('data/census/state_abbr.txt', 'r') as f:
+    with open('data/geodata/state_abbr.txt', 'r') as f:
         contents = f.read()
         state_abbr_dict = ast.literal_eval(contents)
 
@@ -66,7 +66,7 @@ def apple_mobility_to_pd(df_load):
     df_apple['fips'] = df_apple['region'] + ' ' + df_apple['sub-region']
 
     # Preprocess Census Bureau FIPS list
-    df_fips = pd.read_csv('data/census/county_fips_2017_06.csv',\
+    df_fips = pd.read_csv('data/geodata/county_fips_2017_06.csv',\
                             header=0,\
                             low_memory=False,\
                             usecols=['COUNTYNAME', 'STATE', 'STCOUNTYFP'])
@@ -99,12 +99,11 @@ def apple_mobility_to_pd(df_load):
                     index=False)
 
 def main():
-    print('[ ] Process Apple Mobility Data', end='\r')
+    print('• Processing Apple Mobility Data')
     status = apple_url_health()
     if status:
         df = get_apple_data()
         apple_mobility_to_pd(df)
-        print('[' + '+' + ']\n')
+        print('  Finished\n')
     else:
-        print('[' + '+' + ']\n')
-        print('\n Apple Mobility Data could not be found from server\n')
+        print('  Error - Apple Mobility Data could not be found from server\n')
