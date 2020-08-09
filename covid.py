@@ -1,8 +1,6 @@
 from model.merge import merge
 from model.train import train
 from model.predict import predict
-
-#predict()
 import argparse
 
 __author__ = 'Duy Cao, Joseph Galasso'
@@ -11,7 +9,6 @@ __license__ = 'MIT'
 __status__ = 'beta'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 __version__ = '2.0.0'
-
 
 def main(args):
     if args.preprocess:
@@ -24,6 +21,9 @@ def main(args):
         merge()
         train()
         predict()
+    if args.map:
+        from data.graphics.draw import draw_map
+        draw_map()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='COVID-19 County Prediction\n',\
