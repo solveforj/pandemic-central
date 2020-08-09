@@ -30,33 +30,31 @@ def update():
     preprocess_testing()
 
 # Read datasets into memory
-def merge():
+def merge(apple_google_mobility = False):
     print("MERGING DATA\n")
     ccvi = pd.read_csv("data/CCVI/CCVI.csv")
     census = pd.read_csv("data/census/census.csv")
     testing = pd.read_csv("data/COVIDTracking/testing_data.csv")
     fb_mobility = pd.read_csv("data/facebook/mobility.csv.gz")
-    g_mobility = pd.read_csv("data/google/mobility.csv.gz")
-    a_mobility = pd.read_csv("data/apple/mobility.csv.gz")
     ihme = pd.read_csv("data/IHME/IHME.csv")
     ihme_smoking = pd.read_csv("data/IHME/IHME_smoking.csv")
     cases = pd.read_csv("data/JHU/jhu_data.csv")
     rt = pd.read_csv("data/Rt/aligned_rt.csv")
 
-    # Capitalize the column name
-    a_mobility = a_mobility.rename(columns={'fips': 'FIPS'})
-    g_mobility = g_mobility.rename(columns={'fips': 'FIPS'})
-
     # Merge datasets together
     merged_DF = pd.merge(left=rt, right=testing, how='left', on=['FIPS', 'date'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=cases, how='left', on=['FIPS', 'date'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=fb_mobility, how='left', on=['FIPS', 'date'], copy=False)
-    merged_DF = pd.merge(left=merged_DF, right=g_mobility, how='left', on=['FIPS', 'date'], copy=False)
-    merged_DF = pd.merge(left=merged_DF, right=a_mobility, how='left', on=['FIPS', 'date'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=ihme, how='left', on=['FIPS'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=ccvi, how='left', on=['FIPS'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right = ihme_smoking, how='left', on=['region', 'Location'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=census, how='left', on=['FIPS'], copy=False).sort_values(['FIPS', 'date']).reset_index(drop=True)
+
+    if apple_google_mobility:
+        g_mobility = pd.read_csv("data/google/mobility.csv.gz")
+        a_mobility = pd.read_csv("data/apple/mobility.csv.gz")
+        merged_DF = pd.merge(left=merged_DF, right=g_mobility, how='left', on=['FIPS', 'date'], copy=False)
+        merged_DF = pd.merge(left=merged_DF, right=a_mobility, how='left', on=['FIPS', 'date'], copy=False)
 
     locations = merged_DF['Location']
     merged_DF = merged_DF.drop('Location', axis=1)

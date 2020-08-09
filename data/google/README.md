@@ -9,6 +9,6 @@
   - **mobility.csv.gz** is the output of _preprocess.py_ and contains the following columns:
     | Column      | Description |
     | ----------- | ----------- |
-    | fips   | The FIPS of interest        |
+    | FIPS   | The FIPS of interest        |
     | date | The date of interest       |
     | google_mobility   | Positive or negative change in movement relative to baseline (mean of all categories)|

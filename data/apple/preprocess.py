@@ -93,7 +93,8 @@ def apple_mobility_to_pd(df_load):
     df_apple['date'] = df_apple['date'].apply(pd.DateOffset(1))
     df_apple['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
     df_apple = df_apple.dropna()
-
+    df_apple = df_apple.rename(columns={'fips': 'FIPS'})
+    
     df_apple.to_csv('data/apple/mobility.csv.gz',\
                     compression='gzip',\
                     index=False)

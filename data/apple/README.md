@@ -9,6 +9,6 @@
 
     | Column      | Description |
     | ----------- | ----------- |
-    | fips   | The FIPS of interest        |
+    | FIPS   | The FIPS of interest        |
     | date | The date of interest       |
     | apple_mobility   | Change in movement relative to baseline _(`100` means no change)_ |

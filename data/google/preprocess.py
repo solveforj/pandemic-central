@@ -72,7 +72,8 @@ def google_mobility_to_pd(df_load):
     df_google['date'] = df_google['date'].apply(pd.DateOffset(1))
     df_google['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
     df_google = df_google.dropna()
-
+    df_google = df_google.rename(columns={'fips': 'FIPS'})
+    
     df_google.to_csv(path, compression='gzip', index=False)
 
 def preprocess_google():
