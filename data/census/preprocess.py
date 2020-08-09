@@ -2,6 +2,13 @@ import pandas as pd
 import sys
 import time
 
+__author__ = 'Duy Cao, Joseph Galasso'
+__copyright__ = '© Pandamic Central, 2020'
+__license__ = 'MIT'
+__version__ = '2.0.0'
+__status__ = 'beta'
+__url__ = 'https://github.com/solveforj/pandemic-central'
+
 def preprocess_census(year = 2018, drop_tot = False):
     print('• Processing Census Data')
 

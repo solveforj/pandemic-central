@@ -4,6 +4,13 @@ import io
 import os
 from datetime import datetime
 
+__author__ = 'Duy Cao, Joseph Galasso'
+__copyright__ = '© Pandamic Central, 2020'
+__license__ = 'MIT'
+__version__ = '2.0.0'
+__status__ = 'beta'
+__url__ = 'https://github.com/solveforj/pandemic-central'
+
 def preprocess_JHU():
     print('• Processing JHU Case Data')
 
@@ -89,4 +96,3 @@ def preprocess_JHU():
 
 if __name__ == "__main__":
     preprocess_JHU()
-    

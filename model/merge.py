@@ -30,7 +30,7 @@ def update():
     preprocess_testing()
 
 # Read datasets into memory
-def merge(apple_google_mobility = False):
+def combine(apple_google_mobility = False):
     print("MERGING DATA\n")
     ccvi = pd.read_csv("data/CCVI/CCVI.csv")
     census = pd.read_csv("data/census/census.csv")
@@ -80,6 +80,9 @@ def merge(apple_google_mobility = False):
     training_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz", index=False, compression='gzip')
     training_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz", index=False, compression='gzip')
 
-if __name__ == "__main__":
+def merge():
     update()
+    combine()
+
+if __name__ == "__main__":
     merge()

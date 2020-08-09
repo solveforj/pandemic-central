@@ -1,6 +1,13 @@
 import pandas as pd
 import sys
 
+__author__ = 'Duy Cao, Joseph Galasso'
+__copyright__ = '© Pandamic Central, 2020'
+__license__ = 'MIT'
+__version__ = '2.0.0'
+__status__ = 'beta'
+__url__ = 'https://github.com/solveforj/pandemic-central'
+
 us_state_abbrev = {
     'Alabama': 'AL',
     'Alaska': 'AK',
@@ -84,7 +91,7 @@ def get_state_fips():
     fips_data = fips_data[['FIPS', 'State Code (FIPS)']]
 
     return state_map, fips_data
-    
+
 
 def preprocess_testing():
     print("• Processing COVID Tracking Project Testing Data")
