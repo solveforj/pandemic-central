@@ -16,7 +16,7 @@ __status__ = 'released'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 
 def predict():
-    print("MAKING PREDICTIONS\n")
+    print("• MAKING PREDICTIONS")
     date_today = date.today().strftime('%Y-%m-%d')
 
     mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "mobility_full_predictions.csv.gz", dtype={"label":float})
@@ -41,8 +41,15 @@ def predict():
     combined_predictions = combined_predictions.fillna("NULL")
     combined_predictions = combined_predictions.astype(str)
 
+    if not os.path.exists('predictions'):
+        os.mkdir('predictions')
+    if not os.path.exists('predictions/projections'):
+        os.mkdir('predictions/projections')
+
     combined_predictions.to_csv("predictions/projections/predictions_" + date_today + ".csv", index=False)
     combined_predictions.to_csv("predictions/projections/predictions_latest.csv", index=False)
+
+    print("Finished\n")
 
 if __name__ == "__main__":
     predict()

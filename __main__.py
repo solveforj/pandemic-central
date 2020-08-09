@@ -1,11 +1,8 @@
-from data.apple.preprocess import preprocess_apple
-from data.CCVI.preprocess import preprocess_disparities
-from data.census.preprocess import preprocess_census
-from data.COVIDTracking.preprocess import preprocess_testing
-from data.facebook.preprocess import preprocess_facebook
-from data.google.preprocess import preprocess_google
-from data.JHU.preprocess import preprocess_JHU
-from data.Rt.preprocess import preprocess_Rt
+from model.merge import merge
+from model.train import train
+from model.predict import predict
+
+#predict()
 import argparse
 
 __author__ = 'Duy Cao, Joseph Galasso'
@@ -18,18 +15,15 @@ __version__ = '2.0.0'
 
 def main(args):
     if args.preprocess:
-        preprocess_apple()
-        preprocess_facebook()
-        preprocess_google()
+        merge()
     if args.train:
-        print('train here')
-    if args.output:
-        print('output here')
+        train()
+    if args.predict:
+        predict()
     if args.default:
-        preprocess_apple()
-        preprocess_google()
-        preprocess_facebook()
-        print('train here\noutput here')
+        merge()
+        train()
+        predict()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='COVID-19 County Prediction\n',\
@@ -37,7 +31,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--default', action='store_true', help='Download and preprocess latest data, train, and predict')
     parser.add_argument('-p', '--preprocess', action='store_true', help='Download and preprocess data only')
     parser.add_argument('-t', '--train', action='store_true', help='Train model using Scikit-learn only')
-    parser.add_argument('-o', '--output', action='store_true', help='Predict and export predictions only')
+    parser.add_argument('-o', '--predict', action='store_true', help='Predict and export predictions only')
     parser.add_argument('--map', action='store_true', help='Render map for existing predictions')
     parser.add_argument('--tf', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
