@@ -43,10 +43,16 @@ def merge():
     cases = pd.read_csv("data/JHU/jhu_data.csv")
     rt = pd.read_csv("data/Rt/aligned_rt.csv")
 
+    # Capitalize the column name
+    a_mobility = a_mobility.rename(columns={'fips': 'FIPS'})
+    g_mobility = g_mobility.rename(columns={'fips': 'FIPS'})
+
     # Merge datasets together
     merged_DF = pd.merge(left=rt, right=testing, how='left', on=['FIPS', 'date'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=cases, how='left', on=['FIPS', 'date'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=fb_mobility, how='left', on=['FIPS', 'date'], copy=False)
+    merged_DF = pd.merge(left=merged_DF, right=g_mobility, how='left', on=['FIPS', 'date'], copy=False)
+    merged_DF = pd.merge(left=merged_DF, right=a_mobility, how='left', on=['FIPS', 'date'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=ihme, how='left', on=['FIPS'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=ccvi, how='left', on=['FIPS'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right = ihme_smoking, how='left', on=['region', 'Location'], copy=False)
