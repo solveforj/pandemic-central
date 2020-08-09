@@ -2,7 +2,6 @@ import pandas as pd
 import os
 import sys
 sys.path.append(os.getcwd() + "/")
-
 from data.apple.preprocess import preprocess_apple
 from data.CCVI.preprocess import preprocess_disparities
 from data.census.preprocess import preprocess_census
@@ -12,6 +11,13 @@ from data.google.preprocess import preprocess_google
 from data.IHME.preprocess import preprocess_IHME
 from data.JHU.preprocess import preprocess_JHU
 from data.Rt.preprocess import preprocess_Rt
+
+__author__ = 'Duy Cao, Joseph Galasso'
+__copyright__ = '© Pandamic Central, 2020'
+__license__ = 'MIT'
+__version__ = '2.0.0'
+__status__ = 'released'
+__url__ = 'https://github.com/solveforj/pandemic-central'
 
 # Update dynamic data
 def update():
