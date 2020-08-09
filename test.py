@@ -1,8 +1,13 @@
 
-#rom model.merge import merge
-#from model.train import train
-#train()
+from model.merge import merge
+from model.train import train
+from model.predict import predict
 
-#from model.predict import predict
+# Update data and merge into training dataset:
+merge()
 
-#predict()
+# Train model
+train()
+
+# Make predictions for website
+predict()
