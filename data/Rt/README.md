@@ -12,7 +12,9 @@
 
     - [covidactnow.org](https://data.covidactnow.org/latest/us/counties.WEAK_INTERVENTION.timeseries.csv) - access through covidactnow.org API
 
-  - **rt_data.csv** is the output of _preprocess.py_ and contains the following columns:
+    It then utilizes _rt_data.csv_, testing data, and case data to align the R<sub>t</sub> to the case curve.  Data from all of these files is output into _aligned_rt.csv_
+
+  - **rt_data.csv** is one output of _preprocess.py_ and contains the following columns:
 
     | Column      | Description |
     | ----------- | ----------- |
@@ -30,7 +32,7 @@
 
   - **with_county_rt.p** a Pickle-serialized dictionary containing alignment ranges for counties without covidactnow.org R<sub>t</sub> values
 
-  - **aligned_rt.csv** is the output of _align_Rt.py_ and contains the following columns:
+  - **aligned_rt.csv** is another output of _preprocess.py_ and contains the following columns:
 
     | Column      | Description |
     | ----------- | ----------- |
