@@ -1,12 +1,19 @@
 import numpy as np
 import pandas as pd
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import os
 import yaml
+from isoweek import Week
 
 PREDICTION_FILE = 'predictions/projections/predictions_latest.csv'
 CENSUS_PATH = 'data/census/census.csv'
 PREDICTION_COLUMNS = ['FIPS', 'date', 'model_predictions']
+
+def next_two_saturday(d):
+    date = d.isocalendar()
+    final = str(date[0]) + 'W' + str((date[1] + 2))
+    next_sat = Week.fromstring(final).saturday()
+    return next_sat
 
 def read_prediction():
     # Read CSV predictions and get the last date data
@@ -27,7 +34,7 @@ def read_prediction():
 
     # Calculate estimated hospitalization from
     df_predict['TOT_POP'] = df_predict['TOT_POP'] / 100000
-    df_predict['value'] = df_predict['model_predictions'] * df_predict['TOT_POP'] * 17
+    df_predict['value'] = df_predict['model_predictions'] * df_predict['TOT_POP'] * 14
 
     df_predict = df_predict.drop(['TOT_POP', 'model_predictions'], 1)
 
@@ -37,8 +44,7 @@ def read_prediction():
 
     # Calculate end date of the prediced period
     df_predict['target_end_date'] = pd.to_datetime(df_predict['forecast_date'])
-    df_predict['target_end_date'] = df_predict['target_end_date'].apply(pd.DateOffset(14))
-    df_predict['target_end_date'].apply(lambda x: x.strftime('%Y-%m-%d'))
+    df_predict['target_end_date'] = next_two_saturday(pd.to_datetime(df_predict['forecast_date'])[0])
 
     # Add required columns for convention
     df_predict['target'] = '2 wk ahead inc case'
@@ -52,9 +58,12 @@ def read_prediction():
         os.mkdir('predictions/covid19-forecast-hub')
 
     filepath = 'predictions/covid19-forecast-hub/' + filename + '-PandemicCentral-USCounty.csv'
+    print('Forecast date:', df_predict['forecast_date'].unique(), '\n')
 
-    df_predict = df_predict[df_predict['forecast_date'] != '2020-07-20']
-    df_predict['target_end_date'] = '2020-08-22'
+    # Remove some counties with day lag
+    odd_date = df_predict['forecast_date'].unique()[1]
+    df_predict = df_predict[df_predict['forecast_date'] != odd_date]
+
     df_predict.to_csv(filepath, index=False)
 
     print(df_predict.head())
