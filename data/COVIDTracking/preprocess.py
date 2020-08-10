@@ -1,12 +1,18 @@
+"""
+This module preprocesses COVIDTracking data.
+
+Data source: https://www.covidtracking.com/
+"""
+
 import pandas as pd
 import sys
 
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '2.0.0'
-__status__ = 'beta'
+__status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '2.0.0'
 
 us_state_abbrev = {
     'Alabama': 'AL',

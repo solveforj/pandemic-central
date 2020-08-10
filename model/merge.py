@@ -15,9 +15,9 @@ from data.Rt.preprocess import preprocess_Rt
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '2.0.0'
-__status__ = 'released'
+__status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '2.0.0'
 
 # Update dynamic data
 def update():
@@ -79,10 +79,15 @@ def combine(apple_google_mobility = False):
     unused_DF.to_csv(os.path.split(os.getcwd())[0] + "/unused_data.csv.gz", index=False, compression='gzip')
     training_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz", index=False, compression='gzip')
     training_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz", index=False, compression='gzip')
+    print("  Finished!\n")
 
-def merge():
-    update()
-    combine()
+def merge(apple_google_mobility=False):
+    if apple_google_mobility:
+        update()
+        combine(apple_google_mobility=True)
+    if not apple_google_mobility:
+        update()
+        combine()
 
 if __name__ == "__main__":
     merge()

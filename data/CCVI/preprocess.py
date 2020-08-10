@@ -1,11 +1,17 @@
+"""
+This module preprocesses CCVI Index.
+
+Data source: https://docs.google.com/spreadsheets/d/1qEPuziEpxj-VG11IAZoa5RWEr4GhNoxMn7aBdU76O5k/edit#gid=549685106
+"""
+
 import pandas as pd
 
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '2.0.0'
-__status__ = 'beta'
+__status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '2.0.0'
 
 def preprocess_disparities():
     print('• Processing CCVI Data')

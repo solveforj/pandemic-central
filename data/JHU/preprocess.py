@@ -1,3 +1,11 @@
+"""
+This module preprocesses JHU and NYC Public Health Department data.
+
+Data source:
+    https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_daily_reports
+    https://www1.nyc.gov/site/doh/covid/covid-19-data.page
+"""
+
 import pandas as pd
 from urllib.request import urlopen
 import io
@@ -7,9 +15,9 @@ from datetime import datetime
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '2.0.0'
-__status__ = 'beta'
+__status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '2.0.0'
 
 def preprocess_JHU():
     print('• Processing JHU Case Data')

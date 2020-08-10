@@ -14,8 +14,14 @@ from urllib.request import urlopen
 import json
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import seaborn as sns
 from PIL import Image, ImageDraw, ImageFilter
+
+__author__ = 'Duy Cao, Joseph Galasso'
+__copyright__ = '© Pandamic Central, 2020'
+__license__ = 'MIT'
+__status__ = 'release'
+__url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '2.0.0'
 
 PREDICTION_COLUMNS = ['FIPS', 'date', 'model_predictions', 'ID']
 

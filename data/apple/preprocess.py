@@ -19,9 +19,9 @@ from bs4 import BeautifulSoup
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '2.0.0'
-__status__ = 'beta'
+__status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '2.0.0'
 
 # DOWNLOAD
 def apple_url_health():
@@ -94,7 +94,7 @@ def apple_mobility_to_pd(df_load):
     df_apple['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
     df_apple = df_apple.dropna()
     df_apple = df_apple.rename(columns={'fips': 'FIPS'})
-    
+
     df_apple.to_csv('data/apple/mobility.csv.gz',\
                     compression='gzip',\
                     index=False)

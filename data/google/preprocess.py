@@ -19,9 +19,9 @@ from bs4 import BeautifulSoup
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '2.0.0'
-__status__ = 'beta'
+__status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '2.0.0'
 
 # DOWNLOAD
 def google_url_health():
@@ -73,7 +73,7 @@ def google_mobility_to_pd(df_load):
     df_google['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
     df_google = df_google.dropna()
     df_google = df_google.rename(columns={'fips': 'FIPS'})
-    
+
     df_google.to_csv(path, compression='gzip', index=False)
 
 def preprocess_google():

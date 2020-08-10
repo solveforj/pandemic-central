@@ -11,12 +11,12 @@ from sklearn.preprocessing import StandardScaler
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '2.0.0'
-__status__ = 'released'
+__status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '2.0.0'
 
 def predict():
-    print("• MAKING PREDICTIONS")
+    print("MAKING PREDICTIONS\n")
     date_today = date.today().strftime('%Y-%m-%d')
 
     mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "mobility_full_predictions.csv.gz", dtype={"label":float})

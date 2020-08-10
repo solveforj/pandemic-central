@@ -1,3 +1,9 @@
+"""
+This module preprocesses and calculates for county's Rt.
+
+Data source: see README for more details
+"""
+
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import PolynomialFeatures
@@ -6,13 +12,14 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 import pickle
 from sklearn.metrics import r2_score
+import warnings
 
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '2.0.0'
-__status__ = 'beta'
+__status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '2.0.0'
 
 us_state_abbrev = {
     'Alabama': 'AL',
@@ -73,6 +80,7 @@ us_state_abbrev = {
     'Wisconsin': 'WI',
     'Wyoming': 'WY'
 }
+
 def get_state_fips():
 
     # Source: US census
@@ -161,7 +169,7 @@ def align_rt(update=True, train=True):
         return output
 
     if update:
-        print("Aligning and estimating county-level Rt")
+        print("  Aligning and estimating county-level Rt")
         final_estimate = final[(final['date'] > "2020-03-18")]
         final_estimate = final_estimate[~final_estimate['normalized_cases_norm'].isnull()]
         new_col = final_estimate['test_positivity']/final_estimate['county_counts']
@@ -174,7 +182,7 @@ def align_rt(update=True, train=True):
         final_estimate['estimated_county_rt'] = final_estimate['aligned_state_rt'] * final_estimate['county_fraction']
         final_estimate['estimated_county_rt'] = final_estimate['estimated_county_rt'] / (final_estimate['estimated_county_rt'].mean()/final_estimate['aligned_state_rt'])
 
-        print("Aligning COVID Act Now county-level Rt")
+        print("  Aligning COVID Act Now county-level Rt")
         with_county_rt = final_estimate[~final_estimate['RtIndicator'].isnull()].dropna().reset_index(drop=True)
         final_estimate = final_estimate[final_estimate['RtIndicator'].isnull()]
 
@@ -194,7 +202,7 @@ def align_rt(update=True, train=True):
 
     if train:
         predict = 14
-        print("Aligning and estimating county-level Rt")
+        print("  Aligning and estimating county-level Rt")
         final_estimate = final[(final['date'] > "2020-03-18")]
 
         final_estimate = final_estimate[~final_estimate['normalized_cases_norm'].isnull()]
@@ -215,7 +223,7 @@ def align_rt(update=True, train=True):
         final_estimate['estimated_county_rt'] = final_estimate['aligned_state_rt'] * final_estimate['county_fraction']
         final_estimate['estimated_county_rt'] = final_estimate['estimated_county_rt'] / (final_estimate['estimated_county_rt'].mean()/final_estimate['aligned_state_rt'])
 
-        print("Aligning COVID Act Now county-level Rt")
+        print("  Aligning COVID Act Now county-level Rt")
         with_county_rt = final_estimate[~final_estimate['RtIndicator'].isnull()].dropna().reset_index()
         final_estimate = final_estimate[final_estimate['RtIndicator'].isnull()]
 
@@ -252,7 +260,13 @@ def align_rt(update=True, train=True):
 
         combined.to_csv("data/Rt/aligned_rt.csv", index=False)
 
+def warning_suppressor(debug_mode=True):
+    if not debug_mode:
+        warnings.filterwarnings("ignore")
+
 def preprocess_Rt():
+    warning_suppressor(debug_mode=False) # Change it to show errors
+
     print("• Processing Rt Data")
 
     state_map, fips_data = get_state_fips()
@@ -298,5 +312,8 @@ def preprocess_Rt():
 
     print("  Finished\n")
 
+
+
 if __name__ == "__main__":
+    warning_suppressor()
     preprocess_Rt()

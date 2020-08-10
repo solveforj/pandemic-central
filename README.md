@@ -23,88 +23,58 @@ Follow these instructions to get the project up and running on your local machin
 
 These are what you **must** install before using our project.
 
-1. [NumPy](https://pypi.org/project/numpy/) and [Matplotlib](https://pypi.org/project/matplotlib/)
+1. [NumPy](https://pypi.org/project/numpy/), [Pandas](https://pandas.pydata.org/) and [Matplotlib](https://pypi.org/project/matplotlib/)
 
 2. [Scikit-learn](https://scikit-learn.org/stable/install.html)
 
-3. [TensorFlow](https://www.tensorflow.org/install) (release ≥ 2.0.0)
+Optional:
+
+1. [TensorFlow](https://www.tensorflow.org/install) (release ≥ 2.0.0) and [TensorFlow_docs](https://github.com/tensorflow/docs)
+
+2. [Plotly](https://plotly.com/) including: plotly, chart_studio, and [Plotly Orca](https://github.com/plotly/orca)
+3. [psutil](https://pypi.org/project/psutil/)
 
 Your local machine must also have Python 3 (≥ 3.7) installed beforehand.
 
 ### Run
-To run project, first clone this repository, then run this command
+To run this project, first clone this repository.
   ```
-  python3 pandemic-central
+  git clone https://github.com/solveforj/pandemic-central.git
   ```
-or you can also download the zip package from Lastest Release **(we recommend cloning and pulling method since it contains the lastest data files and hot fixes.)**
+<br>
 
-For more details, please also read `USAGE.md`.
+For a basic usage, use this command
+  ```
+  python covid.py -d
+  ```
+or
+  ```
+  python covid.py --default
+  ```
+This command should download the data from sources, preprocess them, train, and export predictions.
+<br><br><br>
+For full list of available commands, use
+  ```
+  python covid.py --help
+  ```
 
 ### GitHub
-Make sure you always clone and pull the lastest data from Pandemic Central.
-**Notice that our repository can always be found at https://github.com/solveforj/pandemic-central.**
-
-
-## Project Structure
-This is not complete project structure, read USAGE.md for more details.
-```
-pandemic-central/
-  ├── __init__.py
-  ├── __main__.py
-  │
-  ├── data/
-  ├── raw_data/
-  ├── processed_data/
-  ├── models/
-  │
-  ├── generate_data.py
-  ├── LICENSE.txt
-  ├── predict.py
-  ├── preprocess.py
-  ├── README.md
-  ├── tf_predict.py
-  ├── train.py
-  └── USAGE.md
-```
-In which:
-- `raw_data/` contains the raw mobility datasets (in csv or txt formats) for preprocessing.
-
-- `processed_data/` contains processed and merged mobility data that is ready for training.
-
-- `data/` contains other necessary raw or processed datasets such as census or epidemiology.
-
-- `models/` contains saved TensorFlow models from training and for later deployment.
-
-- `preprocess.py` preprocesses raw Google and Apple mobility data (among other tasks) for eventual integration into training datasets.
-
-- `generate_data.py` processes and merges all mobility, socioeconomic, and health data into the final training datasets.
-
-- `train.py` trains a Random Forest Regression model using Scikit-Learn and appends predictions to the dataset. *This is currently the default model.*
-
-- `tf_predict.py` trains a TensorFlow Neural Network model. *This currently an experimental model.*
-
-- `predict.py` generates predictions for each county for the last 5 weeks, generating the latest detailed predictions, which we add to this repository daily.
-
-- `LICENSE.txt` is MIT license.
-
-- `README.md` is what you are reading now.
-
-- `USAGE.md` is a detailed manual for specific use case.
+Make sure you always clone and pull the latest version from Pandemic Central.
+**Our repository can always be found at https://github.com/solveforj/pandemic-central.**
 
 ## Authors
 * [**Joseph Galasso**](https://github.com/solveforj/)
 * [**Duy Cao**](https://github.com/caominhduy/)
-* [**Kimberly Diwa**](https://github.com/kdiwa/)
 
 ## Support
-Since this is still in its earliest versions, bugs and incompletions are unavoidable. Please feel free to comment or make a pull request.
+Since this is still in its earliest versions, bugs and incompletions are unavoidable. Please feel free to comment or contact our developers!
 Your contributions are very valuable to us and this project.
 
 For technical support, please email our developers:
 [jgalasso@itsonit.com](mailto:jgalasso@itsonit.com) (Joseph) or [dcao@udallas.edu](mailto:dcao@udallas.edu) (Duy). Thank you for your patience.
 
 ## Versioning
-Our latest version is v1.0.2. For version details, see **Releases** tags.
+Our latest version is v2.0.0. For version details, see **Releases** tags.
 
 ## Credits
  Our project can not be completed without these great sources. We do not own any data; all input data we use are open-source or permission-granted. More details about how we process this data may be found in `generate_data.py` and `preprocess.py`.
@@ -128,6 +98,6 @@ Our latest version is v1.0.2. For version details, see **Releases** tags.
 9.    [US Census Population Data](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html)
 10.    [USDA FIPS Code List](https://www.ers.usda.gov/data-products/rural-urban-commuting-area-codes/)
 
-We also thank the TensorFlow and Python communities for very detailed and helpful official documentations.
+We also thank Plotly, TensorFlow and Python communities for very detailed and helpful documentations.
 
 **Please check out these resources for yourself!**

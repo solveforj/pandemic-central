@@ -1,11 +1,17 @@
+"""
+This module preprocesses IHME datasets.
+
+Data source: http://ghdx.healthdata.org/us-data
+"""
+
 import pandas as pd
 
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
-__version__ = '2.0.0'
-__status__ = 'beta'
+__status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '2.0.0'
 
 us_state_abbrev = {
     'Alabama': 'AL',
