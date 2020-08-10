@@ -17,7 +17,7 @@ See our latest predictions at our [website](https://itsonit.com) and check us ou
 We hope to serve as a valuable  resource for understanding trends in the ongoing pandemic and raise awareness about COVID-19 at the community level, something which is desperately needed in our attempts to lower the curve.  However, we strongly advise against **over-interpreting our predictions**. Machine learning models are only as good as the data that trains them.  We use the best quality data that is available to us, but we acknowledge that error in our predictions is unavoidable.
 
 ## Getting Started
-Follow these instructions to get the project up and running on your local machine. For detailed information, see `USAGE.md`.
+Follow these instructions to get the project up and running on your local machine.
 
 ### Prerequisites
 
