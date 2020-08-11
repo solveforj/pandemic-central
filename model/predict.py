@@ -41,10 +41,13 @@ def predict():
     combined_predictions = combined_predictions.fillna("NULL")
     combined_predictions = combined_predictions.astype(str)
 
+    # Fix bugs
     if not os.path.exists('predictions'):
         os.mkdir('predictions')
     if not os.path.exists('predictions/projections'):
         os.mkdir('predictions/projections')
+    combined_predictions['model_predictions'] = combined_predictions['model_predictions'].astype(float)
+    combined_predictions['model_predictions'] = combined_predictions['model_predictions'].clip(lower=0)
 
     combined_predictions.to_csv("predictions/projections/predictions_" + date_today + ".csv", index=False)
     combined_predictions.to_csv("predictions/projections/predictions_latest.csv", index=False)

@@ -1,3 +1,8 @@
+"""
+This module processes output data into right format.
+Processed data can be found at
+"""
+
 import numpy as np
 import pandas as pd
 from datetime import datetime, date, timedelta
@@ -9,6 +14,7 @@ PREDICTION_FILE = 'predictions/projections/predictions_latest.csv'
 CENSUS_PATH = 'data/census/census.csv'
 PREDICTION_COLUMNS = ['FIPS', 'date', 'model_predictions']
 
+# Epiweek ends on Saturday
 def next_two_saturday(d):
     date = d.isocalendar()
     final = str(date[0]) + 'W' + str((date[1] + 2))
