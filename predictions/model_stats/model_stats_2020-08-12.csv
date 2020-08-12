@@ -1,0 +1,3 @@
+mobility,trainingr2,trainingmae,testingr2,testingmae
+mobility,0.996,0.251,0.983,0.617
+non-mobility,0.997,0.222,0.982,0.543
