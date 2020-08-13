@@ -3,3 +3,4 @@
 *.pyc
 demo.py
 test.py
+ssh_client.py
