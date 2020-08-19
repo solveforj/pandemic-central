@@ -136,7 +136,8 @@ def preprocess_testing():
     #testing_pop = testing_pop.drop(['positiveIncrease', 'totalTestResultsIncrease'], axis=1)
 
     # Get dataframe of all dates mapped to all FIPS from the Rt data
-    fips_df = pd.read_csv("data/Rt/rt_data.csv", dtype={'FIPS':str,'state':str}, usecols=['FIPS','date','state'])
+    fips_df = pd.read_csv("data/JHU/jhu_data.csv", dtype={'FIPS':str,'state':str}, usecols=['FIPS','date'])
+    fips_df['state'] = fip_df['FIPS'].str.slice(stop=2)
 
     merged_df = pd.merge(left=fips_df, right=testing_pop, how='left', on=['state', 'date'], copy=False)
     merged_df = merged_df.drop(['state'], axis=1)

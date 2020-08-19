@@ -19,8 +19,9 @@ date_today = date.today().strftime('%Y-%m-%d')
 np.random.seed(1)
 pd.set_option('display.max_columns', 500)
 
-def make_ML_model(data, output, density = 0):
+def make_ML_model(data, output, density = 0, date = date_today):
     data['label'] = data.groupby('FIPS')['confirmed_cases_norm'].shift(periods=-14)
+    data = data[data['date'] <= date_today]
     data = data[data['POP_DENSITY'] >= density]
     data_train = data.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
     to_drop = ['confirmed_cases', 'confirmed_cases_norm', 'normalized_cases_norm', 'positiveIncrease_norm', 'positiveIncrease', 'TOT_POP']
