@@ -26,8 +26,8 @@ def update():
     preprocess_google()
     preprocess_facebook()
     preprocess_JHU()
-    preprocess_Rt()
     preprocess_testing()
+    preprocess_Rt()
 
 # Read datasets into memory
 def combine(apple_google_mobility = False):
