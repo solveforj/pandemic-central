@@ -111,9 +111,11 @@ def align_rt(update=True, train=True):
     county_rt = pd.read_csv("data/Rt/rt_data.csv", dtype={"FIPS":str})
 
     case_data = pd.read_csv("data/JHU/jhu_data.csv", dtype={"FIPS":str})
+
     final = pd.merge(left=county_rt, right=case_data,how="left", on=['FIPS', 'date'], copy=False)
 
     testing_data = pd.read_csv("data/COVIDTracking/testing_data.csv", dtype={"FIPS":str})
+
     final = pd.merge(left=final, right=testing_data, how="left", on=['FIPS','date'], copy=False)
 
     final[['confirmed_cases_norm','confirmed_cases']] = final[['confirmed_cases_norm','confirmed_cases']].mask(final[['confirmed_cases_norm','confirmed_cases']] < 0, 0)

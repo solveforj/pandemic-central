@@ -49,10 +49,12 @@ def preprocess_JHU():
             return df
 
     def process_FIPS(fips):
-        num = fips[0:-2]
-        missing_zeroes = 5 - len(num)
-        missing_zeroes = "0" * missing_zeroes
-        return missing_zeroes + num
+        missing_zeroes = "0" * (5-len(fips))
+        #num = fips[0:-2]
+        #missing_zeroes = 5 - len(num)
+        #missing_zeroes = "0" * missing_zeroes
+        #print(fips, num, missing_zeroes)
+        return missing_zeroes + fips
 
     # Get daily case data from New York City counties
     bronx = read_NYC_county(bronx, "bronx")
@@ -65,6 +67,7 @@ def preprocess_JHU():
     jhu_data = pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv", dtype={"FIPS": str})
     jhu_data = jhu_data[jhu_data['FIPS'].notnull()]
     jhu_data['FIPS'] = jhu_data['FIPS'].apply(lambda x : process_FIPS(x))
+
     jhu_data = jhu_data.drop(["Admin2","Province_State","Country_Region","Lat","Long_","Combined_Key","UID","iso2","iso3","code3"], axis=1)
     jhu_data = jhu_data.melt(id_vars=['FIPS'], var_name = 'date', value_name = 'confirmed_cases')
     jhu_data['date'] = pd.to_datetime(jhu_data['date'])
@@ -89,10 +92,13 @@ def preprocess_JHU():
     full_data['date'] = pd.to_datetime(full_data['date'])
     full_data['date'] = full_data['date'].apply(pd.DateOffset(1))
 
+    full_data = full_data.reset_index(drop=True)
+
     # Normalize confirmed cases for population and export to csv
     census_data = pd.read_csv("data/census/census.csv", dtype={'FIPS':str})[['FIPS', 'TOT_POP']]
 
     merged_df = pd.merge(left=census_data, right=full_data, how='left', on='FIPS', copy=False)
+
     merged_df['confirmed_cases_norm'] = (merged_df['confirmed_cases']/merged_df['TOT_POP'] * 100000).round()
     merged_df = merged_df.drop('TOT_POP', axis=1)
     startdate = datetime.strptime('2020-2-15', '%Y-%m-%d')
