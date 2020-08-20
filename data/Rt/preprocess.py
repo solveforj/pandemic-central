@@ -127,6 +127,7 @@ def align_rt(update=True, train=True):
     county_counts = county_counts.explode().reset_index(drop=True)
     final['county_counts'] = county_counts
 
+    print(final[final['FIPS'] == "05009"])
     #print("Not null")
     #print(final[~final['RtIndicator'].isnull()]['FIPS'].unique())
     #print("Null")
@@ -205,7 +206,7 @@ def align_rt(update=True, train=True):
     if train:
         predict = 14
         print("  Aligning and estimating county-level Rt")
-        final_estimate = final[(final['date'] > "2020-03-18")]
+        final_estimate = final[(final['date'] > "2020-03-25")]
 
         final_estimate = final_estimate[~final_estimate['normalized_cases_norm'].isnull()]
         new_col = final_estimate['test_positivity']/final_estimate['county_counts']
