@@ -67,12 +67,16 @@ def read_prediction():
     print('Forecast date:', df_predict['forecast_date'].unique(), '\n')
 
     # Remove some counties with day lag
-    odd_date = df_predict['forecast_date'].unique()[1]
-    df_predict = df_predict[df_predict['forecast_date'] != odd_date]
+    latest = df_predict['forecast_date'].unique()[0]
+    df_predict = df_predict[df_predict['forecast_date'] == latest]
+
+    print(df_predict.head())
+
+    print('\nForecast date:', df_predict['forecast_date'].unique(), '\n')
 
     df_predict.to_csv(filepath, index=False)
 
-    print(df_predict.head())
+
 
 def metadata():
     meta = {
