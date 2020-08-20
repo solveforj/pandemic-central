@@ -127,7 +127,6 @@ def align_rt(update=True, train=True):
     county_counts = county_counts.explode().reset_index(drop=True)
     final['county_counts'] = county_counts
 
-    print(final[final['FIPS'] == "05009"])
     #print("Not null")
     #print(final[~final['RtIndicator'].isnull()]['FIPS'].unique())
     #print("Null")
