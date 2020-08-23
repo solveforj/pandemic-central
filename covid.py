@@ -1,6 +1,7 @@
 from model.merge import merge
 from model.train import train
 from model.predict import predict
+from model.web import web
 import argparse
 
 __author__ = 'Duy Cao, Joseph Galasso'
@@ -21,6 +22,7 @@ def main(args):
         merge()
         train()
         predict()
+        web()
     if args.map:
         from data.graphics.draw import draw_map
         draw_map()
