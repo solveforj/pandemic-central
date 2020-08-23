@@ -15,8 +15,8 @@ __status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 __version__ = '2.0.0'
 
-#date_today = date.today().strftime('%Y-%m-%d')
-date_today = "2020-08-22"
+date_today = date.today().strftime('%Y-%m-%d')
+#date_today = "2020-08-22"
 
 np.random.seed(1)
 pd.set_option('display.max_columns', 500)

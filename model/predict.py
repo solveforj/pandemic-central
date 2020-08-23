@@ -52,7 +52,7 @@ def predict():
     combined_predictions['model_predictions'] = combined_predictions['model_predictions'].astype(float)
     combined_predictions['model_predictions'] = combined_predictions['model_predictions'].clip(lower=0)
 
-    combined_predictions = combined_predictions.rename({"model_predictions":"model_predictions_norm"})
+    combined_predictions = combined_predictions.rename({"model_predictions":"model_predictions_norm"}, axis=1)
     combined_predictions.to_csv("predictions/projections/predictions_" + date_today + ".csv", index=False)
     combined_predictions.to_csv("predictions/projections/predictions_latest.csv", index=False)
 

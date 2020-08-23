@@ -40,13 +40,13 @@ def calculate_mae(cumulative = True):
     for i in use_dates:
         tot_dir = "predictions/projections/" + i
         predictions = pd.read_csv(tot_dir)
-        latest_predictions = predictions.groupby("FIPS").tail(2)[['ID','Location','FIPS','date','model_predictions']]
+        latest_predictions = predictions.groupby("FIPS").tail(2)[['ID','Location','FIPS','date','model_predictions_norm']]
         latest_predictions = latest_predictions.reset_index(drop=True)
         merged_cases = pd.concat([merged_cases,latest_predictions], axis=0)
 
     merged_cases = merged_cases.sort_values(['FIPS', 'date'])
     merged_data = pd.merge(left=merged_cases, right=case_data, how='left', on=['FIPS', 'date'], copy=False)
     merged_data = merged_data.sort_values(['FIPS','date'])
-    mae = np.abs(merged_data['model_predictions'] - merged_data['confirmed_cases_norm']).mean()
-    corr = merged_data.groupby("FIPS").apply(lambda x : pearsonr(x['model_predictions'], x['confirmed_cases_norm'])[0])
+    mae = np.abs(merged_data['model_predictions_norm'] - merged_data['confirmed_cases_norm']).mean()
+    corr = merged_data.groupby("FIPS").apply(lambda x : pearsonr(x['model_predictions_norm'], x['confirmed_cases_norm'])[0])
     return mae, corr

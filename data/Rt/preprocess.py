@@ -182,7 +182,7 @@ def align_rt(update=True, train=True):
 
     if update:
         print("  Aligning and estimating county-level Rt")
-        final_estimate = final[(final['date'] > "2020-03-18")]
+        final_estimate = final[(final['date'] > "2020-03-30")]
         final_estimate = final_estimate[~final_estimate['normalized_cases_norm'].isnull()]
         new_col = final_estimate['test_positivity']/final_estimate['county_counts']
         final_estimate['county_fraction'] = final_estimate['normalized_cases_norm']/new_col.replace(0, 1)
@@ -221,6 +221,8 @@ def align_rt(update=True, train=True):
         new_col = final_estimate['test_positivity']/final_estimate['county_counts']
         final_estimate['county_fraction'] = final_estimate['normalized_cases_norm']/new_col.replace(0, 1)
 
+        print(final_estimate.groupby("FIPS").tail(1)['date'].unique())
+
         final_estimate = final_estimate.reset_index(drop=True)
 
         new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['test_positivity'], x['rt_mean_MIT'], predict)).reset_index(drop=True)
@@ -249,6 +251,7 @@ def align_rt(update=True, train=True):
 
         final_estimate = final_estimate[['FIPS', 'date', 'estimated_county_rt', 'normalized_cases_norm', 'ECR_shift']].dropna()
         with_county_rt = with_county_rt[['FIPS', 'date', 'estimated_county_rt', 'normalized_cases_norm', 'RtIndicator','ECR_shift', 'CAN_county_rt', 'CAN_shift']].dropna()
+
         final_estimate = final_estimate[final_estimate['FIPS'].isin(without_county_rt_dict.keys())].reset_index(drop=True)
         with_county_rt = with_county_rt[with_county_rt['FIPS'].isin(with_county_rt_dict.keys())].reset_index(drop=True)
         new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : make_prediction(x.name, without_county_rt_dict, x['estimated_county_rt'], 1))
@@ -270,7 +273,7 @@ def align_rt(update=True, train=True):
         combined = pd.merge(left=combined, right=final, how='left', on=['FIPS', 'date'], copy=False)
         combined = combined[['FIPS','date','state','region','normalized_cases_norm','estimated_county_rt','prediction']]
 
-        combined.to_csv("data/Rt/aligned_rt.csv", index=False)
+        return combined
 
 def warning_suppressor(debug_mode=True):
     if not debug_mode:
@@ -320,7 +323,10 @@ def preprocess_Rt():
 
     final_rt.to_csv("data/Rt/rt_data.csv", index=False, sep=',')
 
-    align_rt()
+    print("Aligning Rt")
+    combined = align_rt()
+    combined = combined.sort_values(['FIPS','date'])
+    combined.to_csv("data/Rt/aligned_rt.csv", index=False)
 
     print("  Finished\n")
 
