@@ -4,7 +4,7 @@
 
 - **Files**:
 
-  - **draw.py** draws choropleth map from `predictions/projections/predictions_latest.csv`. The output will be:
+  - **draw.py** draws choropleth map from `predictions/web/predictions_latest.csv`. The output will be:
     - **latest_map.html**: an interactive map
     - **latest_map.png**: map in PNG format
-    - Both these two files can be found in `predictions/projections/` directory
+    - Both these two files can be found in `predictions/graphics/` directory
