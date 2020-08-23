@@ -12,5 +12,5 @@
     | ----------- | ----------- |
     | FIPS   | The FIPS of interest        |
     | date  | The date of interest      |
-    | confirmed_cases   |  A 14-day moving average of daily case increases per county       |
-    | confirmed_cases_norm   |  A 14-day moving average of daily case increases per county normalized to cases per 100,000 people      |
+    | confirmed_cases   |  A 7-day moving average of daily case increases per county       |
+    | confirmed_cases_norm   |  A 7-day moving average of daily case increases per county normalized to cases per 100,000 people      |
