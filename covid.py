@@ -24,9 +24,12 @@ def main(args):
     if args.map:
         from data.graphics.draw import draw_map
         draw_map()
+    if args.reichlab:
+        from model.reichlab import read_prediction
+        read_prediction()
     if args.ag:
         merge(apple_google_mobility=True)
-    
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='COVID-19 County Prediction\n',\
                                     usage='use "-h" or "--help" for more instructions')
@@ -36,6 +39,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--predict', action='store_true', help='Predict and export predictions only')
     parser.add_argument('--map', action='store_true', help='Render map for existing predictions')
     parser.add_argument('--tf', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--reichlab', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--ag', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
     main(args)

@@ -23,10 +23,10 @@ __status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 __version__ = '2.0.0'
 
-PREDICTION_COLUMNS = ['FIPS', 'date', 'model_predictions', 'ID']
+PREDICTION_COLUMNS = ['FIPS', 'date', 'model_predictions_norm', 'ID']
 
 def read_lastest_file():
-    path = 'predictions/projections/predictions_latest.csv'
+    path = 'predictions/web/predictions_latest.csv'
     df_predict = pd.read_csv(path, \
         low_memory=False, \
         usecols=PREDICTION_COLUMNS)
@@ -40,13 +40,13 @@ def read_lastest_file():
 def render_map(df):
     with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
         counties = json.load(response)
-    fig = px.choropleth(df, geojson=counties, locations='FIPS', color='model_predictions',
+    fig = px.choropleth(df, geojson=counties, locations='FIPS', color='model_predictions_norm',
                                color_continuous_scale="Spectral_r",
                                range_color=(0, 40),
                                hover_name='ID',
                                hover_data={'FIPS':False},
                                scope="usa",
-                               labels={'model_predictions':'Predicted'},
+                               labels={'model_predictions_norm':'Predicted'},
                                width=1100,
                                height=600
                               )
