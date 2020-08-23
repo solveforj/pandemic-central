@@ -40,6 +40,6 @@
     | date  | The date of interest      |
     | state  | The state FIPS of interest      |
     | region  | The state abbreviation of interest      |
-    | normalized_cases_norm   |  confirmed_cases_norm from `data/JHU/jhu_data.csv` further normalized by state-wide tests conducted and aligned such that it represents the cases expected 14 days into the future from the date of interest      |
+    | normalized_cases_norm   |  confirmed_cases_norm from `data/JHU/jhu_data.csv` further normalized by state-wide tests conducted and aligned such that it represents the average daily cases expected during the 7-14 day time period into the future from the date of interest      |
     | estimated_county_rt   |  Aligned R<sub>t</sub> value that is relevant for the desired prediction date (14 days in the future)    |
-    | prediction   |  Predicted value of normalized_case_norm 14 days into the future by estimated_county_rt     |
+    | prediction   |  Predicted value of normalized_case_norm (average daily cases expected during the 7-14 day time period into the future) based on estimated_county_rt     |
