@@ -17,7 +17,8 @@ __version__ = '2.0.0'
 
 def predict():
     print("MAKING PREDICTIONS\n")
-    date_today = date.today().strftime('%Y-%m-%d')
+    #date_today = date.today().strftime('%Y-%m-%d')
+    date_today = "2020-08-22"
 
     mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "mobility_full_predictions.csv.gz", dtype={"label":float})
     no_mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "no_mobility_full_predictions.csv.gz",dtype={"label":float})
@@ -31,6 +32,8 @@ def predict():
     combined_predictions = combined_predictions.sort_values(['FIPS', 'date', 'fb_movement_change'], na_position='first').groupby(['FIPS', 'date']).tail(1)
     combined_predictions = combined_predictions.groupby("FIPS").tail(10)
 
+    #combined_predictions['date'] = pd.to_datetime(combined_predictions['date'])
+    #combined_predictions['date'] = combined_predictions['date'].apply(pd.DateOffset(7))
 
     combined_predictions['fb_movement_change'] = combined_predictions['fb_movement_change'].astype(float)
     combined_predictions['fb_stationary'] = combined_predictions['fb_stationary'].astype(float)

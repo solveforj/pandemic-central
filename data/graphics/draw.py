@@ -54,10 +54,10 @@ def render_map(df):
         title='Average projected new cases per 100,000 people per day for the next two weeks',
         title_x=0.5,
         title_font_size=16)
-    pio.write_image(fig, file='predictions/projections/latest_map.png')
-    pio.write_html(fig, file='predictions/projections/latest_map.html', auto_open=True)
+    pio.write_image(fig, file='predictions/graphics/latest_map.png')
+    pio.write_html(fig, file='predictions/graphics/latest_map.html', auto_open=True)
 
-def fix_map(path='predictions/projections/latest_map.html'):
+def fix_map(path='predictions/graphics/latest_map.html'):
     with open(path) as map_:
         content = map_.read()
     # Remove the "Tool Bar"
@@ -71,7 +71,7 @@ def fix_map(path='predictions/projections/latest_map.html'):
     with open(path, 'w') as new_map:
         new_map.write(content)
 
-def add_watermark(img_1='predictions/projections/latest_map.png',\
+def add_watermark(img_1='predictions/graphics/latest_map.png',\
     img_2='data/graphics/pandemic-central-watermark.png'):
 
     background = Image.open(img_1)

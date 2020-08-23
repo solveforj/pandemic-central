@@ -15,13 +15,15 @@ __status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 __version__ = '2.0.0'
 
-date_today = date.today().strftime('%Y-%m-%d')
+#date_today = date.today().strftime('%Y-%m-%d')
+date_today = "2020-08-22"
+
 np.random.seed(1)
 pd.set_option('display.max_columns', 500)
 
-def make_ML_model(data, output, density = 0, date = date_today):
+def make_ML_model(data, output, density = 0):
+    data = data[data['date'] < date_today].reset_index(drop=True)
     data['label'] = data.groupby('FIPS')['confirmed_cases_norm'].shift(periods=-14)
-    data = data[data['date'] <= date_today]
     data = data[data['POP_DENSITY'] >= density]
     data_train = data.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
     to_drop = ['confirmed_cases', 'confirmed_cases_norm', 'normalized_cases_norm', 'positiveIncrease_norm', 'positiveIncrease', 'TOT_POP']
