@@ -23,5 +23,3 @@
   - **web.py** reads the output file of *predict.py* and reformats it for our website, creating `predictions/web/predictions_yyyy-mm-dd.csv`
 
   - **reichlab.py** reads the output file of *predict.py* and reformats it for the COVID-19 Forecast Hub, creating `predictions/covid19-forecast-hub/yyyy-mm-dd-PandemicCentral-USCounty.csv`
-
-  - **utils.py** contains tools to measure the accuracy of our model's predictions over time.
