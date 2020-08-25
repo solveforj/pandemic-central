@@ -71,7 +71,7 @@ Since this is still in its earliest versions, bugs and incompletions are unavoid
 Your contributions are very valuable to us and this project.
 
 For technical support, please email our developers:
-[jgalasso@itsonit.com](mailto:jgalasso@udallas.edu) (Joseph) or [dcao@udallas.edu](mailto:dcao@udallas.edu) (Duy). Thank you for your patience.
+[jgalasso@udallas.edu](mailto:jgalasso@udallas.edu) (Joseph) or [dcao@udallas.edu](mailto:dcao@udallas.edu) (Duy). Thank you for your patience.
 
 ## Versioning
 Our latest version is v2.0.0. For version details, see **Releases** tags.
