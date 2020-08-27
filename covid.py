@@ -18,6 +18,7 @@ def main(args):
         train()
     if args.predict:
         predict()
+        web()
     if args.default:
         merge()
         train()
