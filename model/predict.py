@@ -17,8 +17,8 @@ __version__ = '2.0.0'
 
 def predict():
     print("MAKING PREDICTIONS\n")
-    #date_today = date.today().strftime('%Y-%m-%d')
-    date_today = "2020-08-22"
+    date_today = date.today().strftime('%Y-%m-%d')
+    #date_today = "2020-08-22"
 
     mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "mobility_full_predictions.csv.gz", dtype={"label":float})
     no_mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "no_mobility_full_predictions.csv.gz",dtype={"label":float})
