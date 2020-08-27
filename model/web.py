@@ -57,10 +57,10 @@ def calculate_mae(cumulative = True):
     mae = np.abs(merged_data['model_predictions_norm'] - merged_data['confirmed_cases_norm']).mean()
     corr = merged_data.groupby("FIPS").apply(lambda x : pearsonr(x['model_predictions_norm'], x['confirmed_cases_norm'])[0])
     return mae, corr
-    
+
 def web():
-    #date_today = date.today().strftime('%Y-%m-%d')
-    date_today = "2020-08-22"
+    date_today = date.today().strftime('%Y-%m-%d')
+    #date_today = "2020-08-22"
 
     projections = pd.read_csv("predictions/projections/predictions_" + date_today + ".csv")
     projections = projections.fillna("NULL")
