@@ -13,11 +13,21 @@ from isoweek import Week
 PREDICTION_FILE = 'predictions/web/predictions_latest.csv'
 PREDICTION_COLUMNS = ['FIPS', 'date', 'model_predictions']
 
-# Epiweek ends on Saturday
-def next_two_saturday(d):
+# Require isoweek
+def get_saturday(d):
+    #
+    # EPIWEEK ENDS ON SATURDAY
+    # If the forecast date is Sunday or Monday, the first week will end on the
+    # next Saturday. Otherwise, first week should end on the Saturday of the second
+    # week.
+    #
     date = d.isocalendar()
-    final = str(date[0]) + 'W' + str((date[1] + 2))
-    next_sat = Week.fromstring(final).saturday()
+    if date[2] == 1:
+        final = str(date[0]) + 'W' + str((date[1]))
+        next_sat = Week.fromstring(final).saturday()
+    else:
+        final = str(date[0]) + 'W' + str((date[1] + 1))
+        next_sat = Week.fromstring(final).saturday()
     return next_sat
 
 def read_prediction():
@@ -28,15 +38,8 @@ def read_prediction():
     #   - 'nextweek_predictions': predictions for the next closest week
 
     df_predict = pd.read_csv(PREDICTION_FILE, usecols=PREDICTION_COLUMNS)
-    df_predict_2 = df_predict.groupby('FIPS').tail(2)
-    df_predict_2 = df_predict_2.groupby('FIPS').head(1).reset_index(drop=True)
-    df_predict_2 = df_predict_2.rename(columns={'model_predictions': 'nextweek_predictions'})
-
-    df_predict = df_predict.groupby('FIPS').tail(1)
-    df_predict = df_predict.drop(['date'], 1).reset_index(drop=True)
-
-    df_predict['date'] = df_predict_2['date']
-    df_predict = df_predict.merge(right=df_predict_2, how='left', on=['FIPS', 'date'])
+    df_predict = df_predict.groupby('FIPS').tail(2).reset_index(drop=True)
+    df_predict = df_predict.rename(columns={'model_predictions': 'value'})
 
     # Write FIPS in 5-digit string format
     df_predict['FIPS'] = df_predict['FIPS'].astype('str')
@@ -46,45 +49,55 @@ def read_prediction():
     # Rename some columns
     df_predict = df_predict.rename(columns={'FIPS': 'location', 'date': 'forecast_date'})
 
-    # Calculate estimated new cases
-    df_predict['value'] = df_predict['nextweek_predictions'] * 7
-    df_predict['value'] = df_predict['value'] + df_predict['model_predictions'] * 7
+    # 1st week from forecast date
+    df_predict_1 = df_predict.groupby('location').head(1).reset_index(drop=True)
+    df_predict_1['value'] = df_predict_1['value'] * 7
+    # Calculate end date of the first week
+    df_predict_1['target_end_date'] = pd.to_datetime(df_predict_1['forecast_date'])
+    df_predict_1['target_end_date'] = get_saturday(pd.to_datetime(df_predict_1['forecast_date'])[0])
+    df_predict_1['target'] = '1 wk ahead inc case'
+    # Remove some counties with day lag
+    latest = df_predict_1['forecast_date'].unique()[0]
+    df_predict_1 = df_predict_1[df_predict_1['forecast_date'] == latest]
 
-    df_predict = df_predict.drop(['model_predictions', 'nextweek_predictions'], 1)
+    # 2nd week from forecast date
+    df_predict_2 = df_predict.groupby('location').tail(1).reset_index(drop=True)
+    df_predict_2['value'] = df_predict_2['value'] * 7
+    # Calculate end date of the second week
+    df_predict_2['target_end_date'] = pd.to_datetime(df_predict_2['forecast_date'])
+    df_predict_2['target_end_date'] = get_saturday(pd.to_datetime(df_predict_2['forecast_date'])[0])
+    df_predict_2['target'] = '2 wk ahead inc case'
+    # Remove some counties with day lag
+    latest = df_predict_2['forecast_date'].unique()[0]
+    df_predict_2 = df_predict_2[df_predict_2['forecast_date'] == latest]
+
+    # Merge two datasets together
+    df_predict = pd.concat([df_predict_1, df_predict_2], ignore_index=True, sort=False)
+    df_predict = df_predict.sort_values(by=['location', 'target']).reset_index(drop=True)
 
     # Fix negative value bug and round number
     df_predict['value'] = df_predict['value'].mask(df_predict['value'] < 0, 0)
     df_predict['value'] = df_predict['value'].round().astype(int)
 
-    # Calculate end date of the prediced period
-    df_predict['target_end_date'] = pd.to_datetime(df_predict['forecast_date'])
-    df_predict['target_end_date'] = next_two_saturday(pd.to_datetime(df_predict['forecast_date'])[0])
-
     # Add required columns for convention
-    df_predict['target'] = '2 wk ahead inc case'
     df_predict['type'] = 'point'
     df_predict['quantile'] = 'NA'
 
+    latest = df_predict['forecast_date'].unique()[0]
+    df_predict['forecast_date'] = latest
+
     # Export data
-    filename = df_predict['forecast_date'][0]
+    filename = latest
 
     if not os.path.exists('predictions/covid19-forecast-hub'):
         os.mkdir('predictions/covid19-forecast-hub')
 
     filepath = 'predictions/covid19-forecast-hub/' + filename + '-PandemicCentral-USCounty.csv'
-    print('Unique forecast date:', df_predict['forecast_date'].unique(), '\n')
-
-    # Remove some counties with day lag
-    latest = df_predict['forecast_date'].unique()[0]
-    df_predict = df_predict[df_predict['forecast_date'] == latest]
-
-    print(df_predict.head())
-
-    print('\nProcessed final forecast date:', df_predict['forecast_date'].unique(), '\n')
-
     df_predict.to_csv(filepath, index=False)
 
-
+    print('Unique forecast date:', df_predict['forecast_date'].unique(), '\n')
+    print('Unique end date:', df_predict['target_end_date'].unique(), '\n')
+    print(df_predict.head(10))
 
 def metadata():
     meta = {
