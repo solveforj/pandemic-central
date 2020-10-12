@@ -32,6 +32,8 @@ def main(args):
         read_prediction()
     if args.ag:
         merge(apple_google_mobility=True)
+    if args.upload:
+        import ssh_client
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='COVID-19 County Prediction\n',\
@@ -44,5 +46,6 @@ if __name__ == '__main__':
     parser.add_argument('--tf', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--reichlab', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--ag', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--upload', action='store_true', help=argparse.SUPPRESS)
     args = parser.parse_args()
     main(args)
