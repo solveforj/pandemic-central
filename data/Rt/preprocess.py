@@ -315,9 +315,9 @@ def preprocess_Rt():
     merged_df = merged_df.sort_values(['FIPS', 'state'])
 
     # Add county-level Rt values
-    county_rt = pd.read_csv("https://data.covidactnow.org/latest/us/counties.WEAK_INTERVENTION.timeseries.csv", dtype={"fips": str}, \
-        usecols=['date', 'fips', 'RtIndicator'])
-    county_rt = county_rt.rename({'fips':'FIPS'}, axis=1)
+    county_rt = pd.read_csv("https://api.covidactnow.org/v2/counties.timeseries.csv?apiKey=ad02de2c8b484d09aff3a1c59ed43755", dtype={"fips": str}, \
+        usecols=['date', 'fips', 'metrics.infectionRate'])
+    county_rt = county_rt.rename({'fips':'FIPS', 'metrics.infectionRate':'RtIndicator'}, axis=1)
     final_rt = pd.merge(left=merged_df, right=county_rt, how="left", on=['FIPS', 'date'], copy=False)
     final_rt = final_rt
 
