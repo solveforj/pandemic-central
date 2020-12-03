@@ -26,11 +26,23 @@ def make_ML_model(data, output, density = 0):
     data = data[data['POP_DENSITY'] >= density]
     data = data[data['date'] < date_today].reset_index(drop=True)
     data = data.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
-    quantiles = [0.01, 0.025, 0.05, 0.50, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 0.975, 0.99]
+    quantiles = [0.025,0.1,0.25,0.5,0.75,0.9,0.975]
 
     prediction_df = pd.DataFrame()
+    model_stats = pd.DataFrame()
+
+    week_number = []
+    model_type = []
+    r2_training = []
+    r2_testing = []
+    mae_training = []
+    mae_testing = []
 
     for shift in range(1, 5):
+
+        week_number.append(shift)
+        model_type.append(output)
+
         data_train = data.copy()
 
         data_train['label'] = data_train.groupby('FIPS')['confirmed_cases_norm'].shift(periods=-7*shift)
@@ -46,21 +58,14 @@ def make_ML_model(data, output, density = 0):
         X_train, X_test, y_train, y_test = train_test_split(nX, y, train_size=0.9)
         regr = RandomForestRegressor(n_estimators=20, min_samples_split=10, n_jobs=4).fit(X_train, y_train)
 
-        print("R^2 Score on unseen data subset:")
         r2_test = regr.score(X_test, y_test)
-        print(r2_test)
-
-        print("R^2 Score on training data subset:")
+        r2_testing.append(r2_test)
         r2_train = regr.score(X_train, y_train)
-        print(r2_train)
-
-        print("Mean Absolute Error on unseen data subset:")
+        r2_training.append(r2_train)
         mae_test = mean_absolute_error(y_test,regr.predict(X_test))
-        print(mae_test)
-
-        print("Mean Absolute Error on training data subset:")
+        mae_testing.append(mae_test)
         mae_train = mean_absolute_error(y_train,regr.predict(X_train))
-        print(mae_train)
+        mae_training.append(mae_train)
 
         print("Relative feature importances:")
         n = pd.DataFrame()
@@ -93,7 +98,15 @@ def make_ML_model(data, output, density = 0):
     data = pd.concat([data, prediction_df], axis=1)
     data.to_csv(os.path.split(os.getcwd())[0] + "/" + output + "_full_predictions.csv.gz", index=False, compression='gzip')
 
-    return r2_test, r2_train, mae_test, mae_train
+    model_stats['model_type'] = model_type
+    model_stats['week'] = week_number
+    model_stats['R2_testing'] = r2_testing
+    model_stats['R2_training'] = r2_training
+    model_stats['MAE_testing'] = mae_testing
+    model_stats['MAE_training'] = mae_training
+    print(model_stats)
+
+    return model_stats
 
 
 def train():
@@ -101,26 +114,26 @@ def train():
 
     print("• Training mobility model")
     training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz")
-    training_mobility = training_mobility[training_mobility['FIPS'].astype(str).str.startswith("36")]
-    m_r2_test, m_r2_train, m_mae_test, m_mae_train =  make_ML_model(training_mobility, "mobility")
+    #training_mobility = training_mobility[training_mobility['FIPS'].astype(str).str.startswith("36")]
+    mobility_model_stats = make_ML_model(training_mobility, "mobility")
     print("  Finished\n")
 
     print("• Training non-mobility model")
     training_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz")
-    n_r2_test, n_r2_train, n_mae_test, n_mae_train = make_ML_model(training_no_mobility, "no_mobility")
+    #training_no_mobility = training_no_mobility[training_no_mobility['FIPS'].astype(str).str.startswith("36")]
+    nonmobility_model_stats = make_ML_model(training_no_mobility, "no_mobility")
     print("  Finished\n")
 
-    data_list = [["mobility",m_r2_train, m_mae_train, m_r2_test, m_mae_test], ["non-mobility",n_r2_train, n_mae_train, n_r2_test, n_mae_test]]
-    modelstats = pd.DataFrame(data_list, columns=["mobility","trainingr2", "trainingmae", "testingr2", "testingmae"])
-    modelstats.iloc[:, 1:] = modelstats.iloc[:, 1:].round(3)
+    full_model_stats = pd.concat([mobility_model_stats, nonmobility_model_stats], axis=0)
+
     # Create directory (if it does not exist yet)
     if not os.path.exists('predictions'):
         os.mkdir('predictions')
     if not os.path.exists('predictions/model_stats'):
         os.mkdir('predictions/model_stats')
 
-    modelstats.to_csv("predictions/model_stats/model_stats_" + date_today + ".csv", index=False)
-    modelstats.to_csv("predictions/model_stats/model_stats_latest.csv", index=False)
+    full_model_stats.to_csv("predictions/model_stats/model_stats_" + date_today + ".csv", index=False)
+    full_model_stats.to_csv("predictions/model_stats/model_stats_latest.csv", index=False)
 
 if __name__ == '__main__':
     train()

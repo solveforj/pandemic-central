@@ -27,13 +27,9 @@ def predict():
     latest_mobility = mobility_data.groupby("FIPS", as_index=False).nth(latest_dates)
     latest_no_mobility = no_mobility_data.groupby("FIPS", as_index=False).nth(latest_dates)
 
-
     combined_predictions = latest_mobility.append(latest_no_mobility, ignore_index=True)
     combined_predictions = combined_predictions.sort_values(['FIPS', 'date', 'fb_movement_change'], na_position='first').groupby(['FIPS', 'date']).tail(1)
     combined_predictions = combined_predictions.groupby("FIPS").tail(10)
-
-    #combined_predictions['date'] = pd.to_datetime(combined_predictions['date'])
-    #combined_predictions['date'] = combined_predictions['date'].apply(pd.DateOffset(7))
 
     combined_predictions['fb_movement_change'] = combined_predictions['fb_movement_change'].astype(float)
     combined_predictions['fb_stationary'] = combined_predictions['fb_stationary'].astype(float)
@@ -49,14 +45,17 @@ def predict():
         os.mkdir('predictions')
     if not os.path.exists('predictions/projections'):
         os.mkdir('predictions/projections')
-    combined_predictions['model_predictions'] = combined_predictions['model_predictions'].astype(float)
-    combined_predictions['model_predictions'] = combined_predictions['model_predictions'].clip(lower=0)
 
-    combined_predictions = combined_predictions.rename({"model_predictions":"model_predictions_norm"}, axis=1)
+    combined_predictions.iloc[:, 65:] = combined_predictions.iloc[:, 65:].astype(float)
+    combined_predictions.iloc[:, 65:] = combined_predictions.iloc[:, 65:].clip(lower=0)
+
+    #combined_predictions = combined_predictions.rename({"model_predictions":"model_predictions_norm"}, axis=1)
+
     combined_predictions.to_csv("predictions/projections/predictions_" + date_today + ".csv", index=False)
     combined_predictions.to_csv("predictions/projections/predictions_latest.csv", index=False)
 
     print("Finished\n")
+
 
 if __name__ == "__main__":
     predict()
