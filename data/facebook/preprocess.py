@@ -30,8 +30,10 @@ def get_facebook_data():
     soup = BeautifulSoup(content, 'html.parser')
     download_url = soup.find_all('a',\
         {"class": "btn btn-empty btn-empty-blue hdx-btn resource-url-analytics ga-download"},\
-         href=True)[0]['href']
+         href=True)[1]['href']
     download_url = 'https://data.humdata.org' + download_url
+
+    print(download_url)
 
     zip = requests.get(download_url)
     os.mkdir('temp')

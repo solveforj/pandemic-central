@@ -90,4 +90,5 @@ def merge(apple_google_mobility=False):
         combine()
 
 if __name__ == "__main__":
+    #preprocess_Rt()
     merge()

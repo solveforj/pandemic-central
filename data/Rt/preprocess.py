@@ -109,33 +109,58 @@ def get_state_fips():
 def align_rt(update=True, train=True):
 
     county_rt = pd.read_csv("data/Rt/rt_data.csv", dtype={"FIPS":str})
-
-    print(county_rt)
+    print(1)
+    print(county_rt.groupby("FIPS").tail(1)['date'].unique())
 
     case_data = pd.read_csv("data/JHU/jhu_data.csv", dtype={"FIPS":str})
+    
+    print(2)
+    print(case_data.groupby("FIPS").tail(1)['date'].unique())
 
-    print(case_data)
 
     final = pd.merge(left=county_rt, right=case_data, how="left", on=['FIPS', 'date'], copy=False)
-
-    print(final)
+    print(3)
+    print(final.groupby("FIPS").tail(1)['date'].unique())
 
     testing_data = pd.read_csv("data/COVIDTracking/testing_data.csv", dtype={"FIPS":str})
-
-    print(testing_data)
+    print(4)
+    print(testing_data.groupby("FIPS").tail(1)['date'].unique())
 
     final = pd.merge(left=final, right=testing_data, how="left", on=['FIPS','date'], copy=False)
 
-    print(final)
+    print(final.groupby("FIPS").tail(1)['date'].unique())
 
     final[['confirmed_cases_norm','confirmed_cases']] = final[['confirmed_cases_norm','confirmed_cases']].mask(final[['confirmed_cases_norm','confirmed_cases']] < 0, 0)
 
     final['normalized_cases_norm'] = (final['confirmed_cases_norm']/final['totalTestResultsIncrease_norm'])
     final['normalized_cases'] = (final['confirmed_cases']/final['totalTestResultsIncrease'])
 
-    county_counts = final.groupby("state", as_index=False).apply(lambda x : [len(x['FIPS'].unique())]*len(x))
-    county_counts = county_counts.explode().reset_index(drop=True)
-    final['county_counts'] = county_counts
+    final = final.sort_values(["state", "FIPS"])
+    county_counts = final.groupby("state", as_index=False).apply(lambda x: len(x['FIPS'].unique()))
+    county_counts.columns = ["state", "unique_counties"]
+    county_counts = county_counts['unique_counties'].to_list()
+
+    state_counts = final.groupby("state", as_index=False).apply(lambda x: len(x['FIPS']))
+    state_counts.columns = ['state','total_counties']
+    state_counts = state_counts['total_counties'].to_list()
+
+    ccounts = []
+    for i in range(len(state_counts)):
+        lst = [county_counts[i]]*state_counts[i]
+        ccounts += lst
+
+    final['county_counts'] = ccounts
+
+    #print(final.groupby("state").apply(lambda x: x['county_counts'].unique()))
+
+
+    #print(county_dict)
+
+    #county_counts = final.groupby("state", as_index=False).apply(lambda x: [[len(x['FIPS'].unique())]*len(x)]).iloc[:,1]
+    #county_counts = final.groupby("state", as_index=False).apply(lambda x : [len(x['FIPS'].unique())]*len(x))
+
+    #county_counts = county_counts.explode().reset_index(drop=True)
+    #final['county_counts'] = county_counts
 
     #print("Not null")
     #print(final[~final['RtIndicator'].isnull()]['FIPS'].unique())
@@ -188,7 +213,7 @@ def align_rt(update=True, train=True):
         final_estimate['county_fraction'] = final_estimate['normalized_cases_norm']/new_col.replace(0, 1)
 
         final_estimate = final_estimate.reset_index(drop=True)
-        new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['test_positivity'], x['rt_mean_MIT'], 0)).reset_index(drop=True)
+        new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['test_positivity'], x['rt_mean_rt.live'], 0)).reset_index(drop=True)
         final_estimate[["aligned_state_rt","ECR_shift"]] = new_col
 
         final_estimate['estimated_county_rt'] = final_estimate['aligned_state_rt'] * final_estimate['county_fraction']
@@ -225,7 +250,7 @@ def align_rt(update=True, train=True):
 
         final_estimate = final_estimate.reset_index(drop=True)
 
-        new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['test_positivity'], x['rt_mean_MIT'], predict)).reset_index(drop=True)
+        new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['test_positivity'], x['rt_mean_rt.live'], predict)).reset_index(drop=True)
         final_estimate[["aligned_state_rt","ECR_shift"]] = new_col
 
         new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : shift_fraction(x.name, x['county_fraction'], predict))
@@ -275,6 +300,7 @@ def align_rt(update=True, train=True):
 
         return combined
 
+
 def warning_suppressor(debug_mode=True):
     if not debug_mode:
         warnings.filterwarnings("ignore")
@@ -284,6 +310,7 @@ def preprocess_Rt():
 
     print("• Processing Rt Data")
 
+    n = """
     state_map, fips_data = get_state_fips()
 
     # Rt calculations from rt.live
@@ -300,18 +327,18 @@ def preprocess_Rt():
     df['state'] = df['FIPS'].apply(lambda x : x[0:2])
 
     # Rt calculations from covid19-projections.com
-    projections = pd.read_csv("https://raw.githubusercontent.com/youyanggu/covid19_projections/master/projections/combined/latest_us.csv", usecols=['date', 'region', 'r_values_mean'])
-    projections['datetime'] = pd.to_datetime(projections['date'])
-    projections = projections[(projections['region'].notnull()) & (projections['datetime'] < pd.to_datetime('today'))]
-    projections.insert(0, "state", projections['region'].apply(lambda x : state_map[x]))
-    projections = projections.drop(['datetime', 'region'], axis=1).reset_index(drop=True)
+    #projections = pd.read_csv("https://raw.githubusercontent.com/youyanggu/covid19_projections/master/projections/combined/latest_us.csv", usecols=['date', 'region', 'r_values_mean'])
+    #projections['datetime'] = pd.to_datetime(projections['date'])
+    #projections = projections[(projections['region'].notnull()) & (projections['datetime'] < pd.to_datetime('today'))]
+    #projections.insert(0, "state", projections['region'].apply(lambda x : state_map[x]))
+    #projections = projections.drop(['datetime', 'region'], axis=1).reset_index(drop=True)
 
     # Merge Rt values from both sources together
     merged_df = pd.merge(left=df, right=rt_data, how='left', on=['state', 'date'], copy=False)
     merged_df = merged_df[merged_df['region'].notnull()]
     merged_df = merged_df.rename({'mean':'rt_mean_rt.live'},axis=1)
-    merged_df = pd.merge(left=merged_df, right=projections, on=['state', 'date'], copy=False)
-    merged_df = merged_df.rename({'r_values_mean':'rt_mean_MIT'},axis=1)
+    #merged_df = pd.merge(left=merged_df, right=projections, on=['state', 'date'], copy=False)
+    #merged_df = merged_df.rename({'r_values_mean':'rt_mean_MIT'},axis=1)
     merged_df = merged_df.sort_values(['FIPS', 'state'])
 
     # Add county-level Rt values
@@ -322,10 +349,14 @@ def preprocess_Rt():
     final_rt = final_rt
 
     final_rt.to_csv("data/Rt/rt_data.csv", index=False, sep=',')
+    """
 
+    #print(final_rt.groupby("FIPS").tail(1)['date'].unique())
     print("Aligning Rt")
     combined = align_rt()
     combined = combined.sort_values(['FIPS','date'])
+
+    print(combined.groupby("FIPS").tail(1)['date'].unique())
     combined.to_csv("data/Rt/aligned_rt.csv", index=False)
 
     print("  Finished\n")

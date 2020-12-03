@@ -21,48 +21,76 @@ date_today = date.today().strftime('%Y-%m-%d')
 np.random.seed(1)
 pd.set_option('display.max_columns', 500)
 
+
 def make_ML_model(data, output, density = 0):
+    data = data[data['POP_DENSITY'] >= density]
     data = data[data['date'] < date_today].reset_index(drop=True)
     data = data.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
-    data['label'] = data.groupby('FIPS')['confirmed_cases_norm'].shift(periods=-14)
-    data = data[data['POP_DENSITY'] >= density]
-    data_train = data.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
-    to_drop = ['confirmed_cases', 'confirmed_cases_norm', 'normalized_cases_norm', 'positiveIncrease_norm', 'positiveIncrease', 'TOT_POP']
-    data_mod = data_train.drop(to_drop, axis=1)
-    print(data_mod.columns)
-    X = data_mod[data_mod.columns[5:-1]]
-    scaler = StandardScaler()
-    nX = scaler.fit_transform(X)
-    y = data_mod['label']
-    X_train, X_test, y_train, y_test = train_test_split(nX, y, train_size=0.9)
-    regr = RandomForestRegressor(n_estimators=20, n_jobs=4).fit(X_train, y_train)
+    quantiles = [0.01, 0.025, 0.05, 0.50, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 0.975, 0.99]
 
-    print("R^2 Score on unseen data subset:")
-    r2_test = regr.score(X_test, y_test)
-    print(r2_test)
+    prediction_df = pd.DataFrame()
 
-    print("R^2 Score on training data subset:")
-    r2_train = regr.score(X_train, y_train)
-    print(r2_train)
+    for shift in range(1, 5):
+        data_train = data.copy()
 
-    print("Mean Absolute Error on unseen data subset:")
-    mae_test = mean_absolute_error(y_test,regr.predict(X_test))
-    print(mae_test)
+        data_train['label'] = data_train.groupby('FIPS')['confirmed_cases_norm'].shift(periods=-7*shift)
+        to_drop = ['confirmed_cases', 'confirmed_cases_norm', 'normalized_cases_norm', 'positiveIncrease_norm', 'positiveIncrease', 'TOT_POP']
+        data_train = data_train.drop(to_drop, axis=1)
 
-    print("Mean Absolute Error on training data subset:")
-    mae_train = mean_absolute_error(y_train,regr.predict(X_train))
-    print(mae_train)
+        data_mod = data_train.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
+        X = data_mod[data_mod.columns[5:-1]]
 
-    print("Relative feature importances:")
-    n = pd.DataFrame()
-    n['features'] = X.columns
-    n['value'] = regr.feature_importances_
-    print(n.sort_values('value'))
+        scaler = StandardScaler()
+        nX = scaler.fit_transform(X)
+        y = data_mod['label']
+        X_train, X_test, y_train, y_test = train_test_split(nX, y, train_size=0.9)
+        regr = RandomForestRegressor(n_estimators=20, min_samples_split=10, n_jobs=4).fit(X_train, y_train)
 
-    data_predict = data.drop(to_drop, axis=1)
-    nX = scaler.fit_transform(data_predict[data_predict.columns[5:-1]])
-    data['model_predictions'] = regr.predict(nX)
-    data = data.sort_values(['FIPS', 'date'])
+        print("R^2 Score on unseen data subset:")
+        r2_test = regr.score(X_test, y_test)
+        print(r2_test)
+
+        print("R^2 Score on training data subset:")
+        r2_train = regr.score(X_train, y_train)
+        print(r2_train)
+
+        print("Mean Absolute Error on unseen data subset:")
+        mae_test = mean_absolute_error(y_test,regr.predict(X_test))
+        print(mae_test)
+
+        print("Mean Absolute Error on training data subset:")
+        mae_train = mean_absolute_error(y_train,regr.predict(X_train))
+        print(mae_train)
+
+        print("Relative feature importances:")
+        n = pd.DataFrame()
+        n['features'] = X.columns
+        n['value'] = regr.feature_importances_
+        print(n.sort_values('value'))
+
+        data_predict = data.drop(to_drop, axis=1)
+        nX = scaler.fit_transform(data_predict[data_predict.columns[5:]])
+
+        prediction_df['point_' + str(shift) + "_weeks"] = regr.predict(nX)
+
+        pred_Q = pd.DataFrame()
+
+        for pred in regr.estimators_:
+            temp = pd.Series(pred.predict(nX).round(2))
+            pred_Q = pd.concat([pred_Q, temp], axis=1)
+
+        RF_actual_pred = pd.DataFrame()
+
+        quantile_labels = []
+        for q in quantiles:
+            quantile_labels.append("quantile_" + str(q) + "_" + str(shift) + "_weeks")
+            s = pred_Q.quantile(q=q, axis=1)
+            RF_actual_pred = pd.concat([RF_actual_pred,s],axis=1,sort=False)
+
+        RF_actual_pred.columns=quantile_labels
+        prediction_df = pd.concat([prediction_df, RF_actual_pred], axis=1)
+
+    data = pd.concat([data, prediction_df], axis=1)
     data.to_csv(os.path.split(os.getcwd())[0] + "/" + output + "_full_predictions.csv.gz", index=False, compression='gzip')
 
     return r2_test, r2_train, mae_test, mae_train
@@ -73,6 +101,7 @@ def train():
 
     print("• Training mobility model")
     training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz")
+    training_mobility = training_mobility[training_mobility['FIPS'].astype(str).str.startswith("36")]
     m_r2_test, m_r2_train, m_mae_test, m_mae_train =  make_ML_model(training_mobility, "mobility")
     print("  Finished\n")
 
