@@ -39,9 +39,19 @@ def combine(apple_google_mobility = False):
     ihme = pd.read_csv("data/IHME/IHME.csv")
     ihme_smoking = pd.read_csv("data/IHME/IHME_smoking.csv")
     cases = pd.read_csv("data/JHU/jhu_data.csv")
-    rt = pd.read_csv("data/Rt/aligned_rt.csv")
 
-    # Merge datasets together
+    # Read Rt datasets for all alignments
+    rt = pd.read_csv("data/Rt/aligned_rt_7.csv")
+    rt_14 = pd.read_csv("data/Rt/aligned_rt_14.csv", usecols=['FIPS', 'date', 'estimated_county_rt_14','prediction_14'])
+    rt_21 = pd.read_csv("data/Rt/aligned_rt_21.csv", usecols=['FIPS', 'date', 'estimated_county_rt_21','prediction_21'])
+    rt_28 = pd.read_csv("data/Rt/aligned_rt_28.csv", usecols=['FIPS', 'date', 'estimated_county_rt_28','prediction_28'])
+
+    # Merge all Rt datasets into one final
+    rt = pd.merge(left=rt, right=rt_14, how='left', on=['FIPS', 'date'], copy=False)
+    rt = pd.merge(left=rt, right=rt_21, how='left', on=['FIPS', 'date'], copy=False)
+    rt = pd.merge(left=rt, right=rt_28, how='left', on=['FIPS', 'date'], copy=False)
+
+    # Merge all datasets together
     merged_DF = pd.merge(left=rt, right=testing, how='left', on=['FIPS', 'date'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=cases, how='left', on=['FIPS', 'date'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=fb_mobility, how='left', on=['FIPS', 'date'], copy=False)

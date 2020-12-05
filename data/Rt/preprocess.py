@@ -113,7 +113,7 @@ def align_rt(update=True, train=True):
     print(county_rt.groupby("FIPS").tail(1)['date'].unique())
 
     case_data = pd.read_csv("data/JHU/jhu_data.csv", dtype={"FIPS":str})
-    
+
     print(2)
     print(case_data.groupby("FIPS").tail(1)['date'].unique())
 
@@ -150,6 +150,8 @@ def align_rt(update=True, train=True):
         ccounts += lst
 
     final['county_counts'] = ccounts
+
+    print(final.columns)
 
     #print(final.groupby("state").apply(lambda x: x['county_counts'].unique()))
 
@@ -190,7 +192,10 @@ def align_rt(update=True, train=True):
 
     def shift_fraction(name, column, predict_shift):
         new_col = column.shift(periods = -1 * predict_shift).replace(0,0.0001)
-        new_col = pd.concat([new_col.iloc[0:-21], new_col.iloc[-21:].interpolate(method='spline', order=1)], axis=0)
+        if predict_shift <= 14:
+            new_col = pd.concat([new_col.iloc[0:-22], new_col.iloc[-22:].interpolate(method='spline', order=1)], axis=0)
+        if predict_shift > 14:
+            new_col = pd.concat([new_col.iloc[0:-20], new_col.iloc[-20:].interpolate(method='spline', order=1)], axis=0)
         return new_col
 
     def make_prediction(fips, dictionary, x, x_var):
@@ -238,68 +243,74 @@ def align_rt(update=True, train=True):
         pickle.dump(with_county_rt_, open("data/Rt/with_county_rt.p", "wb"))
 
     if train:
-        predict = 14
-        print("  Aligning and estimating county-level Rt")
-        final_estimate = final[(final['date'] > "2020-03-25")]
 
-        final_estimate = final_estimate[~final_estimate['normalized_cases_norm'].isnull()]
-        new_col = final_estimate['test_positivity']/final_estimate['county_counts']
-        final_estimate['county_fraction'] = final_estimate['normalized_cases_norm']/new_col.replace(0, 1)
+        shift_dates = [7, 14, 21, 28]
 
-        print(final_estimate.groupby("FIPS").tail(1)['date'].unique())
+        for predict in shift_dates:
+            print(predict)
+            print("  Train - Aligning and estimating county-level Rt")
+            final_estimate = final.copy(deep=True)
+            print(final_estimate.columns)
+            final_estimate = final_estimate[(final_estimate['date'] > "2020-03-25")]
 
-        final_estimate = final_estimate.reset_index(drop=True)
+            final_estimate = final_estimate[~final_estimate['normalized_cases_norm'].isnull()]
+            new_col = final_estimate['test_positivity']/final_estimate['county_counts']
+            final_estimate['county_fraction'] = final_estimate['normalized_cases_norm']/new_col.replace(0, 1)
 
-        new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['test_positivity'], x['rt_mean_rt.live'], predict)).reset_index(drop=True)
-        final_estimate[["aligned_state_rt","ECR_shift"]] = new_col
+            print(final_estimate.groupby("FIPS").tail(1)['date'].unique())
 
-        new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : shift_fraction(x.name, x['county_fraction'], predict))
-        final_estimate['county_fraction'] = new_col.reset_index(drop=True)
+            final_estimate = final_estimate.reset_index(drop=True)
 
-        new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : shift_fraction(x.name, x['normalized_cases_norm'], predict))
-        final_estimate['normalized_cases_norm'] = new_col.reset_index(drop=True)
+            new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['test_positivity'], x['rt_mean_rt.live'], predict)).reset_index(drop=True)
+            final_estimate[["aligned_state_rt","ECR_shift"]] = new_col
 
-        final_estimate['estimated_county_rt'] = final_estimate['aligned_state_rt'] * final_estimate['county_fraction']
-        final_estimate['estimated_county_rt'] = final_estimate['estimated_county_rt'] / (final_estimate['estimated_county_rt'].mean()/final_estimate['aligned_state_rt'])
+            new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : shift_fraction(x.name, x['county_fraction'], predict))
+            final_estimate['county_fraction'] = new_col.reset_index(drop=True)
 
-        print("  Aligning COVID Act Now county-level Rt")
-        with_county_rt = final_estimate[~final_estimate['RtIndicator'].isnull()].dropna().reset_index()
-        final_estimate = final_estimate[final_estimate['RtIndicator'].isnull()]
+            new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : shift_fraction(x.name, x['normalized_cases_norm'], predict))
+            final_estimate['normalized_cases_norm'] = new_col.reset_index(drop=True)
 
-        new_col = with_county_rt.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['normalized_cases'], x['RtIndicator'], 0)).reset_index(drop=True)
-        with_county_rt[['CAN_county_rt','CAN_shift']] = new_col
+            final_estimate['estimated_county_rt'] = final_estimate['aligned_state_rt'] * final_estimate['county_fraction']
+            final_estimate["estimated_county_rt_" + str(predict)] = final_estimate['estimated_county_rt'] / (final_estimate['estimated_county_rt'].mean()/final_estimate['aligned_state_rt'])
 
-        final_estimate = final_estimate.reset_index(drop=True)
+            print("  Train - Aligning COVID Act Now county-level Rt")
+            with_county_rt = final_estimate[~final_estimate['RtIndicator'].isnull()].dropna().reset_index()
+            final_estimate = final_estimate[final_estimate['RtIndicator'].isnull()]
 
-        without_county_rt_dict = pickle.load(open("data/Rt/without_county_rt.p", "rb"))
-        with_county_rt_dict = pickle.load(open("data/Rt/with_county_rt.p", "rb"))
+            new_col = with_county_rt.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['normalized_cases'], x['RtIndicator'], 0)).reset_index(drop=True)
+            with_county_rt[['CAN_county_rt','CAN_shift']] = new_col
 
-        final_estimate = final_estimate[['FIPS', 'date', 'estimated_county_rt', 'normalized_cases_norm', 'ECR_shift']].dropna()
-        with_county_rt = with_county_rt[['FIPS', 'date', 'estimated_county_rt', 'normalized_cases_norm', 'RtIndicator','ECR_shift', 'CAN_county_rt', 'CAN_shift']].dropna()
+            final_estimate = final_estimate.reset_index(drop=True)
 
-        final_estimate = final_estimate[final_estimate['FIPS'].isin(without_county_rt_dict.keys())].reset_index(drop=True)
-        with_county_rt = with_county_rt[with_county_rt['FIPS'].isin(with_county_rt_dict.keys())].reset_index(drop=True)
-        new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : make_prediction(x.name, without_county_rt_dict, x['estimated_county_rt'], 1))
+            without_county_rt_dict = pickle.load(open("data/Rt/without_county_rt.p", "rb"))
+            with_county_rt_dict = pickle.load(open("data/Rt/with_county_rt.p", "rb"))
 
-        final_estimate['prediction'] = new_col.reset_index(drop=True)
+            final_estimate = final_estimate[['FIPS', 'date', "estimated_county_rt_" + str(predict), 'normalized_cases_norm', 'ECR_shift']].dropna()
+            with_county_rt = with_county_rt[['FIPS', 'date', "estimated_county_rt_" + str(predict), 'normalized_cases_norm', 'RtIndicator','ECR_shift', 'CAN_county_rt', 'CAN_shift']].dropna()
 
-        new_col = with_county_rt.groupby("FIPS", as_index=False).apply(lambda x : make_prediction(x.name, with_county_rt_dict, x[['estimated_county_rt', 'CAN_county_rt']], 2))
-        with_county_rt['prediction'] = new_col.reset_index(drop=True)
+            final_estimate = final_estimate[final_estimate['FIPS'].isin(without_county_rt_dict.keys())].reset_index(drop=True)
+            with_county_rt = with_county_rt[with_county_rt['FIPS'].isin(with_county_rt_dict.keys())].reset_index(drop=True)
+            new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : make_prediction(x.name, without_county_rt_dict, x['estimated_county_rt'], 1))
 
-        #print(with_county_rt['prediction'].corr(with_county_rt['normalized_cases_norm']))
-        #print(r2_score(with_county_rt['normalized_cases_norm'],with_county_rt['prediction']))
+            final_estimate["prediction_" + str(predict)] = new_col.reset_index(drop=True)
 
-        #print(final_estimate['prediction'].corr(final_estimate['normalized_cases_norm']))
-        #print(r2_score(final_estimate['normalized_cases_norm'],final_estimate['prediction']))
+            new_col = with_county_rt.groupby("FIPS", as_index=False).apply(lambda x : make_prediction(x.name, with_county_rt_dict, x[['estimated_county_rt', 'CAN_county_rt']], 2))
+            with_county_rt["prediction_" + str(predict)] = new_col.reset_index(drop=True)
 
-        col_keep = ['FIPS', 'date', 'normalized_cases_norm', 'estimated_county_rt', 'prediction']
-        combined = pd.concat([with_county_rt[col_keep], final_estimate[col_keep]])
-        final = final[['FIPS','date','state','region']]
-        combined = pd.merge(left=combined, right=final, how='left', on=['FIPS', 'date'], copy=False)
-        combined = combined[['FIPS','date','state','region','normalized_cases_norm','estimated_county_rt','prediction']]
+            #print(with_county_rt['prediction'].corr(with_county_rt['normalized_cases_norm']))
+            #print(r2_score(with_county_rt['normalized_cases_norm'],with_county_rt['prediction']))
 
-        return combined
+            #print(final_estimate['prediction'].corr(final_estimate['normalized_cases_norm']))
+            #print(r2_score(final_estimate['normalized_cases_norm'],final_estimate['prediction']))
 
+            col_keep = ['FIPS', 'date', 'normalized_cases_norm', "estimated_county_rt_" + str(predict), "prediction_" + str(predict)]
+            combined = pd.concat([with_county_rt[col_keep], final_estimate[col_keep]])
+            final_ = final[['FIPS','date','state','region']].copy(deep=True)
+            combined = pd.merge(left=combined, right=final_, how='left', on=['FIPS', 'date'], copy=False)
+            combined = combined[['FIPS','date','state','region','normalized_cases_norm',"estimated_county_rt_" + str(predict),"prediction_" + str(predict)]]
+            combined = combined.sort_values(['FIPS','date'])
+
+            combined.to_csv("data/Rt/aligned_rt_"+str(predict)+".csv", index=False, sep=',')
 
 def warning_suppressor(debug_mode=True):
     if not debug_mode:
@@ -310,7 +321,6 @@ def preprocess_Rt():
 
     print("• Processing Rt Data")
 
-    n = """
     state_map, fips_data = get_state_fips()
 
     # Rt calculations from rt.live
@@ -349,15 +359,15 @@ def preprocess_Rt():
     final_rt = final_rt
 
     final_rt.to_csv("data/Rt/rt_data.csv", index=False, sep=',')
-    """
+
 
     #print(final_rt.groupby("FIPS").tail(1)['date'].unique())
-    print("Aligning Rt")
-    combined = align_rt()
-    combined = combined.sort_values(['FIPS','date'])
 
-    print(combined.groupby("FIPS").tail(1)['date'].unique())
-    combined.to_csv("data/Rt/aligned_rt.csv", index=False)
+    print("Aligning Rt")
+    align_rt()
+
+    #print(combined.groupby("FIPS").tail(1)['date'].unique())
+    #combined.to_csv("data/Rt/aligned_rt.csv", index=False)
 
     print("  Finished\n")
 
