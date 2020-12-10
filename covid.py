@@ -2,6 +2,7 @@ from model.merge import merge
 from model.train import train
 from model.predict import predict
 from model.web import web
+from model.visualize import visualize
 import argparse
 
 __author__ = 'Duy Cao, Joseph Galasso'
@@ -34,6 +35,11 @@ def main(args):
         merge(apple_google_mobility=True)
     if args.upload:
         import ssh_client
+    if args.tf:
+        from model.tf_train import main as tf_train
+        tf_train()
+    if args.plot:
+        visualize()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='COVID-19 County Prediction\n',\
@@ -47,5 +53,6 @@ if __name__ == '__main__':
     parser.add_argument('--reichlab', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--ag', action='store_true', help=argparse.SUPPRESS)
     parser.add_argument('--upload', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--plot', action='store_true', help='Visualize quantile and point projections')
     args = parser.parse_args()
     main(args)

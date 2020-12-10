@@ -17,12 +17,12 @@ __url__ = 'https://github.com/solveforj/pandemic-central'
 __version__ = '2.1.0'
 
 PREDICTION_FILE = 'predictions/projections/predictions_latest.csv'
-PREDICTION_COLUMNS = ['FIPS', 'date']
+PREDICTION_COLUMNS = ['FIPS', 'date', 'TOT_POP']
 WEEKS = ['1', '2', '3', '4']
 QUANTILES = ['0.025', '0.1', '0.25', '0.5', '0.75', '0.9', '0.975']
 
 # Require package 'isoweek'
-# try command 'pip install isoweek'
+# try command 'pip install isoweek' or 'pip3 install isoweek'
 
 def get_saturday(d):
     # EPIWEEK ENDS ON SATURDAY...
@@ -57,8 +57,22 @@ def read_prediction():
     df_predict['FIPS'] = df_predict['FIPS'].str.zfill(5)
     df_predict = df_predict.rename(columns={'FIPS': 'location'})
 
+    # Denormalize data
+    df_population = pd.read_csv('data/census/Reichlab_Population.csv',\
+                                usecols=['location', 'population'])
+
+    df_population['location'] = df_population['location'].astype('str')
+    df_population['location'] = df_population['location'].str.zfill(5)
+
+    df_predict = df_predict.merge(df_population, how='left', on='location')
+    df_predict['TOT_POP'] = df_predict['population']
+    df_predict = df_predict.drop(['population'], 1)
+
+    for var in PREDICTION_COLUMNS[3:]:
+        df_predict[var] = df_predict[var]*df_predict['TOT_POP']*7/100000
+
     # List of values to be exploded
-    df_predict['value'] = df_predict[PREDICTION_COLUMNS[2:]].values.tolist()
+    df_predict['value'] = df_predict[PREDICTION_COLUMNS[3:]].values.tolist()
 
     # List of targets to be exploded
     targets = []
@@ -72,7 +86,8 @@ def read_prediction():
     df_predict['type'] = [types] * len(df_predict)
 
     # List of quantiles to be exploded
-    df_predict['quantile'] = [(QUANTILES + ['NA'])*len(WEEKS)] * len(df_predict)
+    quantiles_2 = ['0.025', '0.100', '0.250', '0.500', '0.750', '0.900', '0.975']
+    df_predict['quantile'] = [(quantiles_2 + ['NA'])*len(WEEKS)] * len(df_predict)
 
     # List of end dates to be exploded
     ends = []
@@ -85,6 +100,9 @@ def read_prediction():
 
     # EXPLODE
     df_predict = df_predict.set_index(['location']).apply(pd.Series.explode).reset_index()
+
+    # Correct negative values
+    df_predict['value'] = df_predict['value'].clip(lower=0)
 
     # Set 'forecast_date' to be the date today
     df_predict['forecast_date'] = date.today().isoformat()
