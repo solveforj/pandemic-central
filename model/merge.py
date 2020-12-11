@@ -42,9 +42,9 @@ def combine(apple_google_mobility = False):
 
     # Read Rt datasets for all alignments
     rt = pd.read_csv("data/Rt/aligned_rt_7.csv")
-    rt_14 = pd.read_csv("data/Rt/aligned_rt_14.csv", usecols=['FIPS', 'date', 'estimated_county_rt_14','prediction_14'])
-    rt_21 = pd.read_csv("data/Rt/aligned_rt_21.csv", usecols=['FIPS', 'date', 'estimated_county_rt_21','prediction_21'])
-    rt_28 = pd.read_csv("data/Rt/aligned_rt_28.csv", usecols=['FIPS', 'date', 'estimated_county_rt_28','prediction_28'])
+    rt_14 = pd.read_csv("data/Rt/aligned_rt_14.csv", usecols=['FIPS', 'date', "prediction_aligned_int_14" , "rt_aligned_int_14"])
+    rt_21 = pd.read_csv("data/Rt/aligned_rt_21.csv", usecols=['FIPS', 'date', "prediction_aligned_int_21" , "rt_aligned_int_21"])
+    rt_28 = pd.read_csv("data/Rt/aligned_rt_28.csv", usecols=['FIPS', 'date', "prediction_aligned_int_28" , "rt_aligned_int_28"])
 
     # Merge all Rt datasets into one final
     rt = pd.merge(left=rt, right=rt_14, how='left', on=['FIPS', 'date'], copy=False)
@@ -68,6 +68,7 @@ def combine(apple_google_mobility = False):
 
     locations = merged_DF['Location']
     merged_DF = merged_DF.drop('Location', axis=1)
+
     merged_DF.insert(0, 'Location', locations)
 
     # Divide dataset into counties with and without mobility
@@ -75,11 +76,22 @@ def combine(apple_google_mobility = False):
     columns.remove('fb_stationary')
     columns.remove('fb_movement_change')
 
+    #for i in merged_DF.columns:
+    #    s = merged_DF[i]
+    pd.set_option('display.max_rows', 500)
+
+    s = merged_DF.isnull().sum(axis = 0)
+    print(s)
+
     cleaned_DF = merged_DF.dropna(subset=columns)
+
     unused_DF = merged_DF[~merged_DF.index.isin(cleaned_DF.index)]
+
     training_mobility = cleaned_DF.dropna()
     training_mobility = training_mobility.sort_values(['FIPS', 'date'])
 
+    print("Training Mobility")
+    print(training_mobility.groupby("FIPS").tail(1)['date'])
     no_mobility = cleaned_DF[~cleaned_DF.index.isin(training_mobility.index)]
     no_mobility = no_mobility.drop(['fb_stationary', 'fb_movement_change'], axis=1)
     no_mobility = no_mobility.sort_values(['FIPS', 'date'])

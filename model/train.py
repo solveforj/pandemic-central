@@ -46,11 +46,12 @@ def make_ML_model(data, output, density = 0):
         data_train = data.copy()
 
         data_train['label'] = data_train.groupby('FIPS')['confirmed_cases_norm'].shift(periods=-7*shift)
+        #print(data['confirmed_cases_norm'].corr(data['prediction_aligned_int_7']))
         to_drop = ['confirmed_cases', 'confirmed_cases_norm', 'normalized_cases_norm', 'positiveIncrease_norm', 'positiveIncrease', 'TOT_POP']
         data_train = data_train.drop(to_drop, axis=1)
 
         data_mod = data_train.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
-        X = data_mod[data_mod.columns[5:-1]]
+        X = data_mod[data_mod.columns[4:-1]]
 
         scaler = StandardScaler()
         nX = scaler.fit_transform(X)
@@ -59,8 +60,11 @@ def make_ML_model(data, output, density = 0):
         regr = RandomForestRegressor(n_estimators=20, min_samples_split=10, n_jobs=4).fit(X_train, y_train)
 
         r2_test = regr.score(X_test, y_test)
+        print(r2_test)
         r2_testing.append(r2_test)
         r2_train = regr.score(X_train, y_train)
+        print(r2_train)
+        print()
         r2_training.append(r2_train)
         mae_test = mean_absolute_error(y_test,regr.predict(X_test))
         mae_testing.append(mae_test)
@@ -74,7 +78,7 @@ def make_ML_model(data, output, density = 0):
         print(n.sort_values('value'))
 
         data_predict = data.drop(to_drop, axis=1)
-        nX = scaler.fit_transform(data_predict[data_predict.columns[5:]])
+        nX = scaler.fit_transform(data_predict[data_predict.columns[4:]])
 
         prediction_df['point_' + str(shift) + "_weeks"] = regr.predict(nX)
 
@@ -96,6 +100,8 @@ def make_ML_model(data, output, density = 0):
         prediction_df = pd.concat([prediction_df, RF_actual_pred], axis=1)
 
     data = pd.concat([data, prediction_df], axis=1)
+    data['model'] = [output] * len(data)
+
     data.to_csv(os.path.split(os.getcwd())[0] + "/" + output + "_full_predictions.csv.gz", index=False, compression='gzip')
 
     model_stats['model_type'] = model_type
@@ -114,9 +120,11 @@ def train():
 
     print("• Training mobility model")
     training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz")
+    training_mobility = training_mobility[training_mobility['date'] < "2020-12-07"]
     #training_mobility = training_mobility[training_mobility['FIPS'].astype(str).str.startswith("36")]
     mobility_model_stats = make_ML_model(training_mobility, "mobility")
     print("  Finished\n")
+
 
     print("• Training non-mobility model")
     training_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz")

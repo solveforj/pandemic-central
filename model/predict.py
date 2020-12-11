@@ -46,14 +46,15 @@ def predict():
     if not os.path.exists('predictions/projections'):
         os.mkdir('predictions/projections')
 
-    combined_predictions.iloc[:, 65:] = combined_predictions.iloc[:, 65:].astype(float)
-    combined_predictions.iloc[:, 65:] = combined_predictions.iloc[:, 65:].clip(lower=0)
+    combined_predictions.iloc[:, 65:-1] = combined_predictions.iloc[:, 65:-1].astype(float)
+    combined_predictions.iloc[:, 65:-1] = combined_predictions.iloc[:, 65:-1].clip(lower=0)
 
+    print("Here are the latest dates for predictions of all counties")
+    print(combined_predictions.groupby("FIPS").tail(1)['date'].unique())
     #combined_predictions = combined_predictions.rename({"model_predictions":"model_predictions_norm"}, axis=1)
 
     combined_predictions.to_csv("predictions/projections/predictions_" + date_today + ".csv", index=False)
     combined_predictions.to_csv("predictions/projections/predictions_latest.csv", index=False)
-
     print("Finished\n")
 
 

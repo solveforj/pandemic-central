@@ -59,23 +59,38 @@ def calculate_mae(cumulative = True):
     corr = merged_data.groupby("FIPS").apply(lambda x : pearsonr(x['model_predictions_norm'], x['confirmed_cases_norm'])[0])
     return mae, corr
 
-def web():
-    date_today = date.today().strftime('%Y-%m-%d')
+#def web():
+    #date_today = date.today().strftime('%Y-%m-%d')
     #date_today = "2020-08-22"
 
-    projections = pd.read_csv("predictions/projections/predictions_" + date_today + ".csv")
-    projections = projections.fillna("NULL")
-    projections['date'] = pd.to_datetime(projections['date'])
-    projections['date'] = projections['date'].apply(pd.DateOffset(7))
+    #projections = pd.read_csv("predictions/projections/predictions_" + date_today + ".csv")
+    #projections = projections.fillna("NULL")
+    #projections['date'] = pd.to_datetime(projections['date'])
+    #projections['date'] = projections['date'].apply(pd.DateOffset(7))
     #projections = projections.rename({"model_predictions":"model_predictions_norm"}, axis=1)
-    projections['model_predictions'] = projections['model_predictions_norm'] / 100000 * projections['TOT_POP']
-    projections['risk'] = projections['model_predictions'] * 7 / projections['TOT_POP'] * 100
+    #projections['model_predictions'] = projections['model_predictions_norm'] / 100000 * projections['TOT_POP']
+    #projections['risk'] = projections['model_predictions'] * 7 / projections['TOT_POP'] * 100
 
-    mae, _ = calculate_mae(cumulative=True)
-    projections['mae'] = [mae] * len(projections)
+    #mae, _ = calculate_mae(cumulative=True)
+    #projections['mae'] = [mae] * len(projections)
 
-    projections.to_csv("predictions/web/predictions_" + date_today + ".csv", index=False)
-    projections.to_csv("predictions/web/predictions_latest.csv", index=False)
+    #projections.to_csv("predictions/web/predictions_" + date_today + ".csv", index=False)
+    #projections.to_csv("predictions/web/predictions_latest.csv", index=False)
+
+
+    #def date_expand(start):
+    #    return pd.date_rante(start=start, periods=4, freq="W").astype(str).tolist()
+
+    #web = combined_predictions.groupby("FIPS").tail(1)
+    #print(web['date'])
+
+    #print(web['date'].unique())
+    #start_date = web['date'].iloc[0]
+    #ahead = web.iloc[:, [2, 3, 70, 78, 86, 94]]
+    #ahead_dates = pd.date_range(start = start_date, periods = 4, freq="W").astype(str).tolist()
+    #ahead_columns = ['FIPS', 'date'] + ahead_dates
+    #ahead.columns = ahead_columns
+    #print(ahead)
 
 if __name__ == "__main__":
     web()
