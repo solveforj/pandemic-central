@@ -5,3 +5,5 @@ demo.py
 test.py
 ssh_client.py
 predictions/graphics/latest_map.html
+test_formatting.py
+validate_single_forecast_file.py

@@ -31,10 +31,10 @@ def get_saturday(d):
     # week.
     date = d.isocalendar()
     if date[2] <= 1:
-        final = str(date[0]) + 'W' + str((date[1]))
+        final = str(date[0]) + 'W' + str((date[1])).zfill(2)
         next_sat = Week.fromstring(final).saturday()
     else:
-        final = str(date[0]) + 'W' + str((date[1] + 1))
+        final = str(date[0]) + 'W' + str((date[1] + 1)).zfill(2)
         next_sat = Week.fromstring(final).saturday()
     return next_sat.isoformat()
 
