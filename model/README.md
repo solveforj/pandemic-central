@@ -23,3 +23,10 @@
   - **web.py** reads the output file of *predict.py* and reformats it for our website, creating `predictions/web/predictions_yyyy-mm-dd.csv`
 
   - **reichlab.py** reads the output file of *predict.py* and reformats it for the COVID-19 Forecast Hub, creating `predictions/covid19-forecast-hub/yyyy-mm-dd-PandemicCentral-USCounty.csv`
+  - **map.py** draws choropleth map from `predictions/projections/predictions_latest.csv`. The output will be:
+    - **latest_map.html**: an interactive map with hover data
+    - Four **YYYY-MM-DD-w.png**: maps in PNG format. In which:
+      - YYYY-MM-DD: the date today in ISO format
+      - w (labeled 1-4): the w week ahead
+    - These files can be found in `predictions/graphics/` directory
+  - **visualize.py** shows plot quantile and point projections as national total incident cases and export data for web development
