@@ -104,12 +104,16 @@ def make_ML_model(data, output, density = 0):
 
     data.to_csv(os.path.split(os.getcwd())[0] + "/" + output + "_full_predictions.csv.gz", index=False, compression='gzip')
 
+    for i in range(len(model_type)):
+        model_type[i] = model_type[i].replace('_',' ')
+
     model_stats['model_type'] = model_type
     model_stats['week'] = week_number
     model_stats['R2_testing'] = r2_testing
     model_stats['R2_training'] = r2_training
     model_stats['MAE_testing'] = mae_testing
     model_stats['MAE_training'] = mae_training
+    model_stats = model_stats.round(3)
     print(model_stats)
 
     return model_stats
@@ -120,7 +124,7 @@ def train():
 
     print("• Training mobility model")
     training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz")
-    training_mobility = training_mobility[training_mobility['date'] < "2020-12-07"]
+    #training_mobility = training_mobility[training_mobility['date'] < "2020-12-07"]
     #training_mobility = training_mobility[training_mobility['FIPS'].astype(str).str.startswith("36")]
     mobility_model_stats = make_ML_model(training_mobility, "mobility")
     print("  Finished\n")
