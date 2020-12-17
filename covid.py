@@ -26,7 +26,7 @@ def main(args):
         predict()
         web()
     if args.map:
-        from data.graphics.draw import draw_map
+        from model.map import draw_map
         draw_map()
     if args.reichlab:
         from model.reichlab import read_prediction
