@@ -32,9 +32,6 @@ def get_facebook_data():
         {"class": "btn btn-empty btn-empty-blue hdx-btn resource-url-analytics ga-download"},\
          href=True)[1]['href']
     download_url = 'https://data.humdata.org' + download_url
-
-    print(download_url)
-
     zip = requests.get(download_url)
     os.mkdir('temp')
     temp_path = ('temp/data.zip')
@@ -66,7 +63,7 @@ def facebook_mobility_to_pd(files):
 
     # Move dates forward by 1 day so that movement averages represent data from past week
     df['date'] = pd.to_datetime(df['date'])
-    df['date'] = df['date'].apply(pd.DateOffset(1))
+    df['date'] = df['date'] + pd.Timedelta(value=1, unit='day')
     df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
     df = df.dropna()
 

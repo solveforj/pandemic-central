@@ -105,7 +105,7 @@ def preprocess_JHU():
 
     # Move dates forward by 1 day so that movement averages represent data from past week
     full_data['date'] = pd.to_datetime(full_data['date'])
-    full_data['date'] = full_data['date'].apply(pd.DateOffset(1))
+    full_data['date'] = full_data['date'] + pd.Timedelta(value=1, unit='day')
 
     full_data = full_data.reset_index(drop=True)
 

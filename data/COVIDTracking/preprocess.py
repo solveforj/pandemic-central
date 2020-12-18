@@ -115,7 +115,7 @@ def preprocess_testing():
     testing['totalTestResultsIncrease'] = pd.Series(testing.groupby("state")['totalTestResultsIncrease'].rolling(14).mean()).reset_index(drop=True)
 
     # Move dates forward by 1 day so that movement averages represent data from past week
-    testing['date'] = testing['date'].apply(pd.DateOffset(1))
+    testing['date'] = testing['date'] + pd.Timedelta(value=1, unit='day')
     testing['date'] = testing['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
 
     # Source: US Census

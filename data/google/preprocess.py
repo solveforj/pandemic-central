@@ -69,7 +69,7 @@ def google_mobility_to_pd(df_load):
 
     # Move dates forward by 1 day so that movement averages represent data from past week
     df_google['date'] = pd.to_datetime(df_google['date'])
-    df_google['date'] = df_google['date'].apply(pd.DateOffset(1))
+    df_google['date'] = df_google['date'] + pd.Timedelta(value=1, unit='day')
     df_google['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
     df_google = df_google.dropna()
     df_google = df_google.rename(columns={'fips': 'FIPS'})
