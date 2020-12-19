@@ -91,12 +91,15 @@ Our latest version is v2.0.0. For version details, see **Releases** tags.
 
 4. [COVID Tracking Project](https://www.covidtracking.com/)
 
-5. [MIT Projections](https://github.com/youyanggu/covid19_projections/blob/master/projections/combined/latest_us.csv)
-6.    [IHME Datasets](http://ghdx.healthdata.org/us-data)
-7.    [Rt.live Reproduction Rate](https://rt.live/)
-8.    [CCVI Index](https://docs.google.com/spreadsheets/d/1qEPuziEpxj-VG11IAZoa5RWEr4GhNoxMn7aBdU76O5k/edit#gid=549685106)
-9.    [US Census Population Data](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html)
-10.    [USDA FIPS Code List](https://www.ers.usda.gov/data-products/rural-urban-commuting-area-codes/)
+5. [IHME Datasets](http://ghdx.healthdata.org/us-data)
+
+6. [Rt.live Reproduction Rate](https://rt.live/)
+
+7. [CCVI Index](https://docs.google.com/spreadsheets/d/1qEPuziEpxj-VG11IAZoa5RWEr4GhNoxMn7aBdU76O5k/edit#gid=549685106)
+
+8. [US Census Population Data](https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html)
+
+9. [USDA FIPS Code List](https://www.ers.usda.gov/data-products/rural-urban-commuting-area-codes/)
 
 We also thank Plotly, TensorFlow and Python communities for very detailed and helpful documentations.
 

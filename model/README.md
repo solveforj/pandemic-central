@@ -18,9 +18,7 @@
 
     - `../no_mobility_full_predictions.csv.gz`contains all data from the non-mobility training dataset with added predictions from the non-mobility random forest model.
 
-  - **predict.py** reads the mobility and non-mobility predictions produced by *train.py* and filters them to only show the validated projections for the past 3 weeks and the unvalidated projections for the next 2 weeks.  The 2 filtered datasets are merged into one file of predictions for US counties, `predictions/projections/predictions_yyyy-mm-dd.csv`
-
-  - **web.py** reads the output file of *predict.py* and reformats it for our website, creating `predictions/web/predictions_yyyy-mm-dd.csv`
+  - **predict.py** reads the mobility and non-mobility predictions produced by *train.py* and filters them to only show the validated projections for the past 3 weeks and the unvalidated projections for the next 2 weeks.  The 2 filtered datasets are merged into one file of predictions for US counties, `predictions/projections/predictions_yyyy-mm-dd.csv`.  Then, the resultant merged file is reformatted for our website and stored as `predictions/website/web_yyyy-mm-dd.csv`.
 
   - **reichlab.py** reads the output file of *predict.py* and reformats it for the COVID-19 Forecast Hub, creating `predictions/covid19-forecast-hub/yyyy-mm-dd-PandemicCentral-USCounty.csv`
   - **map.py** draws choropleth map from `predictions/projections/predictions_latest.csv`. The output will be:
