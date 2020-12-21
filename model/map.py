@@ -108,18 +108,20 @@ def render():
     weeks = list(range(1,5))
     filenames = []
     for df, wk in zip(dfs, weeks):
-        print(f'Rendering Week {wk}')
+        print(f'Rendering Week {wk}', end='')
         path = render_map(df, wk)
         add_watermark(path)
         filenames.append(path)
-    print('Rendering interactive map')
+        print(' - Done!')
+    print('Rendering interactive map', end='')
     fix_map()
+    print(' - Done!')
     images = []
-    print('Rendering GIF image')
+    print('Rendering GIF image', end='')
     for filename in filenames:
         images.append(imageio.imread(filename))
     imageio.mimsave(f'predictions/graphics/latest_map.gif', images, fps=1)
-    print('Done!')
+    print(' - Done!')
 
 def draw_map():
     # read_lastest_file()

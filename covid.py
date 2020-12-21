@@ -1,7 +1,6 @@
 from model.merge import merge
 from model.train import train
 from model.predict import predict
-from model.web import web
 from model.visualize import visualize
 import argparse
 
@@ -19,12 +18,10 @@ def main(args):
         train()
     if args.predict:
         predict()
-        web()
     if args.default:
         merge()
         train()
         predict()
-        web()
     if args.map:
         from model.map import draw_map
         draw_map()

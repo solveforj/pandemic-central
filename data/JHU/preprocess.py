@@ -51,7 +51,7 @@ def preprocess_JHU():
 
     # Move dates forward by 1 day so that movement averages represent data from past week
     full_data['date'] = pd.to_datetime(full_data['date'])
-    full_data['date'] = full_data['date'] + pd.TimeDelta(value=1, unit='day')
+    full_data['date'] = full_data['date'] + pd.Timedelta(value=1, unit='day')
     full_data['date'] = full_data['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
 
     full_data = full_data.reset_index(drop=True)
@@ -64,6 +64,7 @@ def preprocess_JHU():
     merged_df['confirmed_cases_norm'] = (merged_df['confirmed_cases']/merged_df['TOT_POP'] * 100000).round()
     merged_df = merged_df.drop('TOT_POP', axis=1)
     startdate = datetime.strptime('2020-2-15', '%Y-%m-%d')
+    merged_df['date'] = pd.to_datetime(merged_df['date'])
     merged_df = merged_df[merged_df['date'] >= startdate]
 
     merged_df.to_csv('data/JHU/jhu_data.csv', sep=",", index=False)
