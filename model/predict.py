@@ -65,6 +65,12 @@ def predict():
 
     projections = projections.groupby("FIPS").tail(1).reset_index(drop=True)
 
+    df_population = pd.read_csv('data/census/Reichlab_Population.csv',\
+                                usecols=['location', 'population'])
+    df_population['location'] = df_population['location'].astype('str')
+    df_population['location'] = df_population['location'].str.zfill(5)
+    df_population = df_population.rename(columns={'location':'FIPS'})
+
     projections = projections[['FIPS', 'date', 'ID', 'model', 'ELDERLY_POP', 'BA_FEMALE', 'BA_MALE', 'H_FEMALE', 'H_MALE', 'POP_DENSITY', 'TOT_POP', 'point_1_weeks', 'point_2_weeks', 'point_3_weeks', 'point_4_weeks']].round(2).reset_index(drop=True)
     projections['combined_predictions'] = projections.iloc[:, 11:].values.tolist()
     projections = projections.drop(['point_1_weeks', 'point_2_weeks', 'point_3_weeks', 'point_4_weeks'], axis=1)
@@ -76,6 +82,15 @@ def predict():
     projections = projections.drop(['shift'], axis=1)
     projections['type'] = ['projection'] * len(projections)
     projections = projections.reset_index(drop=True)
+
+    # Use latest population data
+    projections['FIPS'] = projections['FIPS'].astype('str')
+    projections['FIPS'] = projections['FIPS'].str.zfill(5)
+    projections = projections.merge(df_population, how='left', on='FIPS')
+    projections['TOT_POP'] = projections['population']
+    projections = projections.drop(['population'], 1)
+    projections['FIPS'] = projections['FIPS'].astype('int')
+
     projections['cases'] = (projections['combined_predictions'] * projections['TOT_POP'] / 100000).astype(float).round(0)
     projections['TOT_H'] = (projections['H_FEMALE'] + projections['H_MALE'])
     projections['TOT_BA'] = (projections['BA_FEMALE'] + projections['BA_MALE'])
@@ -86,6 +101,15 @@ def predict():
     past['date'] = pd.to_datetime(past['date']) + past['shift']
     past['date'] = past['date'].astype(str)
     past = past.drop(['shift'], axis=1)
+
+    # Use latest population data
+    past['FIPS'] = past['FIPS'].astype('str')
+    past['FIPS'] = past['FIPS'].str.zfill(5)
+    past = past.merge(df_population, how='left', on='FIPS')
+    past['TOT_POP'] = past['population']
+    past = past.drop(['population'], 1)
+    past['FIPS'] = past['FIPS'].astype('int')
+
     past['cases'] = (past['confirmed_cases_norm'] * past['TOT_POP'] / 100000).astype(float).round(0)
     past['TOT_H'] = (past['H_FEMALE'] + past['H_MALE'])
     past['TOT_BA'] = (past['BA_FEMALE'] + past['BA_MALE'])
