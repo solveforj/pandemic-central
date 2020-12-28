@@ -57,7 +57,7 @@ def make_ML_model(data, output, density = 0):
         nX = scaler.fit_transform(X)
         y = data_mod['label']
         X_train, X_test, y_train, y_test = train_test_split(nX, y, train_size=0.9)
-        regr = RandomForestRegressor(n_estimators=20, min_samples_split=10, n_jobs=4).fit(X_train, y_train)
+        regr = RandomForestRegressor(n_estimators=20, min_samples_split=10, n_jobs=-1).fit(X_train, y_train)
 
         r2_test = regr.score(X_test, y_test)
         print(r2_test)
