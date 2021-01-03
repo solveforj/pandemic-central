@@ -76,6 +76,25 @@ def google_mobility_to_pd(df_load):
 
     df_google.to_csv(path, compression='gzip', index=False)
 
+def google_mobility_state_level():
+    print('• Processing Google Mobility Data - State Level')
+    df = get_google_data()
+    df = df[df['country_region_code']=='US']
+    df = df.dropna(subset=['iso_3166_2_code'])
+    df = df.rename(columns={'iso_3166_2_code':'state',\
+        'retail_and_recreation_percent_change_from_baseline':'gg_retail',\
+        'grocery_and_pharmacy_percent_change_from_baseline':'gg_grocery',\
+        'parks_percent_change_from_baseline':'gg_park',\
+        'transit_stations_percent_change_from_baseline':'gg_transit',\
+        'workplaces_percent_change_from_baseline':'gg_workplace',\
+        'residential_percent_change_from_baseline':'gg_residential'})
+    df['state'] = df['state'].str.replace('US-', '')
+    df = df.drop(['country_region_code', 'country_region', 'sub_region_1',\
+                'sub_region_2', 'metro_area', 'census_fips_code'], 1)
+    df = df.sort_values(by=['state', 'date']).reset_index(drop=True)
+    df.to_csv('data/google/state_mobility.csv', index=False)
+    print('  Finished\n')
+
 def preprocess_google():
     print('• Processing Google Mobility Data')
     status = google_url_health()

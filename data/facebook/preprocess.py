@@ -74,8 +74,58 @@ def facebook_mobility_to_pd(files):
         os.remove('temp/' + filename)
     os.rmdir('temp/')
 
+def facebook_mobility_state_level():
+    print('• Processing Facebook Mobility Data - State Level')
+    # Download files
+    files = get_facebook_data()
+    for filename in files:
+        if filename.startswith('movement-range'):
+            path = 'temp/' + filename
+
+    # Read latest Facebook data
+    df_load = pd.read_csv(path, sep='\t', dtype={'polygon_id':str}, usecols=list(range(0,6)))
+    df_load = df_load[df_load['country'] == 'USA']
+    df_load = df_load.drop(['country'], 1)
+    df_load = df_load.rename(columns={'polygon_id':'fips','ds':'date','all_day_bing_tiles_visited_relative_change':'fb_movement_change'})
+
+    # Get county population data
+    df_fips = pd.read_csv('data/geodata/county_fips_2017_06.csv',\
+                        usecols=['STATE', 'STCOUNTYFP'], dtype='str')
+    df_fips = df_fips.rename(columns={'STATE':'state', 'STCOUNTYFP':'fips'})
+    df_load = df_load.merge(df_fips, on='fips', how='inner')
+
+    # Get state population data
+    df_population = pd.read_csv('data/census/Reichlab_Population.csv',
+                                usecols=['abbreviation', 'location', 'population'],
+                                dtype={'location':'str'})
+    df_state = df_population.drop(['location'],1)
+    df_state = df_state.dropna(subset=['abbreviation'])
+    df_state = df_state.rename(columns={'abbreviation':'state', \
+                                                'population':'state_pop'})
+    df_county = df_population[df_population['abbreviation'].isnull()]
+    df_county = df_county.drop(['abbreviation'],1)
+    df_county = df_county.rename(columns={'location':'fips', \
+                                                'population':'county_pop'})
+
+    # Merge population data into DataFrame
+    df_load = df_load.merge(df_state, on='state', how='inner')
+    df_load = df_load.merge(df_county, on='fips', how='inner')
+
+    # Take weighed average
+    df_load['fb_movement_change'] = df_load['fb_movement_change']*(df_load['county_pop']/df_load['state_pop'])
+    df_load = df_load.drop(['fips', 'polygon_source', 'state_pop', 'county_pop', 'polygon_name'], 1)
+    df_load = df_load.groupby(['state', 'date']).sum().reset_index().sort_values(by=['state', 'date'])
+
+    for filename in files:
+        os.remove('temp/' + filename)
+    os.rmdir('temp/')
+
+    df_load.to_csv('data/facebook/state_mobility.csv', index=False)
+
+    print('  Finished\n')
+
 def preprocess_facebook():
-    print('• Processing Facebook Mobility Data')
+    print('• Processing Facebook Mobility Data - County Level')
     files = get_facebook_data()
     facebook_mobility_to_pd(files)
     print('  Finished\n')
