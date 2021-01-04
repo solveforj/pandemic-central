@@ -126,7 +126,7 @@ def align_rt(update=True, train=True):
     print(3)
     print(final.groupby("FIPS").tail(1)['date'].unique())
 
-    testing_data = pd.read_csv("data/COVIDTracking/testing_data.csv", dtype={"FIPS":str})
+    testing_data = pd.read_csv("data/COVIDTracking/testing_data.csv.gz", dtype={"FIPS":str})
     print(4)
     print(testing_data.groupby("FIPS").tail(1)['date'].unique())
 

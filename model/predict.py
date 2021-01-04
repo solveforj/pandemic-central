@@ -61,6 +61,8 @@ def predict():
     projections = pd.read_csv("predictions/projections/predictions_latest.csv")
     census = pd.read_csv("data/census/census.csv")
 
+    projections = projections[projections['FIPS'].groupby(projections['FIPS']).transform('size')>4]
+
     past = projections.groupby("FIPS").tail(4).reset_index(drop=True)
 
     projections = projections.groupby("FIPS").tail(1).reset_index(drop=True)
@@ -122,7 +124,7 @@ def predict():
 
     combined_web = pd.concat([past, projections], axis=0).sort_values(['FIPS','date']).reset_index(drop=True)
     combined_web.iloc[:, 6:] = combined_web.iloc[:, 6:].astype(float).round(3)
-    combined_web = combined_web.round(3).fillna("NULL")
+    combined_web = combined_web.fillna("NULL")
 
     combined_web.to_csv("predictions/website/web_" + date_today + ".csv", index=False)
     combined_web.to_csv("predictions/website/web_latest.csv", index=False)

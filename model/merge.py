@@ -22,8 +22,8 @@ __version__ = '2.0.0'
 # Update dynamic data
 def update():
     print("UPDATING DATA\n")
-    preprocess_apple()
-    preprocess_google()
+    #preprocess_apple()
+    #preprocess_google()
     preprocess_facebook()
     preprocess_JHU()
     preprocess_testing()
@@ -34,10 +34,10 @@ def combine(apple_google_mobility = False):
     print("MERGING DATA\n")
     ccvi = pd.read_csv("data/CCVI/CCVI.csv")
     census = pd.read_csv("data/census/census.csv")
-    testing = pd.read_csv("data/COVIDTracking/testing_data.csv")
+    testing = pd.read_csv("data/COVIDTracking/testing_data.csv.gz")
     fb_mobility = pd.read_csv("data/facebook/mobility.csv.gz")
     ihme = pd.read_csv("data/IHME/IHME.csv")
-    ihme_smoking = pd.read_csv("data/IHME/IHME_smoking.csv")
+    #ihme_smoking = pd.read_csv("data/IHME/IHME_smoking.csv")
     cases = pd.read_csv("data/JHU/jhu_data.csv")
 
     # Read Rt datasets for all alignments
@@ -57,7 +57,7 @@ def combine(apple_google_mobility = False):
     merged_DF = pd.merge(left=merged_DF, right=fb_mobility, how='left', on=['FIPS', 'date'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=ihme, how='left', on=['FIPS'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=ccvi, how='left', on=['FIPS'], copy=False)
-    merged_DF = pd.merge(left=merged_DF, right = ihme_smoking, how='left', on=['region', 'Location'], copy=False)
+    #merged_DF = pd.merge(left=merged_DF, right = ihme_smoking, how='left', on=['region', 'Location'], copy=False)
     merged_DF = pd.merge(left=merged_DF, right=census, how='left', on=['FIPS'], copy=False).sort_values(['FIPS', 'date']).reset_index(drop=True)
 
     if apple_google_mobility:

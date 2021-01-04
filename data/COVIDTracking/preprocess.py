@@ -142,7 +142,7 @@ def preprocess_testing():
     merged_df = pd.merge(left=fips_df, right=testing_pop, how='left', on=['state', 'date'], copy=False)
     merged_df = merged_df.drop(['state'], axis=1)
 
-    merged_df.to_csv("data/COVIDTracking/testing_data.csv", sep=',', index=False)
+    merged_df.to_csv("data/COVIDTracking/testing_data.csv.gz", sep=',', compression='gzip', index=False)
 
     print("  Finished\n")
 

@@ -107,6 +107,7 @@ def preprocess_obesity():
     merged_df.rename(columns={'fips': 'FIPS', }, inplace=True)
     merged_df['FIPS'] = merged_df['FIPS'].astype(str)
 
+    # Note that data for Jefferson, Adams, Weld, and Boulder Counties were supplied by data for Denver County in Colorado
     return merged_df
 
 def preprocess_mortality():
