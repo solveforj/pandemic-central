@@ -2,6 +2,7 @@ from model.merge import merge
 from model.train import train
 from model.predict import predict
 from model.visualize import visualize
+from model.json_worker import json_worker
 import argparse
 
 __author__ = 'Duy Cao, Joseph Galasso'
@@ -22,6 +23,7 @@ def main(args):
         merge()
         train()
         predict()
+        json_worker()
     if args.map:
         from model.map import draw_map
         draw_map()
