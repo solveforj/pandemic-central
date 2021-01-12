@@ -3,12 +3,11 @@ import json
 import pandas as pd
 
 def json_worker():
-    http = urllib3.PoolManager()
-    r = http.request('GET', "https://itsonit.com/static/geojson-counties-fips.geojson")
+    with open ("data/geodata/us-counties-topojson.json", "r") as myfile:
+        data="".join(myfile.readlines())
 
-    result = r.data.decode('UTF-8')[18:].strip()
+    j = json.loads(data)
 
-    j = json.loads(result)
 
     df = pd.read_csv("predictions/website/web_latest.csv", dtype={"FIPS":str}).groupby("FIPS").tail(4).reset_index(drop=True)
 
@@ -22,8 +21,7 @@ def json_worker():
     df['cases'] = (df['cases'] * 7).round(0)
     df = df[['FIPS','date','cases', 'cases_p']]
 
-    print(df['cases_p'].max())
-    print(df['cases_p'].min())
+    quantiles_ = df['cases_p'].quantile([0.8, 0.6, 0.4, 0.2]).tolist()
 
     imploded_df = df.groupby("FIPS").agg({'FIPS': lambda x: x.iloc[0], 'date': lambda x: x.tolist(), 'cases': lambda x: x.tolist(), 'cases_p': lambda x: x.tolist()}).reset_index(drop=True)
 
@@ -37,9 +35,9 @@ def json_worker():
     from collections import defaultdict
 
     present = 0
-    tot_county = len(j['features'])
+    tot_county = len(j['objects']['us-counties']['geometries'])
     for i in range(tot_county):
-        county = j['features'][i]['id']
+        county = j['objects']['us-counties']['geometries'][i]['id']
         if county in imploded_dict.keys():
             present += 1
             dates = imploded_dict[county][0]
@@ -51,25 +49,16 @@ def json_worker():
             for d in (cases_dict, cases_p_dict): # you can list as many input dicts as you want here
                 for key, value in d.items():
                     merged_dict[key].append(value)
-            j['features'][i]['properties']['cases'] = merged_dict
+            j['objects']['us-counties']['geometries'][i]['properties']['cases'] = merged_dict
         else:
-            #dates = ["NULL"]*4
-            #cases = [0]*4
-            #cases_p = [0]*4
             merged_dict = {"NULL0":[0, 0], "NULL1":[0, 0],"NULL2":[0, 0],"NULL3":[0, 0]}
-            print(merged_dict)
-            j['features'][i]['properties']['cases'] = merged_dict
-            print(j['features'][i]['properties']['cases'])
-            print()
+            j['objects']['us-counties']['geometries'][i]['properties']['cases'] = merged_dict
 
-    for i in range(tot_county):
-        if j['features'][i]['id'] == '49017':
-            print(j['features'][i])
+        j['objects']['us-counties']['geometries'][i]['properties']['quantile'] = quantiles_
 
-    output_json = r.data.decode('UTF-8')[0:18] + json.dumps(j)
+    with open('predictions/website/county-data.topojson', 'w') as f:
+        f.write(json.dumps(j))
 
-    with open('predictions/website/county-data.geojson', 'w') as f:
-        f.write(output_json)
 
 if __name__ == "__main__":
     json_worker()
