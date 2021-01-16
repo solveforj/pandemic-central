@@ -17,7 +17,8 @@ CDC_MODERNA_API = 'https://data.cdc.gov/resource/b7pe-5nws.csv'
 CDC_PFIZER_API = 'https://data.cdc.gov/resource/saz5-9hgg.csv'
 
 # Strings in header to be replaced
-LABELS = ['first_doses_', 'doses_allocated_week_of_', 'doses_allocated_week_']
+LABELS = ['first_doses_', 'doses_allocated_week_of_', 'doses_allocated_week_',\
+            'doses_distribution_week_of_']
 
 def vaccine_alloc():
     """
@@ -52,14 +53,13 @@ def vaccine_alloc():
         - Generally, longer gap between first and booster doses create a better
         immune response. However, there has not been enough data about extending
         the gap with COVID-19 vaccines.
-
-        - Again, this data is NOT cumulative, doses are NEW allocated ones on specified dates
     """
 
     print('• Processing CDC Vaccine Data')
 
     # Read Pfizer's vaccine data
     pfizer_df = pd.read_csv(CDC_PFIZER_API)
+    print(pfizer_df.head())
     pfizer_df['jurisdiction'] = pfizer_df['jurisdiction'].str.replace('*', '')
     pfizer_df = pfizer_df.rename(columns={'jurisdiction':'state'})
     for i in LABELS:
