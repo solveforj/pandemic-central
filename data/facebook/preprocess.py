@@ -58,8 +58,8 @@ def facebook_mobility_to_pd(files):
     df = df.reset_index(drop=True)
 
     # Compute 14 day rolling averages for movement data
-    df['fb_movement_change'] = pd.Series(df.groupby("FIPS")['fb_movement_change'].rolling(14).mean()).reset_index(drop=True)
-    df['fb_stationary'] = pd.Series(df.groupby("FIPS")['fb_stationary'].rolling(14).mean()).reset_index(drop=True)
+    df['fb_movement_change'] = pd.Series(df.groupby("FIPS")['fb_movement_change'].rolling(7).mean()).reset_index(drop=True)
+    df['fb_stationary'] = pd.Series(df.groupby("FIPS")['fb_stationary'].rolling(7).mean()).reset_index(drop=True)
 
     # Move dates forward by 1 day so that movement averages represent data from past week
     df['date'] = pd.to_datetime(df['date'])

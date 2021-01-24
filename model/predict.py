@@ -8,6 +8,8 @@ import os
 from datetime import date
 from sklearn.preprocessing import StandardScaler
 
+pd.set_option('display.max_columns', 500)
+
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandamic Central, 2020'
 __license__ = 'MIT'
@@ -19,7 +21,6 @@ def predict():
     print("MAKING PREDICTIONS\n")
 
     date_today = date.today().strftime('%Y-%m-%d')
-    #date_today = "2020-08-22"
 
     mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "mobility_full_predictions.csv.gz", dtype={"label":float})
     no_mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "no_mobility_full_predictions.csv.gz",dtype={"label":float})
@@ -96,7 +97,12 @@ def predict():
     projections['cases'] = (projections['combined_predictions'] * projections['TOT_POP'] / 100000).astype(float).round(0)
     projections['TOT_H'] = (projections['H_FEMALE'] + projections['H_MALE'])
     projections['TOT_BA'] = (projections['BA_FEMALE'] + projections['BA_MALE'])
-    projections = projections[['FIPS', 'date', 'ID',  'cases', 'type', 'model', 'POP_DENSITY', 'TOT_H', 'TOT_BA', 'ELDERLY_POP']]
+    projections['total_cases'] = projections.groupby("FIPS")['cases'].transform('sum')
+    projections['total_cases_percent'] = projections['total_cases']/projections['TOT_POP']
+    projections['total_cases_percentile'] = projections['total_cases_percent'].rank(pct=True) * 100
+
+    projections = projections[['FIPS', 'date', 'ID',  'cases', 'type', 'model', 'POP_DENSITY', 'TOT_H', 'TOT_BA', 'ELDERLY_POP', 'total_cases_percent', 'total_cases_percentile']]
+
 
     past['shift'] = [-7, -7, -7, -7] * int(len(past)/4)
     past['shift'] = pd.to_timedelta(past['shift'], unit='D')
@@ -122,7 +128,13 @@ def predict():
     rt = pd.read_csv("data/Rt/rt_data.csv", usecols=['FIPS','date','rt_mean_rt.live'])
     past = pd.merge(left=past, right=rt, how='left', on=['FIPS', 'date'], copy=False)
 
+    #past = past.groupby("FIPS").tail(1).reset_index(drop=True)
+    past['movement_percentile'] = past['fb_movement_change'].rank(pct=True) * 100
+    past['rt_percentile'] = past['rt_mean_rt.live'].rank(pct=True) * 100
+
+
     combined_web = pd.concat([past, projections], axis=0).sort_values(['FIPS','date']).reset_index(drop=True)
+
     combined_web.iloc[:, 6:] = combined_web.iloc[:, 6:].astype(float).round(3)
     combined_web = combined_web.fillna("NULL")
 
