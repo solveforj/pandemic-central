@@ -22,6 +22,7 @@ def predict():
 
     date_today = date.today().strftime('%Y-%m-%d')
 
+
     mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "mobility_full_predictions.csv.gz", dtype={"label":float})
     no_mobility_data = pd.read_csv(os.path.split(os.getcwd())[0] + "/" + "no_mobility_full_predictions.csv.gz",dtype={"label":float})
 
@@ -98,12 +99,12 @@ def predict():
     projections['TOT_H'] = (projections['H_FEMALE'] + projections['H_MALE'])
     projections['TOT_BA'] = (projections['BA_FEMALE'] + projections['BA_MALE'])
     projections['total_cases'] = projections.groupby("FIPS")['cases'].transform('sum')
-    projections['total_cases_percent'] = projections['total_cases']/projections['TOT_POP']
-    projections['total_cases_percentile'] = projections['total_cases_percent'].rank(pct=True) * 100
+    projections['total_cases_percent'] = projections['total_cases']/projections['TOT_POP'] * 100
+    projections['total_cases_mean'] = [projections['total_cases_percent'].mean()] * len(projections)
 
-    projections = projections[['FIPS', 'date', 'ID',  'cases', 'type', 'model', 'POP_DENSITY', 'TOT_H', 'TOT_BA', 'ELDERLY_POP', 'total_cases_percent', 'total_cases_percentile']]
+    projections = projections[['FIPS', 'date', 'ID',  'cases', 'type', 'model', 'POP_DENSITY', 'TOT_H', 'TOT_BA', 'ELDERLY_POP', 'total_cases_percent', 'total_cases_mean']]
 
-
+    print(projections)
     past['shift'] = [-7, -7, -7, -7] * int(len(past)/4)
     past['shift'] = pd.to_timedelta(past['shift'], unit='D')
     past['date'] = pd.to_datetime(past['date']) + past['shift']
@@ -129,9 +130,8 @@ def predict():
     past = pd.merge(left=past, right=rt, how='left', on=['FIPS', 'date'], copy=False)
 
     #past = past.groupby("FIPS").tail(1).reset_index(drop=True)
-    past['movement_percentile'] = past['fb_movement_change'].rank(pct=True) * 100
-    past['rt_percentile'] = past['rt_mean_rt.live'].rank(pct=True) * 100
-
+    past['movement_mean'] = [past.groupby("FIPS")['fb_movement_change'].take([3]).mean()] * len(past)
+    past['rt_mean'] = [past.groupby("FIPS")['rt_mean_rt.live'].take([3]).mean()] * len(past)
 
     combined_web = pd.concat([past, projections], axis=0).sort_values(['FIPS','date']).reset_index(drop=True)
 
