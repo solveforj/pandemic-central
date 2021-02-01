@@ -18,7 +18,7 @@ CDC_PFIZER_API = 'https://data.cdc.gov/resource/saz5-9hgg.csv'
 
 # Strings in header to be replaced
 LABELS = ['first_doses_', 'doses_allocated_week_of_', 'doses_allocated_week_',\
-            'doses_distribution_week_of_']
+            'doses_distribution_week_of_', 'doses_allocated_for_week_of_']
 
 def vaccine_alloc():
     """
