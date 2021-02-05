@@ -69,7 +69,7 @@ def read_prediction():
     df_predict = df_predict.drop(['population'], 1)
 
     for var in PREDICTION_COLUMNS[3:]:
-        df_predict[var] = df_predict[var]*df_predict['TOT_POP']*7/100000
+        df_predict[var] = df_predict[var]*df_predict['TOT_POP']/100000
 
     # List of values to be exploded
     df_predict['value'] = df_predict[PREDICTION_COLUMNS[3:]].values.tolist()
