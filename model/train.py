@@ -47,11 +47,13 @@ def make_ML_model(data, output, density = 0):
 
         data_train['label'] = data_train.groupby('FIPS')['confirmed_cases_norm'].shift(periods=-7*shift)
         #print(data['confirmed_cases_norm'].corr(data['prediction_aligned_int_7']))
+        data_train = data_train.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
+        rt_compare = data_train['prediction_aligned_int_' + str(7*shift)] * data_train['totalTestResultsIncrease_norm']
         to_drop = ['confirmed_cases', 'confirmed_cases_norm', 'normalized_cases_norm', 'positiveIncrease_norm', 'positiveIncrease', 'TOT_POP']
-        data_train = data_train.drop(to_drop, axis=1)
+        data_mod = data_train.drop(to_drop, axis=1)
 
-        data_mod = data_train.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
-        X = data_mod[data_mod.columns[4:-1]]
+
+        X = data_mod[data_mod.columns[3:-1]]
 
         scaler = StandardScaler()
         nX = scaler.fit_transform(X)
@@ -71,6 +73,14 @@ def make_ML_model(data, output, density = 0):
         mae_train = mean_absolute_error(y_train,regr.predict(X_train))
         mae_training.append(mae_train)
 
+        print("Overall MAE")
+        print(mean_absolute_error(y, regr.predict(nX)))
+
+        print("Rt MAE")
+        print(mean_absolute_error(y, rt_compare))
+
+        print()
+
         print("Relative feature importances:")
         n = pd.DataFrame()
         n['features'] = X.columns
@@ -78,7 +88,7 @@ def make_ML_model(data, output, density = 0):
         print(n.sort_values('value'))
 
         data_predict = data.drop(to_drop, axis=1)
-        nX = scaler.fit_transform(data_predict[data_predict.columns[4:]])
+        nX = scaler.fit_transform(data_predict[data_predict.columns[3:]])
 
         prediction_df['point_' + str(shift) + "_weeks"] = regr.predict(nX)
 

@@ -74,7 +74,7 @@ def preprocess_JHU(type='cases'):
     full_data = full_data.reset_index(drop=True)
 
     # Compute 14-day (weekly) rolling average of cases for each county
-    full_data[f'confirmed_{type}'] = pd.Series(full_data.groupby("FIPS")[f'confirmed_{type}'].rolling(7).mean()).reset_index(drop=True)
+    full_data[f'confirmed_{type}'] = pd.Series(full_data.groupby("FIPS")[f'confirmed_{type}'].rolling(7).sum()).reset_index(drop=True)
     full_data = full_data[full_data[f'confirmed_{type}'].notnull()]
 
     # Move dates forward by 1 day so that movement averages represent data from past week

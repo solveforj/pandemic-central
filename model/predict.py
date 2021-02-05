@@ -17,6 +17,60 @@ __status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 __version__ = '2.0.0'
 
+fips_to_state = {
+   "01": "Alabama",
+   "02": "Alaska",
+   "04": "Arizona",
+   "05": "Arkansas",
+   "06": "California",
+   "08": "Colorado",
+   "09": "Connecticut",
+   "10": "Delaware",
+   "11": "District of Columbia",
+   "12": "Florida",
+   "13": "Georgia",
+   "15": "Hawaii",
+   "16": "Idaho",
+   "17": "Illinois",
+   "18": "Indiana",
+   "19": "Iowa",
+   "20": "Kansas",
+   "21": "Kentucky",
+   "22": "Louisiana",
+   "23": "Maine",
+   "24": "Maryland",
+   "25": "Massachusetts",
+   "26": "Michigan",
+   "27": "Minnesota",
+   "28": "Mississippi",
+   "29": "Missouri",
+   "30": "Montana",
+   "31": "Nebraska",
+   "32": "Nevada",
+   "33": "New Hampshire",
+   "34": "New Jersey",
+   "35": "New Mexico",
+   "36": "New York",
+   "37": "North Carolina",
+   "38": "North Dakota",
+   "39": "Ohio",
+   "40": "Oklahoma",
+   "41": "Oregon",
+   "42": "Pennsylvania",
+   "44": "Rhode Island",
+   "45": "South Carolina",
+   "46": "South Dakota",
+   "47": "Tennessee",
+   "48": "Texas",
+   "49": "Utah",
+   "50": "Vermont",
+   "51": "Virginia",
+   "53": "Washington",
+   "54": "West Virginia",
+   "55": "Wisconsin",
+   "56": "Wyoming"
+}
+
 def predict():
     print("MAKING PREDICTIONS\n")
 
@@ -38,8 +92,10 @@ def predict():
     combined_predictions['fb_stationary'] = combined_predictions['fb_stationary'].astype(float)
     combined_predictions = combined_predictions.round(3)
 
-    id = combined_predictions['Location'] + ", " + combined_predictions['FIPS'].astype(str) + ", " + combined_predictions['region']
+    state = combined_predictions['FIPS'].astype(str).str.zfill(5).apply(lambda x: x[0:2]).map(fips_to_state)
+    id = combined_predictions['Location'] + ", " + combined_predictions['FIPS'].astype(str) + ", " + state
     combined_predictions.insert(0, 'ID', id)
+
     #combined_predictions = combined_predictions.fillna("NULL")
     #combined_predictions = combined_predictions.astype(str)
 
@@ -75,8 +131,8 @@ def predict():
     df_population['location'] = df_population['location'].str.zfill(5)
     df_population = df_population.rename(columns={'location':'FIPS'})
 
-    projections = projections[['FIPS', 'date', 'ID', 'model', 'ELDERLY_POP', 'BA_FEMALE', 'BA_MALE', 'H_FEMALE', 'H_MALE', 'POP_DENSITY', 'TOT_POP', 'point_1_weeks', 'point_2_weeks', 'point_3_weeks', 'point_4_weeks']].round(2).reset_index(drop=True)
-    projections['combined_predictions'] = projections.iloc[:, 11:].values.tolist()
+    projections = projections[['FIPS', 'date', 'ID', 'model', 'ELDERLY_POP', 'BA_FEMALE', 'BA_MALE', 'H_FEMALE', 'H_MALE', 'POP_DENSITY', 'TOT_POP', 'fb_movement_change', 'point_1_weeks', 'point_2_weeks', 'point_3_weeks', 'point_4_weeks']].round(2).reset_index(drop=True)
+    projections['combined_predictions'] = projections.iloc[:, 12:].values.tolist()
     projections = projections.drop(['point_1_weeks', 'point_2_weeks', 'point_3_weeks', 'point_4_weeks'], axis=1)
     projections = projections.explode('combined_predictions')
     projections['shift'] = [0, 7, 14, 21] * int(len(projections)/4)
@@ -102,7 +158,7 @@ def predict():
     projections['total_cases_percent'] = projections['total_cases']/projections['TOT_POP'] * 100
     projections['total_cases_mean'] = [projections['total_cases_percent'].mean()] * len(projections)
 
-    projections = projections[['FIPS', 'date', 'ID',  'cases', 'type', 'model', 'POP_DENSITY', 'TOT_H', 'TOT_BA', 'ELDERLY_POP', 'total_cases_percent', 'total_cases_mean']]
+    projections = projections[['FIPS', 'date', 'ID',  'cases', 'type', 'model', 'POP_DENSITY', 'TOT_H', 'TOT_BA', 'ELDERLY_POP', 'fb_movement_change','total_cases_percent', 'total_cases_mean']]
 
     print(projections)
     past['shift'] = [-7, -7, -7, -7] * int(len(past)/4)
@@ -123,21 +179,25 @@ def predict():
     past['TOT_H'] = (past['H_FEMALE'] + past['H_MALE'])
     past['TOT_BA'] = (past['BA_FEMALE'] + past['BA_MALE'])
     past['type'] = ['actual'] * len(past)
+    past['total_cases'] = past.groupby("FIPS")['cases'].transform('sum')
+    past['total_cases_percent'] = past['total_cases']/past['TOT_POP'] * 100
+    past['total_cases_mean'] = [past['total_cases_percent'].mean()] * len(past)
 
-    past = past[['FIPS', 'date', 'ID', 'cases', 'type', 'model', 'POP_DENSITY', 'TOT_H', 'TOT_BA', 'ELDERLY_POP', 'fb_movement_change', 'test_positivity']]
+    past = past[['FIPS', 'date', 'ID', 'cases', 'type', 'model', 'POP_DENSITY', 'TOT_H', 'TOT_BA', 'ELDERLY_POP', 'fb_movement_change', 'test_positivity', 'total_cases_percent', 'total_cases_mean']]
 
-    rt = pd.read_csv("data/Rt/rt_data.csv", usecols=['FIPS','date','rt_mean_rt.live'])
-    past = pd.merge(left=past, right=rt, how='left', on=['FIPS', 'date'], copy=False)
+    rt = pd.read_csv("data/Rt/rt_data.csv", usecols=['FIPS','date','state_rt'])
+    projections = pd.merge(left=projections, right=rt, how='left', on=['FIPS', 'date'], copy=False)
 
     #past = past.groupby("FIPS").tail(1).reset_index(drop=True)
-    past['movement_mean'] = [past.groupby("FIPS")['fb_movement_change'].take([3]).mean()] * len(past)
-    past['rt_mean'] = [past.groupby("FIPS")['rt_mean_rt.live'].take([3]).mean()] * len(past)
+    projections['movement_mean'] = [projections.groupby("FIPS")['fb_movement_change'].take([0]).mean()] * len(projections)
+    projections['rt_mean'] = [projections.groupby("FIPS")['state_rt'].take([0]).mean()] * len(projections)
+    projections = projections.rename({'state_rt':'rt_mean_rt.live'}, axis=1)
 
     combined_web = pd.concat([past, projections], axis=0).sort_values(['FIPS','date']).reset_index(drop=True)
 
     combined_web.iloc[:, 6:] = combined_web.iloc[:, 6:].astype(float).round(3)
     combined_web = combined_web.fillna("NULL")
-
+    combined_web = combined_web[['FIPS', 'date', 'ID', 'cases', 'type', 'model', 'POP_DENSITY', 'TOT_H', 'TOT_BA', 'ELDERLY_POP', 'fb_movement_change', 'test_positivity', 'rt_mean_rt.live', 'movement_mean', 'rt_mean', 'total_cases_percent', 'total_cases_mean']]
     combined_web.to_csv("predictions/website/web_" + date_today + ".csv", index=False)
     combined_web.to_csv("predictions/website/web_latest.csv", index=False)
 
