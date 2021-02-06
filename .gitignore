@@ -7,8 +7,3 @@ ssh_client.py
 predictions/graphics/latest_map.html
 test_formatting.py
 validate_single_forecast_file.py
-predictions/analytics/analytics.csv
-predictions/analytics/state%.png
-predictions/analytics/state.png
-predictions/analytics/time_series_covid19_confirmed_US.csv
-predictions/analytics/truth-Incident-Cases.txt

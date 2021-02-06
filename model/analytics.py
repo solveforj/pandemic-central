@@ -129,8 +129,8 @@ def state_choropleth():
     )
     pio.write_image(fig, file=TEST_PATH)
 
-state_choropleth()
-add_watermark(TEST_PATH, type='vaccinations')
+#state_choropleth()
+#add_watermark(TEST_PATH, type='vaccinations')
 
 def county_choropleth():
     with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
@@ -155,9 +155,25 @@ def county_choropleth():
         #     color="Black"
 
     fig.show()  # Output the plot to the screen
+def error_for_week(pc_website_file):
+    data = jhu()
 
+    pc = pd.read_csv(pc_website_file)
+    pc = pc[pc['type']=="projection"][['FIPS','date','cases']]
+    pc = pd.merge(left=pc, right=data, how='left', on=['FIPS', 'date'], copy=False)
+    print(pc.head(20))
+    census = read_census()
+    pc['population'] = pc['FIPS'].map(census)
+    #data = data[data['location'] >= 1001]
+    pc['normalized_JHU'] = pc['weekly_sum']
+    pc['normalized_PC'] = (pc['cases'] * 7)/pc['population'] * 100000
+    pc['MAE'] = (pc['normalized_PC'] - pc['normalized_JHU']).abs()
+    pc = pc.dropna()
 
+    from sklearn.metrics import r2_score
 
+    r2 = r2_score(pc['weekly_sum'], pc['cases'])
+    print(r2, pc['MAE'].mean())
 def jhu():
     data = pd.read_csv("predictions/analytics/truth-Incident-Cases.txt", low_memory=False)
     data = data[data['location'].str.len() > 4]
@@ -178,6 +194,7 @@ def jhu():
     data = data.rename({'location': 'FIPS', 'shift_date': 'date'}, axis=1).reset_index(drop=True)
     #print(data[(data['location'] == 48113) & (data['shift_date'] > "2020-08-01")].head(30))
     return data
+
 
 def read_census():
     #census = pd.read_csv("data/census/Reichlab_Population.csv").iloc[58:]
@@ -200,26 +217,6 @@ def jhu_pc():
     data = data.drop(['shift'], axis=1)[['FIPS', 'shift_date', 'weekly_sum']]
     data = data.rename({'shift_date': 'date'}, axis=1).reset_index(drop=True)
     return data
-
-def error_for_week(pc_website_file):
-    data = jhu()
-
-    pc = pd.read_csv(pc_website_file)
-    pc = pc[pc['type']=="projection"][['FIPS','date','cases']]
-    pc = pd.merge(left=pc, right=data, how='left', on=['FIPS', 'date'], copy=False)
-    print(pc.head(20))
-    census = read_census()
-    pc['population'] = pc['FIPS'].map(census)
-    #data = data[data['location'] >= 1001]
-    pc['normalized_JHU'] = pc['weekly_sum']
-    pc['normalized_PC'] = (pc['cases'] * 7)/pc['population'] * 100000
-    pc['MAE'] = (pc['normalized_PC'] - pc['normalized_JHU']).abs()
-    pc = pc.dropna()
-
-    from sklearn.metrics import r2_score
-
-    r2 = r2_score(pc['weekly_sum'], pc['cases'])
-    print(r2, pc['MAE'].mean())
 
 # Finds counties that had Rt values since August 2020
 def get_rt_counties():
@@ -274,13 +271,16 @@ def process_Reich(file, data, file_is_var = False):
     else:
         pc = file
 
-    date = "2020-12-26"
+    #date = "2020-12-26"
     # The output of reichlab.py will have start date of its generation, so this must be overwritten with the actual date for which it was computed
-    pc['forecast_date'] = [date] * len(pc)
-
+    #pc['forecast_date'] = [date] * len(pc)
+    date = pc['forecast_date'].loc[0]
+    print(date)
+    targets = ["1 wk ahead inc case", "2 wk ahead inc case", "3 wk ahead inc case", "4 wk ahead inc case"]
     pc = pc[pc['location'].str.len() > 4] # Filter for counties
+    pc = pc.reset_index(drop=True)
     pc['location'] = pc['location'].astype(int)
-    pc = pc[pc['target'].isin(["1 wk ahead inc case", "2 wk ahead inc case", "3 wk ahead inc case", "4 wk ahead inc case"])] # Filter for incident case projections for next 4 weeks
+    pc = pc[pc['target'].isin(targets)] # Filter for incident case projections for next 4 weeks
     pc = pc[pc['type']=="point"] # Filter out quantiles
     pc = pc.sort_values(["location", "target"]).reset_index(drop=True)
 
@@ -292,43 +292,74 @@ def process_Reich(file, data, file_is_var = False):
     pc = pc.drop(['shift','forecast_date'], axis=1).rename({'shift_date': 'date'}, axis=1).reset_index(drop=True)
 
 
-    pc = pc.rename({'forecast_date': 'date', 'location': 'FIPS', 'value': 'pc_cases'}, axis=1)[['FIPS', 'date', 'pc_cases']]
+    pc = pc.rename({'location': 'FIPS', 'value': 'pc_cases'}, axis=1)[['FIPS', 'date', 'pc_cases','target']]
     pc = pd.merge(left=pc, right=data.copy(deep=True), how='left', on=['FIPS', 'date'], copy=False) # Add in case data
 
-    #print(pc.head(30))
-    fips = get_rt_counties() # Get FIPS that have county Rt
 
+    #print(pc.head(30))
+    #fips = get_rt_counties() # Get FIPS that have county Rt
+
+    #print(fips)
     density_d, pop_d = read_census()
     pc['population_density'] = pc['FIPS'].map(density_d) # Add population to each county
     pc['population'] = pc['FIPS'].map(pop_d) # Add population to each county
     pc = pc.dropna()
 
-    not_fips = pc[~pc['FIPS'].isin(fips)] # Filter for counties with county Rt
+    #not_fips = pc[~pc['FIPS'].isin(fips)] # Filter for counties with county Rt
 
     print(len(pc['FIPS'].unique()))
-    pc = pc[(pc['population_density'] <= 500) & (pc['weekly_sum'] > 0) & pc['FIPS'].isin(fips)]
+    #pc = pc[(pc['population_density'] <= 500) & (pc['weekly_sum'] > 0)]# & pc['FIPS'].isin(fips)]
     print(len(pc['FIPS'].unique()))
-    pc['normalized_JHU'] = pc['weekly_sum']/pc['population'] * 100000
-    pc['normalized_PC'] = pc['pc_cases']/pc['population'] * 100000
-    pc['MAE'] = (pc['normalized_PC'] - pc['normalized_JHU']).abs()
-    pc['MAPE'] = (((pc['normalized_PC']) - (pc['normalized_JHU']+1))/(pc['normalized_JHU'] +1)).abs()
 
-    correlation = pc['weekly_sum'].corr(pc['pc_cases'])
-    r2 = r2_score(pc['weekly_sum'], pc['pc_cases'])
+    output_df = []
+    # pd.DataFrame(columns=)
 
-    print(correlation, r2, pc['MAE'].mean(), pc['MAPE'].mean())
+    if len(pc) > 0:
+        pc['normalized_JHU'] = pc['weekly_sum']/pc['population'] * 100000
+        pc['normalized_PC'] = pc['pc_cases']/pc['population'] * 100000
+        pc['MAE'] = (pc['normalized_PC'] - pc['normalized_JHU']).abs()
+        pc['MAPE'] = (((pc['normalized_PC']) - (pc['normalized_JHU']+1.1))/(pc['normalized_JHU'] +1.1)).abs()
+
+        for target in targets:
+            target_pc = pc[pc['target'] == target]
+            if len(target_pc) == 0:
+                break
+            correlation = target_pc['weekly_sum'].corr(target_pc['pc_cases'])
+            r2 = r2_score(target_pc['weekly_sum'], target_pc['pc_cases'])
+            output_df.append([date, target, correlation, r2, target_pc['MAE'].mean(), target_pc['MAPE'].mean()])
+    else:
+        print("NA")
+
+    output_df = pd.DataFrame(output_df, columns=['date', 'target', 'correlation','R2', 'MAE','MAPE'])
+    return output_df
+
+import glob
+def ReichLabModelStats(directory):
+    files = glob.glob(directory + "*.csv")
+    print(files)
+    jhu = jhu_pc()
+    model = files[0].split('\\')[-1].split("-")[-2]
+    performance_df = pd.DataFrame()
+    for file in files:
+        df = pd.read_csv(file, dtype={'location':'str'})
+        output_df = process_Reich(df, jhu, file_is_var=True)
+        performance_df = pd.concat([performance_df, output_df], axis=0).reset_index(drop=True)
+    performance_df['model'] = [model]*len(performance_df)
+    performance_df.to_csv(directory + model + "_performance.csv", index=False)
+
+ReichLabModelStats("predictions/analytics/JHU_IDD-CovidSP/")
 
 
-reichs = ["predictions/covid19-forecast-hub/2021-01-29-PandemicCentral-USCounty.csv",\
- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/COVIDhub-ensemble/2020-12-28-COVIDhub-ensemble.csv", \
- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/Google_Harvard-CPF/2020-12-27-Google_Harvard-CPF.csv", \
- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/UCLA-SuEIR/2020-12-27-UCLA-SuEIR.csv", \
+#reichs = ["predictions/covid19-forecast-hub/2021-01-29-PandemicCentral-USCounty.csv",\
+# "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/COVIDhub-ensemble/2020-12-28-COVIDhub-ensemble.csv", \
+# "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/Google_Harvard-CPF/2020-12-27-Google_Harvard-CPF.csv", \
+# "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/UCLA-SuEIR/2020-12-27-UCLA-SuEIR.csv", \
  #"https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/CMU-TimeSeries/2020-12-28-CMU-TimeSeries.csv", \
- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/Microsoft-DeepSTIA/2020-12-28-Microsoft-DeepSTIA.csv", \
- "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/OneQuietNight-ML/2021-01-24-OneQuietNight-ML.csv", \
+# "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/Microsoft-DeepSTIA/2020-12-28-Microsoft-DeepSTIA.csv", \
+# "https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/OneQuietNight-ML/2021-01-24-OneQuietNight-ML.csv", \
  #"https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/OliverWyman-Navigator/2020-12-27-OliverWyman-Navigator.csv", \
  #"https://raw.githubusercontent.com/reichlab/covid19-forecast-hub/master/data-processed/UMass-MechBayes/2020-12-27-UMass-MechBayes.csv", \
-]
+#]
 
 #reichs = ["predictions/covid19-forecast-hub/2021-01-29-PandemicCentral-USCounty.csv"]
 #data = jhu()
