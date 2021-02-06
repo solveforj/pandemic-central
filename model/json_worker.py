@@ -30,7 +30,7 @@ def json_worker():
     imploded_dict = imploded_df.T.to_dict("list")
 
     print(len(imploded_dict.keys()))
-    print(imploded_dict['49017'])
+    #print(imploded_dict['49017'])
 
     from collections import defaultdict
 

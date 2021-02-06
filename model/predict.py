@@ -160,7 +160,6 @@ def predict():
 
     projections = projections[['FIPS', 'date', 'ID',  'cases', 'type', 'model', 'POP_DENSITY', 'TOT_H', 'TOT_BA', 'ELDERLY_POP', 'fb_movement_change','total_cases_percent', 'total_cases_mean']]
 
-    print(projections)
     past['shift'] = [-7, -7, -7, -7] * int(len(past)/4)
     past['shift'] = pd.to_timedelta(past['shift'], unit='D')
     past['date'] = pd.to_datetime(past['date']) + past['shift']

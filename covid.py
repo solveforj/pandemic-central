@@ -25,7 +25,7 @@ def main(args):
         predict()
         json_worker()
     if args.map:
-        from model.map import draw_map
+        from model.map import render
         draw_map()
     if args.reichlab:
         from model.reichlab import read_prediction

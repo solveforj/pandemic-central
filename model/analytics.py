@@ -65,7 +65,7 @@ s_state_abbrev = {
     'Wyoming': 'WY'
 }
 
-predictions = pd.read_csv("predictions/website/web_latest.csv", usecols=['FIPS','ID','total_cases_percent','POP_DENSITY'])
+predictions = pd.read_csv("predictions/website/web_latest.csv", usecols=['FIPS','ID','date','cases', 'total_cases_percent','POP_DENSITY'])
 predictions['FIPS'] = predictions['FIPS'].astype(str).str.zfill(5)
 predictions['state'] = predictions['ID'].apply(lambda x: x.split(", ")[-1])
 predictions['state'] = predictions['state'].map(s_state_abbrev)
@@ -75,20 +75,29 @@ county = predictions.iloc[to_select, :].reset_index(drop=True)
 county['Percent Change'] = county['total_cases_percent'].diff()/county['total_cases_percent'].shift(1) * 100
 county = county.groupby("FIPS").tail(1)
 county['FIPS'] = county['FIPS'].astype(str).str.zfill(5)
-county['state'] = county['ID'].apply(lambda x: x.split()[-1])
-county_danger = county[(county['POP_DENSITY'] > 500) & (county['Percent Change'] > 0)].sort_values("Percent Change").reset_index(drop=True)
+county = county[['FIPS','Percent Change']]
 
-state = predictions.iloc[to_select, :].reset_index(drop=True)
-state_past = state.iloc[::2,:].reset_index(drop=True)
-state_past['state_case_percent'] = state_past.groupby("state")['total_cases_percent'].transform('sum')
-state_future = state.iloc[1::2, :].reset_index(drop=True)
-state_future['state_case_percent'] = state_future.groupby("state")['total_cases_percent'].transform('sum')
-state = state_future[['state']].reset_index(drop=True)
-state['Percent Change'] = (state_future['state_case_percent'] - state_past['state_case_percent'])/state_past['state_case_percent'] * 100
-state = state.groupby("state").head(1).sort_values("Percent Change").reset_index(drop=True)
-state_danger = state[state['Percent Change'] > 0].reset_index(drop=True)
+state = predictions.copy(deep=True)
+census = pd.read_csv("data/census/census.csv",dtype={'FIPS':'str'})[['FIPS', 'TOT_POP']]
+state = pd.merge(left=state, right=census, how='left', on=['FIPS'], copy=False)
+state_past = state.groupby("FIPS").head(4).reset_index(drop=True)
+state_future = state.groupby("FIPS").tail(4).reset_index(drop=True)
 
-print(state)
+state_past['total_cases'] = state_past.groupby("state")['cases'].transform('sum')
+state_past['total_population'] = state_past.groupby("state")['TOT_POP'].transform('sum') / 4
+state_future['total_cases'] = state_future.groupby("state")['cases'].transform('sum')
+state_future['total_population'] = state_future.groupby("state")['TOT_POP'].transform('sum') / 4
+
+state_past = state_past.groupby("state").head(1)
+state_past = state_past.sort_values(["state"])
+state_future = state_future.groupby("state").head(1)
+state_future = state_future.sort_values(["state"])
+
+state = pd.DataFrame()
+state['state'] = state_past['state']
+state['Percent Change'] = (state_future['total_cases']-state_past['total_cases'])/state_past['total_cases']
+
+#print(state)
 
 import plotly.express as px  # Be sure to import express
 from urllib.request import urlopen
@@ -109,7 +118,7 @@ def state_choropleth():
                         width=1100,
                         height=600) # Set to plot as US States
     fig.update_layout(
-        title_text = 'Percent Change in Infected Population Projected Next Month vs. Last Month', # Create a Title
+        title_text = 'Percent Change in Infected Population Projected Next 4 Wks. vs. Last 4 Wks.', # Create a Title
         geo_scope='usa',  # Plot only the USA instead of globe
         title_x = 0.5,
         # font=dict(
@@ -121,7 +130,7 @@ def state_choropleth():
     pio.write_image(fig, file=TEST_PATH)
 
 state_choropleth()
-#add_watermark(TEST_PATH, type='vaccinations')
+add_watermark(TEST_PATH, type='vaccinations')
 
 def county_choropleth():
     with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:

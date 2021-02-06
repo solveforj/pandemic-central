@@ -57,6 +57,8 @@ def preprocess_JHU(type='cases'):
         return missing_zeroes + fips
 
     jhu_data['FIPS'] = jhu_data['FIPS'].apply(lambda x : process_FIPS(x))
+    jhu_data = jhu_data[~jhu_data['FIPS'].isin(['49057', '49029', '49047', '49013', '49009', '49001', '49017', '49021', '49025', '49053', '49023', \
+        '49027', '49031', '49039', '49055', '49041'])]
 
     if type == 'cases':
         jhu_data = jhu_data.drop(["Admin2","Province_State","Country_Region","Lat","Long_","Combined_Key","UID","iso2","iso3","code3"], axis=1)

@@ -33,7 +33,7 @@ DATE = date.today().isoformat()
 WATERMARK = 'predictions/graphics/pandemic-central-watermark.png'
 WATERMARK_2 = 'predictions/graphics/pandemic-central-watermark-2.png'
 WATERMARK_3 = 'predictions/graphics/pandemic-central-watermark-3.png'
-UPPER_COLOR_LIMIT = 100
+UPPER_COLOR_LIMIT = 500
 
 def read_lastest_file(type='predictions'):
     if type=='predictions':
@@ -93,7 +93,7 @@ def render_map(df, wk, type='predictions'):
                                    height=600
                                   )
         fig.update_layout(
-            title=f'Average projected new cases per 100,000 people per day for {wk} week ahead',
+            title=f'Projected new cases per 100,000 people for {wk} week ahead' if wk == 1 else f'Projected new cases per 100,000 people for {wk} weeks ahead',
             title_x=0.5,
             title_font_size=16)
         pio.write_image(fig, file=f'predictions/graphics/{DATE}-{wk}.png')
@@ -182,3 +182,6 @@ def render(type='predictions'):
         for m in maps:
             add_watermark(m, type='vaccinations')
         print(' - Done!')
+
+if __name__ == "__main__":
+    render()
