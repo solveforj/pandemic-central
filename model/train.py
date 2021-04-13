@@ -7,24 +7,21 @@ import os
 from datetime import date
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error
+from sklearn.inspection import permutation_importance
 
 __author__ = 'Duy Cao, Joseph Galasso'
-__copyright__ = '© Pandamic Central, 2020'
+__copyright__ = '© Pandemic Central, 2021'
 __license__ = 'MIT'
 __status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
-__version__ = '2.0.0'
-
-date_today = date.today().strftime('%Y-%m-%d')
-#date_today = "2020-08-22"
+__version__ = '3.0.0'
 
 np.random.seed(1)
 pd.set_option('display.max_columns', 500)
 
-
-def make_ML_model(data, output, density = 0):
+def make_ML_model(data, output, date_today, density = 0):
     data = data[data['POP_DENSITY'] >= density]
-    data = data[data['date'] < date_today].reset_index(drop=True)
+    data = data[data['date'] <= date_today].reset_index(drop=True)
     data = data.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
     quantiles = [0.025,0.1,0.25,0.5,0.75,0.9,0.975]
 
@@ -44,21 +41,18 @@ def make_ML_model(data, output, density = 0):
         model_type.append(output)
 
         data_train = data.copy()
-
         data_train['label'] = data_train.groupby('FIPS')['confirmed_cases_norm'].shift(periods=-7*shift)
-        #print(data['confirmed_cases_norm'].corr(data['prediction_aligned_int_7']))
         data_train = data_train.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
-        rt_compare = data_train['prediction_aligned_int_' + str(7*shift)] * data_train['totalTestResultsIncrease_norm']
-        to_drop = ['confirmed_cases', 'confirmed_cases_norm', 'normalized_cases_norm', 'positiveIncrease_norm', 'positiveIncrease', 'TOT_POP']
+        to_drop = ['confirmed_cases', 'confirmed_cases_norm', 'normalized_cases_norm', 'positiveIncrease_norm', 'positiveIncrease', 'totalTestResultsIncrease', 'TOT_POP']
         data_mod = data_train.drop(to_drop, axis=1)
 
-
         X = data_mod[data_mod.columns[3:-1]]
-
         scaler = StandardScaler()
         nX = scaler.fit_transform(X)
         y = data_mod['label']
         X_train, X_test, y_train, y_test = train_test_split(nX, y, train_size=0.9)
+
+        print("Training")
         regr = RandomForestRegressor(n_estimators=20, min_samples_split=10, n_jobs=-1).fit(X_train, y_train)
 
         r2_test = regr.score(X_test, y_test)
@@ -73,14 +67,6 @@ def make_ML_model(data, output, density = 0):
         mae_train = mean_absolute_error(y_train,regr.predict(X_train))
         mae_training.append(mae_train)
 
-        print("Overall MAE")
-        print(mean_absolute_error(y, regr.predict(nX)))
-
-        print("Rt MAE")
-        print(mean_absolute_error(y, rt_compare))
-
-        print()
-
         print("Relative feature importances:")
         n = pd.DataFrame()
         n['features'] = X.columns
@@ -91,7 +77,8 @@ def make_ML_model(data, output, density = 0):
         nX = scaler.fit_transform(data_predict[data_predict.columns[3:]])
 
         prediction_df['point_' + str(shift) + "_weeks"] = regr.predict(nX)
-
+        print(prediction_df['point_' + str(shift) + "_weeks"])
+        print(y)
         pred_Q = pd.DataFrame()
 
         for pred in regr.estimators_:
@@ -124,38 +111,24 @@ def make_ML_model(data, output, density = 0):
     model_stats['MAE_testing'] = mae_testing
     model_stats['MAE_training'] = mae_training
     model_stats = model_stats.round(3)
+
     print(model_stats)
 
     return model_stats
 
-
-def train():
+def train(date_today):
     print("TRAINING MODELS\n")
 
     print("• Training mobility model")
     training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz")
-    #training_mobility = training_mobility[training_mobility['date'] < "2020-12-07"]
-    #training_mobility = training_mobility[training_mobility['FIPS'].astype(str).str.startswith("36")]
-    mobility_model_stats = make_ML_model(training_mobility, "mobility")
+    mobility_model_stats = make_ML_model(training_mobility, "mobility", density = 0, date_today = date_today)
     print("  Finished\n")
-
 
     print("• Training non-mobility model")
     training_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz")
-    #training_no_mobility = training_no_mobility[training_no_mobility['FIPS'].astype(str).str.startswith("36")]
-    nonmobility_model_stats = make_ML_model(training_no_mobility, "no_mobility")
+    nonmobility_model_stats = make_ML_model(training_no_mobility, "no_mobility", density = 0, date_today = date_today)
     print("  Finished\n")
 
     full_model_stats = pd.concat([mobility_model_stats, nonmobility_model_stats], axis=0)
 
-    # Create directory (if it does not exist yet)
-    if not os.path.exists('predictions'):
-        os.mkdir('predictions')
-    if not os.path.exists('predictions/model_stats'):
-        os.mkdir('predictions/model_stats')
-
-    full_model_stats.to_csv("predictions/model_stats/model_stats_" + date_today + ".csv", index=False)
-    full_model_stats.to_csv("predictions/model_stats/model_stats_latest.csv", index=False)
-
-if __name__ == '__main__':
-    train()
+    full_model_stats.to_csv("output/model_stats/model_stats_" + date_today + ".csv", index=False)

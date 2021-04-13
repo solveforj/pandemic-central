@@ -1,18 +1,12 @@
-"""
-This module preprocesses COVIDTracking data.
-
-Data source: https://www.covidtracking.com/
-"""
-
 import pandas as pd
 import sys
 
 __author__ = 'Duy Cao, Joseph Galasso'
-__copyright__ = '© Pandamic Central, 2020'
+__copyright__ = '© Pandemic Central, 2021'
 __license__ = 'MIT'
 __status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
-__version__ = '2.0.0'
+__version__ = '3.0.0'
 
 us_state_abbrev = {
     'Alabama': 'AL',
@@ -73,6 +67,7 @@ us_state_abbrev = {
     'Wisconsin': 'WI',
     'Wyoming': 'WY'
 }
+
 def get_state_fips():
 
     # Source: US census
@@ -110,6 +105,20 @@ def preprocess_testing():
     testing['date'] = pd.to_datetime(testing['date'])
     testing = testing.sort_values(['state','date']).reset_index(drop=True)
 
+    new_testing = pd.read_csv("https://raw.githubusercontent.com/govex/COVID-19/master/data_tables/testing_data/time_series_covid19_US.csv", usecols=['date', 'state', 'tests_combined_total', 'cases_conf_probable'], dtype={'date':str})
+    new_testing = new_testing.rename(columns = {'cases_conf_probable': 'positiveIncrease', 'tests_combined_total':'totalTestResultsIncrease'})
+    new_testing['date'] = pd.to_datetime(new_testing['date'])
+    new_testing['state'] = new_testing['state'].apply(lambda x : state_map[x])
+    new_testing = new_testing.sort_values(['state','date']).reset_index(drop=True)
+    new_testing['positiveIncrease'] = new_testing.groupby("state")['positiveIncrease'].diff()
+    new_testing['totalTestResultsIncrease'] = new_testing.groupby("state")['totalTestResultsIncrease'].diff()
+    new_testing = new_testing.dropna()
+    new_testing[['positiveIncrease', 'totalTestResultsIncrease']] = new_testing[['positiveIncrease', 'totalTestResultsIncrease']].astype(int)
+    new_testing = new_testing[new_testing['date'] > "2021-03-07"].reset_index(drop=True)
+
+    testing = pd.concat([testing, new_testing], axis=0)
+    testing = testing.sort_values(['state', 'date']).reset_index(drop=True)
+
     # Compute 7 day (weekly) rolling averages for state testing data
     testing['positiveIncrease'] = pd.Series(testing.groupby("state")['positiveIncrease'].rolling(14).mean()).reset_index(drop=True)
     testing['totalTestResultsIncrease'] = pd.Series(testing.groupby("state")['totalTestResultsIncrease'].rolling(14).mean()).reset_index(drop=True)
@@ -121,10 +130,10 @@ def preprocess_testing():
     # Source: US Census
     # Link: www2.census.gov/programs-surveys/popest/datasets/2010-2019/national/totals/
     # File: nst-est2019-alldata.csv
-    state_populations = pd.read_csv("data/census/nst-est2019-alldata.csv", usecols = ['SUMLEV', 'STATE', 'POPESTIMATE2019'], dtype={'STATE':str, 'POPESTIMATE2019':float})
+    state_populations = pd.read_csv("data/census/nst-est2019-alldata.csv", usecols = ['SUMLEV', 'STATE', 'POPESTIMATE2018'], dtype={'STATE':str, 'POPESTIMATE2018':float})
 
-    # Process state population data
-    state_populations = state_populations[state_populations['SUMLEV'] == 40].drop(['SUMLEV'], axis=1).rename({'STATE':'state', 'POPESTIMATE2019': 'population'}, axis=1).reset_index(drop=True)
+    # Process state population data (from 2018)
+    state_populations = state_populations[state_populations['SUMLEV'] == 40].drop(['SUMLEV'], axis=1).rename({'STATE':'state', 'POPESTIMATE2018': 'population'}, axis=1).reset_index(drop=True)
 
     # Merge state population and state testing data
     testing_pop = pd.merge(left=testing, right=state_populations, how='left', on='state', copy=False)

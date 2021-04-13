@@ -1,8 +1,3 @@
-"""
-This module processes output data into right format.
-Processed data can be found @ cdc.gov & Reichlab's GitHub repository
-"""
-
 import numpy as np
 import pandas as pd
 from datetime import datetime, date, timedelta
@@ -10,18 +5,23 @@ import os
 from isoweek import Week
 
 __author__ = 'Duy Cao, Joseph Galasso'
-__copyright__ = '© Pandamic Central, 2020'
+__copyright__ = '© Pandemic Central, 2021'
 __license__ = 'MIT'
 __status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
-__version__ = '2.1.0'
+__version__ = '3.0.0'
 
-PREDICTION_FILE = 'predictions/projections/predictions_latest.csv'
 PREDICTION_COLUMNS = ['FIPS', 'date', 'TOT_POP']
 WEEKS = ['1', '2', '3', '4']
 QUANTILES = ['0.025', '0.1', '0.25', '0.5', '0.75', '0.9', '0.975']
 
-# Require package 'isoweek'
+meta_description = """
+This model utilizes population mobility, demographics, and health data in combination with COVID-19 SEIR-generated projections and testing data \
+as input into a random forest regression model to forecast COVID-19 cases for 1, 2, 3, and 4 weeks into the future for over 3000 U.S. counties \
+and county equivalents.
+"""
+
+# Requires package 'isoweek'
 # try command 'pip install isoweek' or 'pip3 install isoweek'
 
 def get_saturday(d):
@@ -38,7 +38,11 @@ def get_saturday(d):
         next_sat = Week.fromstring(final).saturday()
     return next_sat.isoformat()
 
-def read_prediction():
+def reichlab(date_today):
+
+    print("GENERATING COVID-19 FORECAST HUB DATA\n")
+
+    PREDICTION_FILE = 'output/raw_predictions/raw_predictions_' + date_today + '.csv'
     # Complete the list of important column headers
     for week in WEEKS:
         for quantile in QUANTILES:
@@ -92,7 +96,7 @@ def read_prediction():
     # List of end dates to be exploded
     ends = []
     for wk in range(0,4):
-        ends = ends + [get_saturday(date.today() + timedelta(weeks=wk))]*8
+        ends = ends + [get_saturday(date.fromisoformat(date_today) + timedelta(weeks=wk))]*8
     df_predict['target_end_date'] = [ends] * len(df_predict)
 
     # Drop all unnecessary columns
@@ -105,34 +109,18 @@ def read_prediction():
     df_predict['value'] = df_predict['value'].clip(lower=0)
 
     # Set 'forecast_date' to be the date today
-    df_predict['forecast_date'] = date.today().isoformat()
+    #df_predict['forecast_date'] = date.today().isoformat()
+    df_predict['forecast_date'] = date_today
 
     # Reorder columns
     df_predict = df_predict[['location', 'forecast_date', 'value', \
                             'target_end_date', 'target', 'type', 'quantile']]
     # Preview
-    print(df_predict.head(20))
+    print(df_predict.head(5))
 
     # EXPORT DATA
-    filename = date.today().isoformat()
-    if not os.path.exists('predictions/covid19-forecast-hub'):
-        os.mkdir('predictions/covid19-forecast-hub')
-    filepath = 'predictions/covid19-forecast-hub/' + filename + '-PandemicCentral-USCounty.csv'
-    df_predict.to_csv(filepath, index=False)
+    #filename = date.today().isoformat()
+    filename = date_today
+    df_predict.to_csv('output/ReichLabFormat/' + filename + '-PandemicCentral-COVIDForest.csv', index=False)
 
-def metadata():
-    meta = {
-        'team_name': 'Pandemic Central (itsonit.com)',
-        'model_name': 'USCounty',
-        'model_abbr': 'PandemicCentral-USCounty',
-        'model_contributors': ['Joseph Galasso (University of Dallas) <jgalasso@udallas.edu>',
-            'Duy Cao (University of Dallas) <caominhduy@gmail.com>'],
-        'website_url': 'https://itsonit.com',
-        'license': 'MIT',
-        'team_model_designation': 'MIT',
-        'data_inputs': ['Apple Mobility Trends', 'Google Mobility Reports', 'Facebook Movement Ranges',
-          'CCVI', 'Census', 'COVIDTracking', 'IHME', 'JHU CSSEGISandData']
-    }
-
-if __name__ == '__main__':
-    read_prediction()
+    print("finished\n")

@@ -1,17 +1,11 @@
-"""
-This module preprocesses IHME datasets.
-
-Data source: http://ghdx.healthdata.org/us-data
-"""
-
 import pandas as pd
 
 __author__ = 'Duy Cao, Joseph Galasso'
-__copyright__ = '© Pandamic Central, 2020'
+__copyright__ = '© Pandemic Central, 2021'
 __license__ = 'MIT'
 __status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
-__version__ = '2.0.0'
+__version__ = '3.0.0'
 
 us_state_abbrev = {
     'Alabama': 'AL',
@@ -164,23 +158,6 @@ def preprocess_respiratory_disease_mortality():
 
     return mortality_data
 
-def preprocess_smoking_prevalence():
-    # Source: Institute for Health Metrics and Evaluation (IHME). United States Smoking Prevalence by County 1996-2012.
-    #         Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2014
-    # Link: ghdx.healthdata.org/record/ihme-data/united-states-smoking-prevalence-county-1996-2012
-    # File: IHME_US_COUNTY_TOTAL_AND_DAILY_SMOKING_PREVALENCE_1996_2012.csv
-    smoking_data = pd.read_csv("data/IHME/IHME_US_COUNTY_TOTAL_AND_DAILY_SMOKING_PREVALENCE_1996_2012.csv")
-
-    # Preprocess data
-    smoking_data = smoking_data[(smoking_data['sex'] == 'Both') & (smoking_data['year'] == 2012) & (smoking_data['county'].notnull())]
-    smoking_data['state'] = smoking_data['state'].apply(lambda x : us_state_abbrev[x])
-    smoking_data = smoking_data.drop(['sex', 'year', 'total_lb', 'total_ub', 'daily_mean', 'daily_lb', 'daily_ub'], axis=1)
-    smoking_data.rename(columns={'fips': 'FIPS', 'total_mean': 'smoking_prevalence', 'county': 'Location', 'state':'region'}, inplace=True)
-
-    smoking_data.to_csv("data/IHME/IHME_smoking.csv", index=False)
-
-    return smoking_data
-
 def merge_health_data():
 
     # Get all data files
@@ -201,7 +178,6 @@ def merge_health_data():
 def preprocess_IHME():
     print('• Processing IHME Data')
     merge_health_data()
-    preprocess_smoking_prevalence()
     print('  Finished\n')
 
 if __name__ == "__main__":

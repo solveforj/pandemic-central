@@ -1,9 +1,0 @@
-model_type,week,R2_testing,R2_training,MAE_testing,MAE_training
-mobility,1,0.942,0.974,3.542,2.065
-mobility,2,0.928,0.974,3.625,2.119
-mobility,3,0.939,0.974,3.807,2.182
-mobility,4,0.912,0.975,4.008,2.247
-no mobility,1,0.918,0.972,4.535,2.605
-no mobility,2,0.917,0.968,4.654,2.701
-no mobility,3,0.924,0.967,4.795,2.766
-no mobility,4,0.93,0.968,4.932,2.903
