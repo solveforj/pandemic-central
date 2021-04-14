@@ -18,12 +18,12 @@ __url__ = 'https://github.com/solveforj/pandemic-central'
 __version__ = '3.0.0'
 
 # Update dynamic data
-def update(date):
+def update(date, can_key):
     print("UPDATING DATA\n")
     preprocess_facebook()
     preprocess_JHU()
     preprocess_testing()
-    preprocess_Rt(date)
+    preprocess_Rt(date, can_key)
 
 # Read datasets into memory
 def combine():
@@ -92,6 +92,6 @@ def combine():
     training_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz", index=False, compression='gzip')
     print("  Finished!\n")
 
-def merge(date):
-    update(date)
+def merge(date, can_key):
+    update(date, can_key)
     combine()

@@ -1,9 +1,3 @@
-"""
-This module creates an interactive HTML map and a PNG based on latest prediction
-
-Credit: using Plotly for Choropleth Maps (under MIT License)
-"""
-
 import numpy as np
 import pandas as pd
 import os, sys
@@ -28,7 +22,6 @@ __version__ = '3.0.0'
 PREDICTION_COLUMNS = ['ID', 'FIPS', 'date', 'TOT_POP']
 WEEKS = ['1', '2', '3', '4']
 DATE = date.today().isoformat()
-WATERMARK = 'data/geodata/pandemic-central-watermark.png'
 WATERMARK_2 = 'data/geodata/pandemic-central-watermark-2.png'
 WATERMARK_3 = 'data/geodata/pandemic-central-watermark-3.png'
 

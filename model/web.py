@@ -91,10 +91,11 @@ def web(date_today):
     combined_web.to_csv("output/website/web_latest.csv", index=False)
 
     # WEB JSON
-    with open ("data/geodata/us-counties-topojson.json", "r") as myfile:
+    with open ("data/geodata/gz_2010_us_050_00_20m.topojson", "r") as myfile:
         data="".join(myfile.readlines())
 
     j = json.loads(data)
+    j['objects']['us-counties'] = j['objects'].pop('gz_2010_us_050_00_20m')
 
     df = pd.read_csv("output/website/web_latest.csv", dtype={"FIPS":str}).groupby("FIPS").tail(4).reset_index(drop=True)
 
@@ -121,6 +122,7 @@ def web(date_today):
     present = 0
     tot_county = len(j['objects']['us-counties']['geometries'])
     for i in range(tot_county):
+        j['objects']['us-counties']['geometries'][i]['id'] = j['objects']['us-counties']['geometries'][i]['properties']['STATE'] + j['objects']['us-counties']['geometries'][i]['properties']['COUNTY']
         county = j['objects']['us-counties']['geometries'][i]['id']
         if county in imploded_dict.keys():
             present += 1

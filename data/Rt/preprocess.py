@@ -345,7 +345,7 @@ def warning_suppressor(debug_mode=True):
     if not debug_mode:
         warnings.filterwarnings("ignore")
 
-def preprocess_Rt(date):
+def preprocess_Rt(date, can_key):
     warning_suppressor(debug_mode=False) # Change it to show errors
 
     print("• Processing Rt Data")
@@ -412,7 +412,7 @@ def preprocess_Rt(date):
     }
 
     # Rt calculations from rt.live
-    rt_data = pd.read_csv("https://api.covidactnow.org/v2/states.timeseries.csv?apiKey=ad02de2c8b484d09aff3a1c59ed43755", dtype={"fips": str}, \
+    rt_data = pd.read_csv("https://api.covidactnow.org/v2/states.timeseries.csv?apiKey=" + can_key, dtype={"fips": str}, \
         usecols=['date', 'fips', 'metrics.infectionRate'])
     rt_data = rt_data.rename({'fips':'state', 'metrics.infectionRate':'state_rt'}, axis=1)
 
@@ -432,7 +432,7 @@ def preprocess_Rt(date):
     merged_df = merged_df.sort_values(['FIPS', 'state'])
 
     # Add county-level Rt values
-    county_rt = pd.read_csv("https://api.covidactnow.org/v2/counties.timeseries.csv?apiKey=ad02de2c8b484d09aff3a1c59ed43755", dtype={"fips": str}, \
+    county_rt = pd.read_csv("https://api.covidactnow.org/v2/counties.timeseries.csv?apiKey=" + can_key, dtype={"fips": str}, \
         usecols=['date', 'fips', 'metrics.infectionRate'])
     county_rt = county_rt.rename({'fips':'FIPS', 'metrics.infectionRate':'RtIndicator'}, axis=1)
     final_rt = pd.merge(left=merged_df, right=county_rt, how="left", on=['FIPS', 'date'], copy=False)

@@ -1,81 +1,23 @@
-# Health Data
+# Population Health Data
 
-- **Description**: Population health data released by [IHME](http://www.healthdata.org/) for US counties.
+### Description
+Population health data released by [IHME](http://www.healthdata.org/) for US counties used for only for training dataset features
 
-- **Files**:
-  - **preprocess.py** loads and cleans and cleans IHME datasets to make the output dataset _health.csv_ for all data except smoking prevalence, which is output _IHME_smoking.csv_
-
-  - **IHME.csv** is one output file of _preprocess.py_ and contains the following columns:
-
-    | Column                         | Description                                  |
-    |--------------------------------|----------------------------------------------|
-    | Location                       | County name                                  |
-    | FIPS                           | FIPS of reference                            |
-    | Diabetes_Prevalence_Both_Sexes | Diabetes prevalence in both sexes            |
-    | Male_Obesity_%                 | Percent of males who are obese               |
-    | Female_Obesity_%               | Percent of females who are obese             |
-    | life_expectancy                | Average life expectancy                      |
-    | mortality_risk_0-5             | Mortality risk (ages 0-5)                    |
-    | mortality_risk_5-25            | Mortality risk (ages 5-25)                   |
-    | mortality_risk_25-45           | Mortality risk (ages 25-45)                  |
-    | mortality_risk_45-65           | Mortality risk (ages 45-65)                  |
-    | mortality_risk_65-85           | Mortality risk (ages 65-85)                  |
-    | tubercolosis_mortality         | Mortality from tuberculosis                  |
-    | AIDS_mortality                 | Mortality from AIDS                          |
-    | diarrheal_mortality            | Mortality from diarrheal disease             |
-    | lower_respiratory_mortality    | Mortality from lower respiratory diseases    |
-    | meningitis_mortality           | Mortality from meningitis                    |
-    | hepatitis_mortality            | Mortality from hepatitis                     |
-    | other_resp_mortality           | Mortality from other respiratory diseases    |
-    | interstitial_lung_mortality    | Mortality from interstitial lung diseases    |
-    | asthma_mortality               | Mortality from asthma                        |
-    | other_pneumoconiosis_mortality | Mortality from other pneumoconiosis diseases |
-    | coal_pneumoconiosis_mortality  | Mortality from coal pneumoconiosis diseases  |
-    | asbestosis_mortality           | Mortality from asbestosis                    |
-    | silicosis_mortality            | Mortality from silicosis                     |
-    | pneumoconiosis_mortality       | Mortality from pneumoconiosis                |
-    | COPD_mortality                 | Mortality from COPD                          |
-    | chronic_respiratory_mortality  | Mortality from chronic respiratory diseases  |
-
-  - **IHME_smoking.csv** is the second output of _preprocess.py_ and contains smoking prevalence data organized in the following columns:
-
-    | Column                         | Description                                  |
-    |--------------------------------|----------------------------------------------|
-    | region                         | State abbreviation code                      |
-    | Location                       | County name                                  |
-    | smoking_prevalence             | Percent of population that smokes            |
-
-
+### Files
+  - **preprocess.py** loads and cleans all IHME datasets to make the output dataset `IHME.csv`
+  - **IHME.csv** is the only output file of _preprocess.py_ containing processed population health features
   - **IHME_Diabetes.csv**
     - _Citation_: Institute for Health Metrics and Evaluation (IHME). Diagnosed and Undiagnosed Diabetes Prevalence by County in the U.S., 1999-2012. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2016.
-    - _Note_: "Total" sheet from XSLX file is exported as CSV in Excel
-
-
+    - _Note_: "Total" sheet from .xlsx file (found online [here](http://ghdx.healthdata.org/record/ihme-data/united-states-diabetes-prevalence-county-1999-2012)) is exported as .csv in Excel
   - **IHME_Infections_Disease_Mortality.csv**
     - _Citation_: Institute for Health Metrics and Evaluation (IHME). United States Infectious Disease Mortality Rates by County 1980-2014. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2018.
-    - [_Link_](http://ghdx.healthdata.org/record/ihme-data/united-states-infectious-disease-mortality-rates-county-1980-2014)
-    - _Note_: All columns for all sheets in the original XLSX file were merged into 1 sheet by FIPS, which was exported into a CSV file in Excel
-
-
+    - _Note_: All columns for all sheets in the original .xlsx file (from [here](http://ghdx.healthdata.org/record/ihme-data/united-states-infectious-disease-mortality-rates-county-1980-2014)) were merged into 1 sheet by FIPS, which was exported into a .csv file in Excel
   - **IHME_Mortality.csv**
-  
     - _Citation_: Institute for Health Metrics and Evaluation (IHME). United States Life Expectancy and Age-specific Mortality Risk by County 1980-2014. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2017.
-    - [_Link_](http://ghdx.healthdata.org/record/ihme-data/united-states-life-expectancy-and-age-specific-mortality-risk-county-1980-2014)
-    - _Note_: All columns for all sheets in the original XLSX file were merged into 1 sheet by FIPS, which was exported into a CSV file in Excel
-
-
+    - _Note_: All columns for all sheets in the original .xlsx file (from [here](http://ghdx.healthdata.org/record/ihme-data/united-states-life-expectancy-and-age-specific-mortality-risk-county-1980-2014)) were merged into 1 sheet by FIPS, which was exported into a .csv file in Excel
   - **IHME_Respiratory_Disease_Mortality.csv**
     - _Citation_: Institute for Health Metrics and Evaluation (IHME). United States Chronic Respiratory Disease Mortality Rates by County 1980-2014. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2017.
-    - [_Link_](http://ghdx.healthdata.org/record/ihme-data/united-states-chronic-respiratory-disease-mortality-rates-county-1980-2014)
-    - _Note_: All columns for all sheets in the original XLSX file were merged into 1 sheet by FIPS,which was exported into a CSV file in Excel
-
-
-  - **IHME_US_COUNTY_TOTAL_AND_DAILY_SMOKING_PREVALENCE_1996_2012.csv**
-    - _Citation_: Institute for Health Metrics and Evaluation (IHME). United States Smoking Prevalence by County 1996-2012. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2014
-    - [_Link_](https://ghdx.healthdata.org/record/ihme-data/united-states-smoking-prevalence-county-1996-2012)
-    - _Note_: We used the file _IHME_US_COUNTY_TOTAL_AND_DAILY_SMOKING_PREVALENCE_1996_2012.csv_
-
-
+    - _Note_: All columns for all sheets in the original .xlsx file (from [here](http://ghdx.healthdata.org/record/ihme-data/united-states-chronic-respiratory-disease-mortality-rates-county-1980-2014)) were merged into 1 sheet by FIPS, which was exported into a .csv file in Excel
   - **IHME_USA_OBESITY_PHYSICAL_ACTIVITY_2001_2011.csv**
     - _Citation_: Institute for Health Metrics and Evaluation (IHME). United States Physical Activity and Obesity Prevalence by County 2001-2011. Seattle, United States: Institute for Health Metrics and Evaluation (IHME), 2013.
-    - [_Link_](https://ghdx.healthdata.org/record/ihme-data/united-states-physical-activity-and-obesity-prevalence-county-2001-2011)
+    - The file available online [here](https://ghdx.healthdata.org/record/ihme-data/united-states-physical-activity-and-obesity-prevalence-county-2001-2011) was already in .csv format and needed no modifications
