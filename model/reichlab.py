@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime, date, timedelta
 import os
-from isoweek import Week
+from epiweeks import Week as epiweek
 
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandemic Central, 2021'
@@ -21,22 +21,18 @@ as input into a random forest regression model to forecast COVID-19 cases for 1,
 and county equivalents.
 """
 
-# Requires package 'isoweek'
-# try command 'pip install isoweek' or 'pip3 install isoweek'
-
 def get_saturday(d):
     # EPIWEEK ENDS ON SATURDAY...
     # If the forecast date is Sunday or Monday, the first week will end on the
     # next Saturday. Otherwise, first week should end on the Saturday of the second
     # week.
-    date = d.isocalendar()
-    if date[2] <= 1:
-        final = str(date[0]) + 'W' + str((date[1])).zfill(2)
-        next_sat = Week.fromstring(final).saturday()
-    else:
-        final = str(date[0]) + 'W' + str((date[1] + 1)).zfill(2)
-        next_sat = Week.fromstring(final).saturday()
-    return next_sat.isoformat()
+
+    if d.weekday() >= 1 and d.weekday() <=  5:
+        d += timedelta(weeks=1)
+
+    end_date = epiweek.fromdate(d).enddate().isoformat()
+
+    return end_date
 
 def reichlab(date_today):
 

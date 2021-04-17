@@ -14,7 +14,7 @@ def get_sunday(d):
     start = date.fromisoformat(d)
 
     while start.weekday()!=6:
-        start += timedelta(days=1)
+        start -= timedelta(days=1)
 
     return start.isoformat()
 
@@ -22,12 +22,18 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Run Pandemic Central model to generate U.S. county-level COVID-19 projections')
     parser.add_argument("-d", "--date", help=f'Start date in isoformat (for example, today is {date.today().isoformat()})', type=str)
-    parser.add_argument("-r", "--can_api_key", help=f'COVIDActNow.org API Key (Register here: https://apidocs.covidactnow.org/#register)', type=str)
+    parser.add_argument("-r", "--can_api_key", help='COVIDActNow.org API Key (Register here: https://apidocs.covidactnow.org/#register)', type=str)
+    parser.add_argument('--sunday', help='(Optional) If addressed, the forecast day will be the previous Sunday')
     args = parser.parse_args()
 
-    print('Working on this Sunday...')
-    date_today = get_sunday(args.date)
-    print(date_today)
+    if args.sunday:
+        print('Forecast date: ', end='')
+        date_today = get_sunday(args.date)
+        print(date_today)
+    else:
+        print('Forecast date: ', end='')
+        date_today = date.today().isoformat()
+        print(date_today)
 
     input('Press \'Enter\' to proceed \n')
 
