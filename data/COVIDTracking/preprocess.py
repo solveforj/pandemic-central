@@ -94,29 +94,35 @@ def get_state_fips():
     return state_map, fips_data
 
 
-def preprocess_testing():
+def preprocess_testing(after_mar_the_seventh = True):
     print("• Processing COVID Tracking Project Testing Data")
 
     state_map, fips_data = get_state_fips()
 
     # State testing data obtained from the COVID Tracking Project (www.covidtracking.com)
-    testing = pd.read_csv("https://covidtracking.com/api/v1/states/daily.csv", usecols = ['date', 'state', 'totalTestResultsIncrease', 'positiveIncrease'], dtype = {'date':str})
+
+    # COVID Tracking Project stopped updating since Mar 7th, 2021
+    # API is last accessed on 2021-05-11
+    # Original API: https://covidtracking.com/api/v1/states/daily.csv
+    testing = pd.read_csv("data/COVIDTracking/covidtracking_2021_03_07.csv", usecols = ['date', 'state', 'totalTestResultsIncrease', 'positiveIncrease'], dtype = {'date':str})
     testing['state'] = testing['state'].apply(lambda x : state_map[x])
     testing['date'] = pd.to_datetime(testing['date'])
     testing = testing.sort_values(['state','date']).reset_index(drop=True)
 
-    new_testing = pd.read_csv("https://raw.githubusercontent.com/govex/COVID-19/master/data_tables/testing_data/time_series_covid19_US.csv", usecols=['date', 'state', 'tests_combined_total', 'cases_conf_probable'], dtype={'date':str})
-    new_testing = new_testing.rename(columns = {'cases_conf_probable': 'positiveIncrease', 'tests_combined_total':'totalTestResultsIncrease'})
-    new_testing['date'] = pd.to_datetime(new_testing['date'])
-    new_testing['state'] = new_testing['state'].apply(lambda x : state_map[x])
-    new_testing = new_testing.sort_values(['state','date']).reset_index(drop=True)
-    new_testing['positiveIncrease'] = new_testing.groupby("state")['positiveIncrease'].diff()
-    new_testing['totalTestResultsIncrease'] = new_testing.groupby("state")['totalTestResultsIncrease'].diff()
-    new_testing = new_testing.dropna()
-    new_testing[['positiveIncrease', 'totalTestResultsIncrease']] = new_testing[['positiveIncrease', 'totalTestResultsIncrease']].astype(int)
-    new_testing = new_testing[new_testing['date'] > "2021-03-07"].reset_index(drop=True)
+    if after_mar_the_seventh:
+        new_testing = pd.read_csv("https://raw.githubusercontent.com/govex/COVID-19/master/data_tables/testing_data/time_series_covid19_US.csv", usecols=['date', 'state', 'tests_combined_total', 'cases_conf_probable'], dtype={'date':str})
+        new_testing = new_testing.rename(columns = {'cases_conf_probable': 'positiveIncrease', 'tests_combined_total':'totalTestResultsIncrease'})
+        new_testing['date'] = pd.to_datetime(new_testing['date'])
+        new_testing['state'] = new_testing['state'].apply(lambda x : state_map[x])
+        new_testing = new_testing.sort_values(['state','date']).reset_index(drop=True)
+        new_testing['positiveIncrease'] = new_testing.groupby("state")['positiveIncrease'].diff()
+        new_testing['totalTestResultsIncrease'] = new_testing.groupby("state")['totalTestResultsIncrease'].diff()
+        new_testing = new_testing.dropna()
+        new_testing[['positiveIncrease', 'totalTestResultsIncrease']] = new_testing[['positiveIncrease', 'totalTestResultsIncrease']].astype(int)
+        new_testing = new_testing[new_testing['date'] > "2021-03-07"].reset_index(drop=True)
 
-    testing = pd.concat([testing, new_testing], axis=0)
+        testing = pd.concat([testing, new_testing], axis=0)
+        
     testing = testing.sort_values(['state', 'date']).reset_index(drop=True)
 
     # Compute 7 day (weekly) rolling averages for state testing data

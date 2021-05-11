@@ -22,7 +22,10 @@ def update(date, can_key):
     print("UPDATING DATA\n")
     preprocess_facebook()
     preprocess_JHU()
-    preprocess_testing()
+    if date <= '2021-03-07':
+        preprocess_testing(after_mar_the_seventh = False)
+    else:
+        preprocess_testing()
     preprocess_Rt(date, can_key)
 
 # Read datasets into memory
