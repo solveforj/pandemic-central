@@ -19,7 +19,7 @@ __version__ = '3.0.0'
 np.random.seed(1)
 pd.set_option('display.max_columns', 500)
 
-def make_ML_model(data, output, date_today, density = 0):
+def make_ML_model(data, output, date_today, franking, density = 0):
     data = data[data['POP_DENSITY'] >= density]
     data = data[data['date'] <= date_today].reset_index(drop=True)
     data = data.replace([np.inf, -np.inf], np.nan).dropna().reset_index(drop=True)
@@ -52,33 +52,41 @@ def make_ML_model(data, output, date_today, density = 0):
         y = data_mod['label']
         X_train, X_test, y_train, y_test = train_test_split(nX, y, train_size=0.9)
 
-        print("Training")
+        print("  • Training model for " + str(np.abs(-7*shift)) + "-day forecasts")
         regr = RandomForestRegressor(n_estimators=20, min_samples_split=10, n_jobs=-1).fit(X_train, y_train)
 
+        if (output == "mobility" and franking == True):
+            print("    • Ranking model's feature importance")
+            feature_ranking = permutation_importance(regr, X_train, y_train, n_repeats=5, n_jobs=1, random_state=0)
+            feature_ranking = pd.DataFrame(feature_ranking.importances)
+            feature_ranking.index = X.columns
+            feature_ranking.to_csv("output/feature_ranking/franking_" + str(shift) + "_" + date_today + ".csv")
+
         r2_test = regr.score(X_test, y_test)
-        print(r2_test)
+        #print(r2_test)
         r2_testing.append(r2_test)
         r2_train = regr.score(X_train, y_train)
-        print(r2_train)
-        print()
+        #print(r2_train)
+        #print()
         r2_training.append(r2_train)
         mae_test = mean_absolute_error(y_test,regr.predict(X_test))
         mae_testing.append(mae_test)
         mae_train = mean_absolute_error(y_train,regr.predict(X_train))
         mae_training.append(mae_train)
 
-        print("Relative feature importances:")
-        n = pd.DataFrame()
-        n['features'] = X.columns
-        n['value'] = regr.feature_importances_
-        print(n.sort_values('value'))
+        #print("    • Relative feature importances (Gini)")
+        #n = pd.DataFrame()
+        #n['features'] = X.columns
+        #n['value'] = regr.feature_importances_
+        #print(n.sort_values('value'))
+        #print("\n")
 
         data_predict = data.drop(to_drop, axis=1)
         nX = scaler.fit_transform(data_predict[data_predict.columns[3:]])
 
         prediction_df['point_' + str(shift) + "_weeks"] = regr.predict(nX)
-        print(prediction_df['point_' + str(shift) + "_weeks"])
-        print(y)
+        #print(prediction_df['point_' + str(shift) + "_weeks"])
+        #print(y)
         pred_Q = pd.DataFrame()
 
         for pred in regr.estimators_:
@@ -112,22 +120,24 @@ def make_ML_model(data, output, date_today, density = 0):
     model_stats['MAE_training'] = mae_training
     model_stats = model_stats.round(3)
 
-    print(model_stats)
+    #print("  • Performance stats summary")
+    #print(model_stats)
+    #print()
 
     return model_stats
 
-def train(date_today):
+def train(date_today, importance=False):
     print("TRAINING MODELS\n")
 
     print("• Training mobility model")
     training_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz")
-    mobility_model_stats = make_ML_model(training_mobility, "mobility", density = 0, date_today = date_today)
-    print("  Finished\n")
+    mobility_model_stats = make_ML_model(training_mobility, "mobility", density = 0, date_today = date_today, franking=importance)
+    print("  • Finished\n")
 
     print("• Training non-mobility model")
     training_no_mobility = pd.read_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz")
-    nonmobility_model_stats = make_ML_model(training_no_mobility, "no_mobility", density = 0, date_today = date_today)
-    print("  Finished\n")
+    nonmobility_model_stats = make_ML_model(training_no_mobility, "no_mobility", density = 0, date_today = date_today, franking=importance)
+    print("  • Finished\n")
 
     full_model_stats = pd.concat([mobility_model_stats, nonmobility_model_stats], axis=0)
 

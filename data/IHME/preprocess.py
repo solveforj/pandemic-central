@@ -178,7 +178,7 @@ def merge_health_data():
 def preprocess_IHME():
     print('• Processing IHME Data')
     merge_health_data()
-    print('  Finished\n')
+    print('  • Finished\n')
 
 if __name__ == "__main__":
     preprocess_IHME()

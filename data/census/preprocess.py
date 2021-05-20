@@ -55,7 +55,7 @@ def preprocess_census(year = 2018, drop_tot = False):
 
     merged_df.to_csv("data/census/census.csv", index=False)
 
-    print('  Finished\n')
+    print('  • Finished\n')
 
 if __name__ == "__main__":
     preprocess_census()

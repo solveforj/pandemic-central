@@ -25,13 +25,17 @@ We hope to serve as a valuable  resource for understanding trends in the ongoing
   ```
 * To install all dependencies in Python 3 (≥ 3.7):
   ```
-  pip install requirements.txt
+  pip install -r requirements.txt
   ```
-* From the project directory, run the entire module with the command below, specifying the date for which you want to generate projections and your COVIDActNow.org API Access key (register [here](https://apidocs.covidactnow.org/#register)) as follows:
+* For map rendering, install [Orca](https://github.com/plotly/orca) and ensure that it is added to your PATH
+
+* From the project directory, run the entire module with the command below, specifying the date for which you want to generate projections, optional arguments to compute feature importance (`--importance`) or produce projections for the prior Sunday to the input reference date (`--sunday`), and your COVIDActNow.org API Access key (register [here](https://apidocs.covidactnow.org/#register)) as follows:
   ```
-  python auto.py -d 2021-04-11 -r API_KEY
+  python auto.py -d 2021-04-11 -r API_KEY --importance --sunday
   ```
+
 * The output data files will be in the `/output` directory:
+  * The `/feature_ranking` directory contains feature rankings for each projection model (using mobility data) trained for each reference date
   * The `/model_stats` directory contains model performance statistics (mean absolute error and R<sup>2</sup> on forecasts vs. actual cases in the training dataset) for each date projections were generated for
   * The `/raw_predictions` directory contains model projections for the date projections were generated for and the preceding 9 weeks; all training dataset features are included for each of these weeks, as well
   * The `/ReichLabFormat` directory contains predictions formatted as necessary for submission to the COVID-19 Forecast Hub

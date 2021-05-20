@@ -122,7 +122,7 @@ def preprocess_testing(after_mar_the_seventh = True):
         new_testing = new_testing[new_testing['date'] > "2021-03-07"].reset_index(drop=True)
 
         testing = pd.concat([testing, new_testing], axis=0)
-        
+
     testing = testing.sort_values(['state', 'date']).reset_index(drop=True)
 
     # Compute 7 day (weekly) rolling averages for state testing data
@@ -159,7 +159,7 @@ def preprocess_testing(after_mar_the_seventh = True):
 
     merged_df.to_csv("data/COVIDTracking/testing_data.csv.gz", sep=',', compression='gzip', index=False)
 
-    print("  Finished\n")
+    print("  • Finished\n")
 
 if __name__ == "__main__":
     preprocess_testing()

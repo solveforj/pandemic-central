@@ -106,17 +106,17 @@ def render(date_today):
     weeks = list(range(1,5))
     filenames = []
     for df, wk in zip(dfs, weeks):
-        print(f'Rendering Week {wk}', end='')
+        print(f'  • Rendering Week {wk}', end='')
         path = render_map(df, wk)
         add_watermark(path)
         filenames.append(path)
         print(' - Done!')
-    print('Rendering interactive map', end='')
+    print('  • Rendering interactive map', end='')
     fix_map()
     print(' - Done!')
     images = []
-    print('Rendering GIF image\n')
+    print('  • Rendering GIF image')
     for filename in filenames:
         images.append(imageio.imread(filename))
     imageio.mimsave(f'output/website/latest_map.gif', images, fps=1)
-    print('finished\n')
+    print('  • Finished\n')

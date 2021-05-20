@@ -65,7 +65,7 @@ def preprocess_JHU():
 
     merged_df.to_csv('data/JHU/jhu_data.csv', sep=",", index=False)
 
-    print('  Finished\n')
+    print('  • Finished\n')
 
 if __name__ == "__main__":
     preprocess_JHU()

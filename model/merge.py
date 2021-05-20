@@ -8,7 +8,7 @@ from data.COVIDTracking.preprocess import preprocess_testing
 from data.facebook.preprocess import preprocess_facebook
 from data.IHME.preprocess import preprocess_IHME
 from data.JHU.preprocess import preprocess_JHU
-from data.Rt.preprocess import preprocess_Rt
+from data.Rt.preprocess import update_Rt, preprocess_Rt
 
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandemic Central, 2021'
@@ -20,23 +20,33 @@ __version__ = '3.0.0'
 # Update dynamic data
 def update(date, can_key):
     print("UPDATING DATA\n")
-    preprocess_facebook()
-    preprocess_JHU()
-    if date <= '2021-03-07':
-        preprocess_testing(after_mar_the_seventh = False)
-    else:
-        preprocess_testing()
-    preprocess_Rt(date, can_key)
+    #preprocess_facebook()
+    #preprocess_JHU()
+    #if date <= '2021-03-07':
+    #    preprocess_testing(after_mar_the_seventh = False)
+    #else:
+    #    preprocess_testing()
+    update_Rt(can_key)
 
 # Read datasets into memory
-def combine():
+def combine(date, update_data):
+
     print("MERGING DATA\n")
+
+    if update_data:
+        preprocess_Rt(date, old=False)
+        testing = pd.read_csv("data/COVIDTracking/testing_data.csv.gz")
+        fb_mobility = pd.read_csv("data/facebook/mobility.csv.gz")
+        cases = pd.read_csv("data/JHU/jhu_data.csv")
+    else:
+        preprocess_Rt(date, old=True)
+        testing = pd.read_csv("data/COVIDTracking/testing_data_test.csv.gz")
+        fb_mobility = pd.read_csv("data/facebook/mobility_test.csv.gz")
+        cases = pd.read_csv("data/JHU/jhu_data_test.csv")
+
     ccvi = pd.read_csv("data/CCVI/CCVI.csv")
     census = pd.read_csv("data/census/census.csv")
-    testing = pd.read_csv("data/COVIDTracking/testing_data.csv.gz")
-    fb_mobility = pd.read_csv("data/facebook/mobility.csv.gz")
     ihme = pd.read_csv("data/IHME/IHME.csv")
-    cases = pd.read_csv("data/JHU/jhu_data.csv")
 
     # Read Rt datasets for all alignments
     rt = pd.read_csv("data/Rt/aligned_rt_7.csv")
@@ -73,7 +83,7 @@ def combine():
     pd.set_option('display.max_rows', 500)
 
     s = merged_DF.isnull().sum(axis = 0)
-    print(s)
+    #print(s)
 
     cleaned_DF = merged_DF.dropna(subset=columns)
 
@@ -82,8 +92,7 @@ def combine():
     training_mobility = cleaned_DF.dropna()
     training_mobility = training_mobility.sort_values(['FIPS', 'date'])
 
-    print("Training Mobility")
-    print(training_mobility.groupby("FIPS").tail(1)['date'])
+    #print(training_mobility.groupby("FIPS").tail(1)['date'])
     no_mobility = cleaned_DF[~cleaned_DF.index.isin(training_mobility.index)]
     no_mobility = no_mobility.drop(['fb_stationary', 'fb_movement_change'], axis=1)
     no_mobility = no_mobility.sort_values(['FIPS', 'date'])
@@ -93,8 +102,9 @@ def combine():
     unused_DF.to_csv(os.path.split(os.getcwd())[0] + "/unused_data.csv.gz", index=False, compression='gzip')
     training_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_mobility.csv.gz", index=False, compression='gzip')
     training_no_mobility.to_csv(os.path.split(os.getcwd())[0] + "/training_no_mobility.csv.gz", index=False, compression='gzip')
-    print("  Finished!\n")
+    print("• Finished\n")
 
-def merge(date, can_key):
-    update(date, can_key)
-    combine()
+def merge(date, can_key, update_data):
+    if update_data:
+        update(date, can_key)
+    combine(date, update_data)

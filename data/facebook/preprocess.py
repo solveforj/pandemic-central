@@ -74,7 +74,7 @@ def preprocess_facebook():
     print('• Processing Facebook Mobility Data')
     files = get_facebook_data()
     facebook_mobility_to_pd(files)
-    print('  Finished\n')
+    print('  • Finished\n')
 
 if __name__ == "__main__":
     preprocess_facebook()

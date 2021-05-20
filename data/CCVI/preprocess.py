@@ -17,7 +17,7 @@ def preprocess_disparities():
     disparities = disparities[disparities.columns[3:-1]].sort_values('FIPS').reset_index(drop=True)
     disparities.to_csv("data/CCVI/CCVI.csv", index=False)
 
-    print('  Finished\n')
+    print('  • Finished\n')
 
 if __name__ == "__main__":
     preprocess_disparities()

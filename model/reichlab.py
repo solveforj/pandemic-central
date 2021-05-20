@@ -112,11 +112,11 @@ def reichlab(date_today):
     df_predict = df_predict[['location', 'forecast_date', 'value', \
                             'target_end_date', 'target', 'type', 'quantile']]
     # Preview
-    print(df_predict.head(5))
+    #print(df_predict.head(5))
 
     # EXPORT DATA
     #filename = date.today().isoformat()
     filename = date_today
     df_predict.to_csv('output/ReichLabFormat/' + filename + '-PandemicCentral-COVIDForest.csv', index=False)
 
-    print("finished\n")
+    print("  • Finished\n")

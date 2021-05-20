@@ -149,4 +149,4 @@ def web(date_today):
     df = pd.read_csv("output/model_stats/model_stats_" + date_today + ".csv").round(3)
     df.to_csv("output/website/model_stats_latest.csv", index=False)
 
-    print('finished\n')
+    print(" • Finished\n")

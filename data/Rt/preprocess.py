@@ -105,33 +105,33 @@ def get_state_fips():
 
     return state_map, fips_data
 
-def align_rt(update=True, train=True):
-
-    county_rt = pd.read_csv("data/Rt/rt_data.csv", dtype={"FIPS":str})
+def align_rt(county_rt):
+    print("  • Loading input Rt, testing, and cases datasets")
+    #county_rt = pd.read_csv("data/Rt/rt_data.csv", dtype={"FIPS":str})
     #county_rt = county_rt[~county_rt['RtIndicator'].isnull()]
     #county_rt['state_rt'] = county_rt['state_rt'].fillna(method='ffill')
-    print(county_rt)
+    #print(county_rt)
 
-    print(len(county_rt[county_rt['FIPS'] == "01001"]))
+    #print(len(county_rt[county_rt['FIPS'] == "01001"]))
 
-    print(county_rt.groupby("FIPS").tail(1)['date'].unique())
+    #print(county_rt.groupby("FIPS").tail(1)['date'].unique())
 
     case_data = pd.read_csv("data/JHU/jhu_data.csv", dtype={"FIPS":str})
 
-    print(case_data.groupby("FIPS").tail(1)['date'].unique())
+    #print(case_data.groupby("FIPS").tail(1)['date'].unique())
 
     final = pd.merge(left=county_rt, right=case_data, how="left", on=['FIPS', 'date'], copy=False)
 
-    print(len(final[final['FIPS'] == "01001"]))
-    print(final.groupby("FIPS").tail(1)['date'].unique())
+    #print(len(final[final['FIPS'] == "01001"]))
+    #print(final.groupby("FIPS").tail(1)['date'].unique())
 
     testing_data = pd.read_csv("data/COVIDTracking/testing_data.csv.gz", dtype={"FIPS":str})
 
-    print(testing_data.groupby("FIPS").tail(1)['date'].unique())
+    #print(testing_data.groupby("FIPS").tail(1)['date'].unique())
 
     final = pd.merge(left=final, right=testing_data, how="left", on=['FIPS','date'], copy=False)
-    print(len(final[final['FIPS'] == "01001"]))
-    print(final.groupby("FIPS").tail(1)['date'].unique())
+    #print(len(final[final['FIPS'] == "01001"]))
+    #print(final.groupby("FIPS").tail(1)['date'].unique())
 
     final[['confirmed_cases_norm','confirmed_cases']] = final[['confirmed_cases_norm','confirmed_cases']].mask(final[['confirmed_cases_norm','confirmed_cases']] < 0, 0)
 
@@ -154,10 +154,15 @@ def align_rt(update=True, train=True):
 
     final['county_counts'] = ccounts
 
-    print(final.columns)
+    track_higher_corrs = {'FIPS':[], 'region':[], 'shift':[], 'correlation': []}
+
+    #print(final.columns)
     #final = final[(final['FIPS'].str.startswith("04")) | (final['FIPS'].str.startswith("01"))]
-    print(len(final[final['FIPS'] == "01001"]))
-    print(final)
+    #print(len(final[final['FIPS'] == "01001"]))
+    #print(final)
+
+    #print("Latest Date")
+    #print(final.sort_values('date').groupby("FIPS").tail(1)['date'].unique())
 
     def get_optimal_lag(realtime, backlag, predict_shift):
         corrs = []
@@ -233,122 +238,133 @@ def align_rt(update=True, train=True):
         shift_a = max(shift_a.fillna(0).tolist())
         shift_b = max(shift_b.fillna(0).tolist())
 
+        track_higher_corrs['FIPS'].append(name)
 
         if corr_a >= corr_b:
             new_col = pd.concat([col_a.reset_index(drop=True), pd.Series([shift_a]*col_a.shape[0])], axis=1)
             new_col.columns = ['rt_final_unaligned', 'rt_final_shift']
+            track_higher_corrs['region'].append('county')
+            track_higher_corrs['shift'].append(new_col['rt_final_shift'].iloc[0])
+            track_higher_corrs['correlation'].append(corr_a)
             return new_col
         else:
             new_col = pd.concat([col_b.reset_index(drop=True), pd.Series([shift_b]*col_b.shape[0])], axis=1)
             new_col.columns = ['rt_final_unaligned', 'rt_final_shift']
+            track_higher_corrs['region'].append('state')
+            track_higher_corrs['shift'].append(new_col['rt_final_shift'].iloc[0])
+            track_higher_corrs['correlation'].append(corr_b)
             return new_col
 
-    if update:
 
-        # Align the Rt.live Rt
-        print("  Aligning and estimating county-level Rt")
-        final_estimate = final[(final['date'] > "2020-03-30")]
+    # Align the Rt.live Rt
+    print("  • Calculating optimal Rt shifts")
+    final_estimate = final[(final['date'] > "2020-03-30")]
 
-        final_estimate = final_estimate[~final_estimate['normalized_cases_norm'].isnull()]
-        final_estimate = final_estimate.reset_index(drop=True)
+    final_estimate = final_estimate[~final_estimate['normalized_cases_norm'].isnull()]
+    final_estimate = final_estimate.reset_index(drop=True)
 
-        print(len(final_estimate[final_estimate['FIPS'] == "01001"]))
+    #print(len(final_estimate[final_estimate['FIPS'] == "01001"]))
 
-        # Align the Rt.live (state) Rt so that it is maximally correlated with test positivity by shifting it forward
-        new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['normalized_cases'], x['state_rt'], 0)).reset_index(drop=True)
-        final_estimate[["aligned_state_rt","ECR_shift", "ECR_correlation"]] = new_col
+    # Align the Rt.live (state) Rt so that it is maximally correlated with test positivity by shifting it forward
+    new_col = final_estimate.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['normalized_cases'], x['state_rt'], 0)).reset_index(drop=True)
+    final_estimate[["aligned_state_rt","ECR_shift", "ECR_correlation"]] = new_col
 
-        # Use the aligned state Rt to calculate an estimated county Rt that is also aligned
-        print("  Aligning COVID Act Now county-level Rt")
+    # Use the aligned state Rt to calculate an estimated county Rt that is also aligned
+    #print("  Aligning COVID Act Now county-level Rt")
 
-        # Find rows with a calculated and estimated county Rt
-        with_county_rt = final_estimate[~final_estimate['RtIndicator'].isnull()].dropna().reset_index(drop=True)
+    # Find rows with a calculated and estimated county Rt
+    with_county_rt = final_estimate[~final_estimate['RtIndicator'].isnull()].dropna().reset_index(drop=True)
 
-        # Find rows with a estimated county Rt only
-        without_county_rt = final_estimate[final_estimate['RtIndicator'].isnull()]
+    # Find rows with a estimated county Rt only
+    without_county_rt = final_estimate[final_estimate['RtIndicator'].isnull()]
 
-        # Align the COVID act now Rt so that it is maximally correlated with cases by shifting it forward
-        new_col = with_county_rt.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['normalized_cases'], x['RtIndicator'], 0)).reset_index(drop=True)
-        with_county_rt[['CAN_county_rt','CAN_shift', "CAN_correlation"]] = new_col
+    # Align the COVID act now Rt so that it is maximally correlated with cases by shifting it forward
+    new_col = with_county_rt.groupby("FIPS", as_index=False).apply(lambda x : get_optimal_lag(x['normalized_cases'], x['RtIndicator'], 0)).reset_index(drop=True)
+    with_county_rt[['CAN_county_rt','CAN_shift', "CAN_correlation"]] = new_col
 
-        # Drop NA values from each of the three dataframes
-        without_county_rt = without_county_rt.replace([np.inf, -np.inf], np.nan)
-        without_county_rt = without_county_rt[['FIPS', 'date', 'state_rt', 'normalized_cases_norm', 'confirmed_cases_norm', 'ECR_shift', 'ECR_correlation']].interpolate().dropna()
+    # Drop NA values from each of the three dataframes
+    without_county_rt = without_county_rt.replace([np.inf, -np.inf], np.nan)
+    without_county_rt = without_county_rt[['FIPS', 'date', 'state_rt', 'normalized_cases_norm', 'confirmed_cases_norm', 'ECR_shift', 'ECR_correlation']].interpolate().dropna()
 
-        with_county_rt = with_county_rt.replace([np.inf, -np.inf], np.nan)
-        with_county_rt = with_county_rt[['FIPS', 'date', 'state_rt', 'aligned_state_rt', 'normalized_cases_norm','confirmed_cases_norm','ECR_shift', 'ECR_correlation', 'RtIndicator', 'CAN_county_rt', 'CAN_shift', 'CAN_correlation']].interpolate().dropna()
+    with_county_rt = with_county_rt.replace([np.inf, -np.inf], np.nan)
+    with_county_rt = with_county_rt[['FIPS', 'date', 'state_rt', 'aligned_state_rt', 'normalized_cases_norm','confirmed_cases_norm','ECR_shift', 'ECR_correlation', 'RtIndicator', 'CAN_county_rt', 'CAN_shift', 'CAN_correlation']].interpolate().dropna()
 
-        final_estimate = final_estimate.replace([np.inf, -np.inf], np.nan)
+    final_estimate = final_estimate.replace([np.inf, -np.inf], np.nan)
 
-        final_estimate = final_estimate[['FIPS', 'date', 'state_rt', 'aligned_state_rt', 'normalized_cases_norm', 'confirmed_cases_norm', 'ECR_shift', 'ECR_correlation']].interpolate().dropna()
+    final_estimate = final_estimate[['FIPS', 'date', 'state_rt', 'aligned_state_rt', 'normalized_cases_norm', 'confirmed_cases_norm', 'ECR_shift', 'ECR_correlation']].interpolate().dropna()
 
-        with_county_rt_merge = with_county_rt[['FIPS', 'date',  'CAN_county_rt', 'RtIndicator', 'CAN_shift', 'CAN_correlation']]
+    with_county_rt_merge = with_county_rt[['FIPS', 'date',  'CAN_county_rt', 'RtIndicator', 'CAN_shift', 'CAN_correlation']]
 
-        merged = pd.merge(left=final_estimate, right=with_county_rt_merge, how='left', on=['FIPS', 'date'], copy=False)
+    merged = pd.merge(left=final_estimate, right=with_county_rt_merge, how='left', on=['FIPS', 'date'], copy=False)
 
-        print(len(merged[merged['FIPS'] == "01001"]))
+    #print(len(merged[merged['FIPS'] == "01001"]))
 
-        print("Optimizing")
+    print("  • Computing case predictions from aligned Rt")
 
-        merged = merged.reset_index(drop=True)
-        new_col = merged.groupby("FIPS", as_index=False).apply(lambda x : optimizer(x.name, x['RtIndicator'], x['CAN_shift'], x['CAN_correlation'], x['state_rt'], x['ECR_shift'], x['ECR_correlation']))
-        merged[['rt_final_unaligned', 'rt_final_shift']] = new_col.reset_index(drop=True)
+    merged = merged.reset_index(drop=True)
+    new_col = merged.groupby("FIPS", as_index=False).apply(lambda x : optimizer(x.name, x['RtIndicator'], x['CAN_shift'], x['CAN_correlation'], x['state_rt'], x['ECR_shift'], x['ECR_correlation']))
+    merged[['rt_final_unaligned', 'rt_final_shift']] = new_col.reset_index(drop=True)
 
-        new_col = merged.groupby("FIPS", as_index=False).apply(lambda x : (x["rt_final_unaligned"].shift(int(x['rt_final_shift'].iloc[0]))))
-        merged["rt_final_aligned"] = new_col.reset_index(drop=True)
+    pd.DataFrame.from_dict(track_higher_corrs, orient='index').transpose().to_csv('data/Rt/higher_corrs.csv', index=False, sep=',')
 
-        print(len(merged))
-        print(merged[merged['FIPS'] == "01001"])
-        merged_training = merged[(~merged['rt_final_aligned'].isnull())]
-        print(len(merged_training))
+    new_col = merged.groupby("FIPS", as_index=False).apply(lambda x : (x["rt_final_unaligned"].shift(int(x['rt_final_shift'].iloc[0]))))
+    merged["rt_final_aligned"] = new_col.reset_index(drop=True)
 
-        prediction_dict = merged_training.groupby("FIPS").apply(lambda x : get_prediction(x['normalized_cases_norm'], x['rt_final_aligned'], 1, x['rt_final_shift'].head(1))).to_dict()
+    #print(len(merged))
+    #print(merged[merged['FIPS'] == "01001"])
+    merged_training = merged[(~merged['rt_final_aligned'].isnull())]
+    #print(len(merged_training))
 
-        merged_training = merged_training[~merged_training['rt_final_unaligned'].isnull()].reset_index(drop=True)
+    prediction_dict = merged_training.groupby("FIPS").apply(lambda x : get_prediction(x['normalized_cases_norm'], x['rt_final_aligned'], 1, x['rt_final_shift'].head(1))).to_dict()
 
-        new_col = merged_training.groupby("FIPS", as_index=False).apply(lambda x : make_prediction(x.name, prediction_dict, x['rt_final_unaligned'], 1))
-        merged_training["prediction_unaligned"] = new_col.reset_index(drop=True)
-        print("Merged Training")
-        print(merged_training)
-        shift_dates = [7, 14, 21, 28]
+    merged_training = merged_training[~merged_training['rt_final_unaligned'].isnull()].reset_index(drop=True)
 
-        print(len(merged_training[merged_training['FIPS'] == "01001"]))
+    new_col = merged_training.groupby("FIPS", as_index=False).apply(lambda x : make_prediction(x.name, prediction_dict, x['rt_final_unaligned'], 1))
+    merged_training["prediction_unaligned"] = new_col.reset_index(drop=True)
+    #print("Merged Training")
+    #print(merged_training)
 
-        for predict in shift_dates:
-            dat = merged_training.copy(deep=True)
-            # Shift
-            new_col = dat.groupby("FIPS", as_index=False).apply(lambda x : (x["prediction_unaligned"].shift(int(x['rt_final_shift'].unique()[0] - predict))))
-            dat["prediction_aligned_" + str(predict)] = new_col.reset_index(drop=True)
+    #print(len(merged_training[merged_training['FIPS'] == "01001"]))
 
-            new_col = dat.groupby("FIPS", as_index=False).apply(lambda x : (x["rt_final_unaligned"].shift(int(x['rt_final_shift'].unique()[0] - predict))))
-            dat["rt_aligned_" + str(predict)] = new_col.reset_index(drop=True)
+    shift_dates = [7, 14, 21, 28]
 
-            # Interpolate
-            new_col = dat.groupby("FIPS", as_index=False).apply(lambda x : interpolator(x["prediction_aligned_" + str(predict)], "prediction_aligned_" + str(predict)))
-            dat["prediction_aligned_int_" + str(predict)] = new_col.reset_index(drop=True).clip(lower=0)
+    for predict in shift_dates:
+        print("  • Shifting case predictions and Rt for " + str(predict) + "-day forecasts")
 
-            new_col = dat.groupby("FIPS", as_index=False).apply(lambda x : interpolator(x["rt_aligned_" + str(predict)], "rt_aligned_" + str(predict)))
-            dat["rt_aligned_int_" + str(predict)] = new_col.reset_index(drop=True).clip(lower=0)
+        dat = merged_training.copy(deep=True)
+        # Shift
+        new_col = dat.groupby("FIPS", as_index=False).apply(lambda x : (x["prediction_unaligned"].shift(int(x['rt_final_shift'].unique()[0] - predict))))
+        dat["prediction_aligned_" + str(predict)] = new_col.reset_index(drop=True)
 
-            # Correlate
-            print()
-            print(dat['normalized_cases_norm'].shift(-1*predict).corr(dat['prediction_aligned_int_'+str(predict)]))
-            print(dat['normalized_cases_norm'].shift(-1*predict).corr(dat['rt_aligned_int_'+str(predict)]))
-            print(dat.groupby("FIPS").tail(1)['date'].unique())
-            print()
+        new_col = dat.groupby("FIPS", as_index=False).apply(lambda x : (x["rt_final_unaligned"].shift(int(x['rt_final_shift'].unique()[0] - predict))))
+        dat["rt_aligned_" + str(predict)] = new_col.reset_index(drop=True)
 
-            dat = dat[['FIPS', 'date','normalized_cases_norm', 'prediction_aligned_int_' + str(predict), 'rt_aligned_int_'+str(predict)]]
-            print(len(dat[dat['FIPS'] == "01001"]))
-            dat.to_csv("data/Rt/aligned_rt_"+str(predict)+".csv", index=False, sep=',')
+        # Interpolate
+        new_col = dat.groupby("FIPS", as_index=False).apply(lambda x : interpolator(x["prediction_aligned_" + str(predict)], "prediction_aligned_" + str(predict)))
+        dat["prediction_aligned_int_" + str(predict)] = new_col.reset_index(drop=True).clip(lower=0)
+
+        new_col = dat.groupby("FIPS", as_index=False).apply(lambda x : interpolator(x["rt_aligned_" + str(predict)], "rt_aligned_" + str(predict)))
+        dat["rt_aligned_int_" + str(predict)] = new_col.reset_index(drop=True).clip(lower=0)
+
+        # Correlate
+        #print()
+        #print(dat['normalized_cases_norm'].shift(-1*predict).corr(dat['prediction_aligned_int_'+str(predict)]))
+        #print(dat['normalized_cases_norm'].shift(-1*predict).corr(dat['rt_aligned_int_'+str(predict)]))
+        #print(dat.groupby("FIPS").tail(1)['date'].unique())
+        #print()
+
+        dat = dat[['FIPS', 'date','normalized_cases_norm', 'prediction_aligned_int_' + str(predict), 'rt_aligned_int_'+str(predict)]]
+        #print(len(dat[dat['FIPS'] == "01001"]))
+        dat.to_csv("data/Rt/aligned_rt_"+str(predict)+".csv", index=False, sep=',')
 
 def warning_suppressor(debug_mode=True):
     if not debug_mode:
         warnings.filterwarnings("ignore")
 
-def preprocess_Rt(date, can_key):
+def update_Rt(can_key):
     warning_suppressor(debug_mode=False) # Change it to show errors
 
-    print("• Processing Rt Data")
+    print("• Downloading Rt dataset")
 
     state_map, fips_data = get_state_fips()
 
@@ -442,17 +458,25 @@ def preprocess_Rt(date, can_key):
     final_rt = final_rt[final_rt['FIPS'].isin(fips_to_use)]
 
     final_rt = final_rt.sort_values(['FIPS', 'date'])
-    final_rt = final_rt[(final_rt['date'] <= date)]
 
     final_rt.to_csv("data/Rt/rt_data.csv", index=False, sep=',')
 
-    final_rt = pd.read_csv("data/Rt/rt_data.csv", dtype={"FIPS":"str"})
+    print("  • Finished\n")
 
-    print("Aligning Rt")
+def preprocess_Rt(date, old):
 
-    align_rt(update=True)
+    print("• Aligning Rt")
 
-    print("  Finished\n")
+    if old:
+        final_rt = pd.read_csv("data/Rt/rt_data_test.csv", dtype={"FIPS":"str"})
+    else:
+        final_rt = pd.read_csv("data/Rt/rt_data.csv", dtype={"FIPS":"str"})
+
+    final_rt = final_rt[(final_rt['date'] <= date)]
+
+    align_rt(final_rt)
+    print("  • Finished\n")
+
 
 if __name__ == "__main__":
     warning_suppressor()

@@ -90,9 +90,8 @@ def predict(date_today):
     combined_predictions.iloc[:, 65:-1] = combined_predictions.iloc[:, 65:-1].astype(float)
     combined_predictions.iloc[:, 65:-1] = combined_predictions.iloc[:, 65:-1].clip(lower=0)
 
-    print("Here are the latest dates for predictions of all counties:")
-    print(combined_predictions.groupby("FIPS").tail(1)['date'].unique())
+    #print("Here are the latest dates for predictions of all counties:")
+    #print(combined_predictions.groupby("FIPS").tail(1)['date'].unique())
 
     combined_predictions.to_csv("output/raw_predictions/raw_predictions_" + date_today + ".csv", index=False)
-
-    print("Finished\n")
+    print("  • Finished\n")
