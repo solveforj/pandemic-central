@@ -6,6 +6,13 @@ import pandas as pd
 import matplotlib.ticker as ticker
 from sklearn.linear_model import LinearRegression
 
+__author__ = 'Duy Cao, Joseph Galasso'
+__copyright__ = '© Pandemic Central, 2021'
+__license__ = 'MIT'
+__status__ = 'release'
+__url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '3.0.0'
+
 def rt_alignment():
     print("GENERATING GRAPH OF Rt ALIGNMENT PROCESS\n")
     county_rt=pd.read_csv("data/Rt/rt_data.csv", dtype={"FIPS":str})

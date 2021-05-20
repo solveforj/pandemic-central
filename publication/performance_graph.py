@@ -4,6 +4,13 @@ import pandas as pd
 from epiweeks import Week
 from datetime import date
 
+__author__ = 'Duy Cao, Joseph Galasso'
+__copyright__ = '© Pandemic Central, 2021'
+__license__ = 'MIT'
+__status__ = 'release'
+__url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '3.0.0'
+
 MODELS = ['JHU_IDD',\
             'OneQuietNight',\
             'RF',\

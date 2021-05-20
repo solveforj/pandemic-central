@@ -8,3 +8,4 @@ COVID-19 county-level case data from [John Hopkins University](https://coronavir
   - [JHU CSSE Github](https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv)
   - See `/census` and `/geodata` directories for information on any census and geographical datasets used here, respectively
 - **jhu_data.csv** is the output of `preprocess.py` and contains all case features
+- **jhu_data_test.csv** is the output of `preprocess.py` as of 2021-05-18

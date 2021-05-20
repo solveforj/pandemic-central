@@ -13,4 +13,4 @@ COVID-19 effective reproduction number (R<sub>t</sub>) time-series is obtained f
 - **aligned_rt_14.csv** is one output of `preprocess.py` and  contains 14-week forecast R<sub>t</sub> features
 - **aligned_rt_21.csv** is one output of `preprocess.py` and contains 21-week forecast R<sub>t</sub> features
 - **aligned_rt_28.csv** is one output of `preprocess.py` and contains 28-week forecast R<sub>t</sub> features
-- **higher_corrs.csv** is one output of `preprocess.py` and describes if the county or state R<sub>t</sub> was used for generating case predictions for each county of interest
+- **higher_corrs.csv** is one output of `preprocess.py` and describes, for each county that projections were made for, which of the two R<sub>t</sub> time-series (county or state) had the highest max correlation with the case time-series when aligned

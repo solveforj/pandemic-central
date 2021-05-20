@@ -17,7 +17,7 @@ See our latest predictions at our [website](https://itsonit.com) and check us ou
 ## Disclaimer
 We hope to serve as a valuable  resource for understanding trends in the ongoing pandemic and raise awareness about COVID-19 at the community level.  However, we strongly advise against **over-interpreting our predictions**. Machine learning models are only as good as the data that trains them.  We use the best quality data that is available to us, but we acknowledge that error in our predictions is unavoidable.
 
-## Generating projections
+## Setup
 
 * First, clone this repository:
   ```
@@ -28,18 +28,31 @@ We hope to serve as a valuable  resource for understanding trends in the ongoing
   pip install -r requirements.txt
   ```
 * For map rendering, install [Orca](https://github.com/plotly/orca) and ensure that it is added to your PATH
+* Get a COVIDActNow.org API access key if you intend to generate projections (register [here](https://apidocs.covidactnow.org/#register))
 
-* From the project directory, run the entire module with the command below, specifying the date for which you want to generate projections, optional arguments to compute feature importance (`--importance`) or produce projections for the prior Sunday to the input reference date (`--sunday`), and your COVIDActNow.org API Access key (register [here](https://apidocs.covidactnow.org/#register)) as follows:
-  ```
-  python auto.py -d 2021-04-11 -r API_KEY --importance --sunday
-  ```
+## Generating projections
 
-* The output data files will be in the `/output` directory:
-  * The `/feature_ranking` directory contains feature rankings for each projection model (using mobility data) trained for each reference date
-  * The `/model_stats` directory contains model performance statistics (mean absolute error and R<sup>2</sup> on forecasts vs. actual cases in the training dataset) for each date projections were generated for
-  * The `/raw_predictions` directory contains model projections for the date projections were generated for and the preceding 9 weeks; all training dataset features are included for each of these weeks, as well
-  * The `/ReichLabFormat` directory contains predictions formatted as necessary for submission to the COVID-19 Forecast Hub
-  * The `/website` directory contains various files, many of which are published in some form on our [website](https://www.itsonit.com)
+There are two ways to generate projections:
+
+1. **Standard Methodology**:  This can be used to generate the latest projections for the present date by using the latest datasets and reduces runtime by eliminating feature importance scoring. You need the *reference date* for which you want to generate projections and your *COVIDActNow.org API access key* (see above for registration instructions). Use the command below:
+```
+python auto.py -d 2021-05-18 -r API_KEY
+```
+If your reference date is not a Sunday (i.e. week start), you may specify an optional flag to create projections for the Sunday prior to your reference date:
+```
+python auto.py -d 2021-05-18 -r API_KEY --sunday
+```
+
+2. **Publication Methodology (for projections ONLY before 2021-01-15)**: Used to generate projections using the specific methodology of our publication in progress  (i.e. including feature importance scoring and the input datasets from 2021-05-18), with a similar command to the Standard Methodology:
+```
+python auto.py -d 2021-05-18 -r API_KEY --publication_method --sunday
+```
+Statistics and figures from the publication manuscript may be regenerated using preloaded datasets referenced specifically by the manuscript with the command below:
+```
+python auto.py --figures
+```
+
+Projections and related files will be in the `output/` subdirectory and publication figures will be in the `publication/output` subdirectory.
 
 ## Credits
 * [Joseph Galasso](https://github.com/solveforj/)

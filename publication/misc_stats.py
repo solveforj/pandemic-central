@@ -2,6 +2,13 @@ import pandas as pd
 import numpy as np
 import glob
 
+__author__ = 'Duy Cao, Joseph Galasso'
+__copyright__ = '© Pandemic Central, 2021'
+__license__ = 'MIT'
+__status__ = 'release'
+__url__ = 'https://github.com/solveforj/pandemic-central'
+__version__ = '3.0.0'
+
 weeks = [1, 2, 3, 4]
 dates = ["2020-11-01", "2020-11-08", "2020-11-15", "2020-11-22", "2020-11-29","2020-12-06", "2020-12-13", "2020-12-20", "2020-12-27", "2021-01-03", "2021-01-10"]
 
