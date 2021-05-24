@@ -20,12 +20,12 @@ __version__ = '3.0.0'
 # Update dynamic data
 def update(date, can_key):
     print("UPDATING DATA\n")
-    #preprocess_facebook()
-    #preprocess_JHU()
-    #if date <= '2021-03-07':
-    #    preprocess_testing(after_mar_the_seventh = False)
-    #else:
-    #    preprocess_testing()
+    preprocess_facebook()
+    preprocess_JHU()
+    if date <= '2021-03-07':
+        preprocess_testing(after_mar_the_seventh = False)
+    else:
+        preprocess_testing()
     update_Rt(can_key)
 
 # Read datasets into memory

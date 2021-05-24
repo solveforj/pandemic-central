@@ -46,6 +46,13 @@ def rt_stats():
     print(higher_corrs['POP_DENSITY'].mean())
     print("\n")
 
+    import matplotlib.pyplot as plt
+
+    higher_corrs['POP_DENSITY'].plot.hist(bins=12)
+    plt.show()
+
+
+
 def model_R2_MAE_stats():
 
     files = glob.glob("output/model_stats/publication/*.csv")
