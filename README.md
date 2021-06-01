@@ -7,15 +7,21 @@
   <b>An application of machine learning in forecasting U.S. COVID-19 cases</b>
 </p>
 
-## About this model
+## About The Model
 Our model uses COVID-19 compartmental model forecasts in combination with demographic, population mobility, population health, and COVID-19 testing data to generate its own COVID-19 forecasts at the US county/county-equivalent level.
 
 This repository contains the code we use to generate this information. For more details on our data sources and pipelines, please read the README.md files in the `data/` directory.
 
 See our latest predictions at our [website](https://itsonit.com) and check us out on [Twitter](https://twitter.com/PandemicCentral).
 
+A complete preprint describing our methodology is available at doi: [10.1101/2021.05.23.21257689](https://doi.org/10.1101/2021.05.23.21257689).
+
 ## Disclaimer
 We hope to serve as a valuable  resource for understanding trends in the ongoing pandemic and raise awareness about COVID-19 at the community level.  However, we strongly advise against **over-interpreting our predictions**. Machine learning models are only as good as the data that trains them.  We use the best quality data that is available to us, but we acknowledge that error in our predictions is unavoidable.
+
+Some of our available data sources have updated their past data. To ensure the integrity
+of data and replicate the results we report in our research journal preprint, Publication Methodology
+must be used (see section *Generating Projections* below).
 
 ## Setup
 
@@ -30,22 +36,22 @@ We hope to serve as a valuable  resource for understanding trends in the ongoing
 * For map rendering, install [Orca](https://github.com/plotly/orca) and ensure that it is added to your PATH
 * Get a COVIDActNow.org API access key if you intend to generate projections (register [here](https://apidocs.covidactnow.org/#register))
 
-## Generating projections
+## Generating Projections
 
 There are two ways to generate projections:
 
 1. **Standard Methodology**:  This can be used to generate the latest projections for the present date by using the latest datasets and reduces runtime by eliminating feature importance scoring. You need the *reference date* for which you want to generate projections and your *COVIDActNow.org API access key* (see above for registration instructions). Use the command below:
 ```
-python auto.py -d 2021-05-18 -r API_KEY
+python auto.py -d 2021-05-18 -r YOUR_API_KEY
 ```
 If your reference date is not a Sunday (i.e. week start), you may specify an optional flag to create projections for the Sunday prior to your reference date:
 ```
-python auto.py -d 2021-05-18 -r API_KEY --sunday
+python auto.py -d 2021-05-18 -r YOUR_API_KEY --sunday
 ```
 
-2. **Publication Methodology (for projections ONLY before 2021-01-15)**: Used to generate projections using the specific methodology of our publication in progress  (i.e. including feature importance scoring and the input datasets from 2021-05-18), with a similar command to the Standard Methodology:
+2. **Publication Methodology (for projections ONLY before 2021-01-15)**: Used to replicate projections using the specific methodology of our publication in progress  (i.e. including feature importance scoring and the input datasets from 2021-05-18), with a similar command to the Standard Methodology:
 ```
-python auto.py -d 2021-05-18 -r API_KEY --publication_method --sunday
+python auto.py -d 2021-05-18 -r YOUR_API_KEY --publication_method --sunday
 ```
 Statistics and figures from the publication manuscript may be regenerated using preloaded datasets referenced specifically by the manuscript with the command below:
 ```

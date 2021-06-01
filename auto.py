@@ -25,8 +25,8 @@ if __name__ == '__main__':
     parser.add_argument("-d", "--date", help=f'Start date in isoformat (for example, today is {date.today().isoformat()})', type=str)
     parser.add_argument("-r", "--can_api_key", help='COVIDActNow.org API Key (Register here: https://apidocs.covidactnow.org/#register)', type=str)
     parser.add_argument('--sunday', default=False, action='store_true', help='(Optional) If addressed, the forecast day will be the previous Sunday (i.e. week start)')
-    parser.add_argument('--figures', default=False, action='store_true', help='(Optional) If addressed, publication figures and relevant data will be regenerated')
-    parser.add_argument('--publication_method', default=False, action='store_true', help='(Optional) If addressed, datasets downloaded on 05/18/21 will be used and feature importance will be calculated.  Use to replicate publication projections.')
+    parser.add_argument('--figures', default=False, action='store_true', help='(Optional) To plot figures and relevant data that we used in our research journal')
+    parser.add_argument('--publication_method', default=False, action='store_true', help='(Optional) To replicate reported results in our research journal. See README.md for more details.')
     args = parser.parse_args()
 
     if args.figures:
