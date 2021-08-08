@@ -9,6 +9,7 @@ from data.facebook.preprocess import preprocess_facebook
 from data.IHME.preprocess import preprocess_IHME
 from data.JHU.preprocess import preprocess_JHU
 from data.Rt.preprocess import update_Rt, preprocess_Rt
+from data.google.preprocess import get_google_data
 
 __author__ = 'Duy Cao, Joseph Galasso'
 __copyright__ = '© Pandemic Central, 2021'
@@ -17,10 +18,23 @@ __status__ = 'release'
 __url__ = 'https://github.com/solveforj/pandemic-central'
 __version__ = '3.0.0'
 
+def google_contingency():
+    get_google_data()
+    df_google = pd.read_csv('data/google/mobility.csv.xz', low_memory=False)
+    df_google.rename(columns={'workplaces_change': 'fb_movement_change'},
+                    inplace=True)
+    df_google['fb_stationary'] = df_google['fb_movement_change'] * -1
+    df_google.to_csv('data/facebook/mobility.csv.gz', index=False)
+    del df_google
+    print('  • Finished\n')
+
 # Update dynamic data
 def update(date, can_key):
     print("UPDATING DATA\n")
-    preprocess_facebook()
+    try:
+        preprocess_facebook()
+    except:
+        google_contingency()
     preprocess_JHU()
     if date <= '2021-03-07':
         preprocess_testing(after_mar_the_seventh = False)
