@@ -12,9 +12,9 @@ Our model uses COVID-19 compartmental model forecasts in combination with demogr
 
 This repository contains the code we use to generate this information. For more details on our data sources and pipelines, please read the README.md files in the `data/` directory.
 
-See our latest predictions at our [website](https://itsonit.com) and check us out on [Twitter](https://twitter.com/PandemicCentral).
+Our predictions were published on our [website](https://itsonit.com) and on [Twitter](https://twitter.com/PandemicCentral).
 
-A complete preprint describing our methodology is available at doi: [10.1101/2021.05.23.21257689](https://doi.org/10.1101/2021.05.23.21257689).
+This work is published in a peer-reviewed journal article located at this doi: [10.1016/j.chaos.2021.111779](https://doi.org/10.1016/j.chaos.2021.111779).
 
 ## Disclaimer
 We hope to serve as a valuable  resource for understanding trends in the ongoing pandemic and raise awareness about COVID-19 at the community level.  However, we strongly advise against **over-interpreting our predictions**. Machine learning models are only as good as the data that trains them.  We use the best quality data that is available to us, but we acknowledge that error in our predictions is unavoidable.
