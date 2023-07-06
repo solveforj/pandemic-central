@@ -1,5 +1,5 @@
 plotly==4.9.0
-scipy==1.5.2
+scipy==1.10.0
 epiweeks==2.1.2
 requests==2.24.0
 pandas==1.1.1
